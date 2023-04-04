@@ -40,7 +40,12 @@ cp -R /usr/src/wordpress/* /var/www/html
 cp -R /usr/src/wordpress/.* /var/www/html
 chown -R www-data:www-data /var/www/html
 
-wp-cli config create --dbname=wordpress --dbuser=wordpress --dbpass=wordpress --dbhost=127.0.0.1
+su -l www-data -s /bin/bash <<EOF
+        cd /var/www/html && \
+        echo -e "define('FORCE_SSL_ADMIN', true);\n\\\$_SERVER['HTTPS'] = 'on';" | \
+        php /opt/wp-cli/wp-cli.phar config create --dbname=wordpress --dbuser=wordpress --dbpass=wordpress --dbhost=127.0.0.1 --extra-php
+EOF
+
 # wp-cli core install --url=http://localhost:8080 --title="Verfassungsblog" --admin_user=user --admin_password=test --admin_email=user@test.com --skip-email
 # wp-cli option update siteurl http://localhost:8080
 wp-cli core install --url=https://verfassungsblog-metadata-wordpress-plugins.in.k8s.knopflogik.de --title="Verfassungsblog" --admin_user=user --admin_password=test --admin_email=user@test.com --skip-email
