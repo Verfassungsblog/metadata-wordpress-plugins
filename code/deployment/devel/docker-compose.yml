@@ -8,10 +8,10 @@ services:
       dockerfile: Dockerfile.mysql
     restart: always
     environment:
-      MYSQL_DATABASE: wordpress
-      MYSQL_USER: wordpress
-      MYSQL_PASSWORD: wordpress
-      MYSQL_ROOT_PASSWORD: wordpress
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-wordpress}
+      MYSQL_USER: ${MYSQL_USER:-wordpress}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-wordpress}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-wordpress}
     volumes:
       - ${DATA_DIR}/mysql:/var/lib/mysql:Z
 
@@ -24,11 +24,11 @@ services:
       - 8080:8080
     environment:
       WORDPRESS_DB_HOST: database
-      WORDPRESS_DB_USER: wordpress
-      WORDPRESS_DB_PASSWORD: wordpress
-      WORDPRESS_DB_NAME: wordpress
+      WORDPRESS_DB_USER: ${MYSQL_USER:-wordpress}
+      WORDPRESS_DB_PASSWORD: ${MYSQL_PASSWORD:-wordpress}
+      WORDPRESS_DB_NAME: ${MYSQL_DATABASE:-wordpress}
     volumes:
-      - ${DATA_DIR}/html:/var/www/html:Z
+      - ${DATA_DIR}/wordpress:/var/www/html:Z
       - ${WORKSPACE_DIR}/code/packages/vb-crossref:/var/www/html/wp-content/plugins/vb-crossref:Z
       - ${WORKSPACE_DIR}/code/packages/vb-gnd-taxonomy:/var/www/html/wp-content/plugins/vb-gnd-taxonomy:Z
       - ${WORKSPACE_DIR}/code/packages/vb-marc21xml-export:/var/www/html/wp-content/plugins/vb-marc21xml-export:Z
@@ -40,7 +40,7 @@ services:
     image: docker.io/library/phpmyadmin
     restart: always
     ports:
-      - 8081:80
+      - "0.0.0.0:8081:80/tcp"
     environment:
       - PMA_HOST=database
     depends_on:

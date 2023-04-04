@@ -3,4 +3,5 @@
 cd "$(dirname "$0")"
 source ./common.sh
 
+${COMPOSE_CMD} pull
 ${COMPOSE_CMD} build

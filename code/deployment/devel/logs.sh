@@ -3,4 +3,4 @@
 cd "$(dirname "$0")"
 source ./common.sh
 
-${COMPOSE_CMD} logs
+${COMPOSE_CMD} logs -f

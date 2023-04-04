@@ -15,3 +15,5 @@ COMPOSE_PROJECT="verfassungsblog-metadata-wordpress-plugins"
 COMPOSE_CMD="podman-compose -p ${COMPOSE_PROJECT}"
 
 mkdir -p ${DATA_DIR}
+mkdir -p ${DATA_DIR}/wordpress
+mkdir -p ${DATA_DIR}/mysql

@@ -1,0 +1,10 @@
+deploymentApiVersion: apps/v1
+service:
+    internalPort: 80
+ingress:
+    annotations:
+        kubernetes.io/tls-acme: "true"
+        nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+        nginx.ingress.kubernetes.io/auth-tls-verify-client: "on"
+        nginx.ingress.kubernetes.io/auth-tls-verify-depth: "1"
+        nginx.ingress.kubernetes.io/auth-tls-secret: "nginx/ca-secret"

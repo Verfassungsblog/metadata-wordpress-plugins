@@ -1,8 +1,8 @@
 <?php
 
 /**
- * Plugin Name: Verfassungsblog GND Taxonomy
- * Plugin URI: https://wordpress.org/plugins/vb-gnd-taxonomy/
+ * Plugin Name: Verfassungsblog CrossRef
+ * Plugin URI: https://wordpress.org/plugins/vb-crossref/
  * Description: TODO ... Some description ...
  * Version: 0.0.1
  * Requires at least: 6.1.1

@@ -1,0 +1,31 @@
+include:
+  - template: Auto-DevOps.gitlab-ci.yml
+
+variables:
+  BROWSER_PERFORMANCE_DISABLED: "true"
+  CODE_QUALITY_DISABLED: "true"
+  CONTAINER_SCANNING_DISABLED: "true"
+  DAST_DISABLED: "true"
+  DEPENDENCY_SCANNING_DISABLED: "true"
+  FF_USE_LEGACY_KUBERNETES_EXECUTION_STRATEGY: "true"
+  LICENSE_MANAGEMENT_DISABLED: "true"
+  PERFORMANCE_DISABLED: "true"
+  POSTGRES_ENABLED: "false"
+  REVIEW_DISABLED: "true"
+  SAST_DISABLED: "true"
+  SECRET_DETECTION_DISABLED: "true"
+  TEST_DISABLED: "true"
+  
+build:
+  image: "registry.gitlab.com/gitlab-org/cluster-integration/auto-build-image/kaniko:stable"
+
+staging:
+  variables:
+    HELM_UPGRADE_VALUES_FILE: ".gitlab/auto-deploy-values.staging.yaml"
+
+production:
+  variables:
+    HELM_UPGRADE_VALUES_FILE: ".gitlab/auto-deploy-values.production.yaml"
+  rules:
+    - when: manual
+
