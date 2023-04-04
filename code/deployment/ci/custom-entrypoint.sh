@@ -41,9 +41,15 @@ EOF
 cp -a /usr/src/wordpress/. /var/www/html/
 chown -R www-data:www-data /var/www/html
 
+# copy wordpress plugins
+cp -a /usr/src/wordpress-plugins/. /var/www/html/wp-content/plugins/
+chown -R www-data:www-data /var/www/html/wp-content/plugins/
+
 # run wp-cli config create with extra commands in case of online deployment (ssl settings)
+echo "Wordpress URL is ${WORDPRESS_URL}"
 touch /var/www/html/.extra_config
 if [[ "${WORDPRESS_URL}" == *"knopflogik.de"* ]]; then
+    echo "add ssl configuration"
     cat <<EOF > /var/www/html/.extra_config
 define('FORCE_SSL_ADMIN', true);
 if ( isset( \$_SERVER['HTTP_X_FORWARDED_PROTO'] ) && strpos( \$_SERVER['HTTP_X_FORWARDED_PROTO'], 'https') !== false ) {
@@ -62,6 +68,8 @@ EOF
 wp-cli core install --url=${WORDPRESS_URL} --title="Verfassungsblog" --admin_user=user --admin_password=test --admin_email=user@test.com --skip-email
 wp-cli plugin update --all
 wp-cli theme update --all
+
+
 
 # start wordpress via apache
 bash /usr/local/bin/docker-entrypoint.sh apache2-foreground

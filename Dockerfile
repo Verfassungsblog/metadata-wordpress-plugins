@@ -19,6 +19,9 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
 RUN sed -i "s/80/8080/" /etc/apache2/sites-enabled/000-default.conf && \
     sed -i "s/Listen 80/Listen 8080/" /etc/apache2/ports.conf
 
+# copy plugins
+COPY code/packages/* /usr/src/wordpress-plugins/
+
 # copy entrypoint that configures mysql and wordpress
 COPY code/deployment/ci/custom-entrypoint.sh /usr/local/bin/custom-entrypoint.sh
 RUN chmod a+x /usr/local/bin/custom-entrypoint.sh
