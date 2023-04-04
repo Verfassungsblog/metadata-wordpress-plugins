@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# define environment variables
+WORDPRESS_URL=${WORDPRESS_URL:-http://localhost:8080}
+WORDPRESS_TITLE=${WORDPRESS_TITLE:-Wordpress Title}
+WORDPRESS_USER=${WORDPRESS_USER:-admin}
+WORDPRESS_PASSWORD=${WORDPRESS_PASSWORD:-password}
+WORDPRESS_EMAIL=${WORDPRESS_EMAIL:-test@example.com}
+
 # create directory for mysql
 mkdir -p /var/run/mysqld
 chown mysql:mysql /var/run/mysqld
@@ -39,13 +46,14 @@ EOF
 # copy wordpress to target directory, which would be done later in actual wordpress 
 # docker entrypoint script, but is required for wp-cli to work
 cp -a /usr/src/wordpress/. /var/www/html/
-chown -R www-data:www-data /var/www/html
 
 # copy wordpress plugins
 cp -a /usr/src/wordpress-plugins/. /var/www/html/wp-content/plugins/
-chown -R www-data:www-data /var/www/html/wp-content/plugins/
 
-# run wp-cli config create with extra commands in case of online deployment (ssl settings)
+# reset file permissions
+chown -R www-data:www-data /var/www/html
+
+# define extra commands for wordpress config in case of online deployment (ssl settings)
 echo "Wordpress URL is ${WORDPRESS_URL}"
 touch /var/www/html/.extra_config
 if [[ "${WORDPRESS_URL}" == *"knopflogik.de"* ]]; then
@@ -59,18 +67,16 @@ EOF
 fi
 chown www-data:www-data /var/www/html/.extra_config
 
+# run wp-cli config create wordpress config
 su -l www-data -s /bin/bash <<EOF
         cd /var/www/html && cat /var/www/html/.extra_config | \
         php /opt/wp-cli/wp-cli.phar config create --dbname=wordpress --dbuser=wordpress --dbpass=wordpress --dbhost=127.0.0.1 --extra-php
 EOF
 
 # run wp-cli to setup account 
-wp-cli core install --url=${WORDPRESS_URL} --title="Verfassungsblog" --admin_user=user --admin_password=test --admin_email=user@test.com --skip-email
-wp-cli option update siteurl ${WORDPRESS_URL}
+wp-cli core install --url=${WORDPRESS_URL} --title=\"${WORDPRESS_TITLE}\" --admin_user=${WORDPRESS_USER} --admin_password=${WORDPRESS_PASSWORD} --admin_email=${WORDPRESS_EMAIL} --skip-email
 wp-cli plugin update --all
 wp-cli theme update --all
-
-
 
 # start wordpress via apache
 bash /usr/local/bin/docker-entrypoint.sh apache2-foreground

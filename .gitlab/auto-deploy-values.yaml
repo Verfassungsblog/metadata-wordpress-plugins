@@ -5,6 +5,6 @@ ingress:
     annotations:
         kubernetes.io/tls-acme: "true"
         nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
-        nginx.ingress.kubernetes.io/auth-tls-verify-client: "on"
-        nginx.ingress.kubernetes.io/auth-tls-verify-depth: "1"
-        nginx.ingress.kubernetes.io/auth-tls-secret: "nginx/ca-secret"
+        nginx.ingress.kubernetes.io/auth-type: "basic"
+        nginx.ingress.kubernetes.io/auth-secret: "basic-auth"
+        nginx.ingress.kubernetes.io/auth-realm: "Authentication Required"
