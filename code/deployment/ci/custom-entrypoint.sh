@@ -36,16 +36,21 @@ wp-cli () {
 EOF
 }
 
-cp -R /usr/src/wordpress/* /var/www/html
-cp -R /usr/src/wordpress/.* /var/www/html
+# copy wordpress to target directory, which would be done later in actual wordpress 
+# docker entrypoint script, but is required for wp-cli to work
+cp -a /usr/src/wordpress/. /var/www/html/
 chown -R www-data:www-data /var/www/html
 
-cat <<EOF > /var/www/html/.extra_config
+# run wp-cli config create with extra commands in case of online deployment (ssl settings)
+touch /var/www/html/.extra_config
+if [[ "${WORDPRESS_URL}" == *"knopflogik.de"* ]]; then
+    cat <<EOF > /var/www/html/.extra_config
 define('FORCE_SSL_ADMIN', true);
 if ( isset( \$_SERVER['HTTP_X_FORWARDED_PROTO'] ) && strpos( \$_SERVER['HTTP_X_FORWARDED_PROTO'], 'https') !== false ) {
-   \$_SERVER['HTTPS'] = 'on';
+    \$_SERVER['HTTPS'] = 'on';
 }
 EOF
+fi
 chown www-data:www-data /var/www/html/.extra_config
 
 su -l www-data -s /bin/bash <<EOF
@@ -53,10 +58,8 @@ su -l www-data -s /bin/bash <<EOF
         php /opt/wp-cli/wp-cli.phar config create --dbname=wordpress --dbuser=wordpress --dbpass=wordpress --dbhost=127.0.0.1 --extra-php
 EOF
 
-# wp-cli core install --url=http://localhost:8080 --title="Verfassungsblog" --admin_user=user --admin_password=test --admin_email=user@test.com --skip-email
-# wp-cli option update siteurl http://localhost:8080
-wp-cli core install --url=https://verfassungsblog-metadata-wordpress-plugins.in.k8s.knopflogik.de --title="Verfassungsblog" --admin_user=user --admin_password=test --admin_email=user@test.com --skip-email
-wp-cli option update siteurl https://verfassungsblog-metadata-wordpress-plugins.in.k8s.knopflogik.de
+# run wp-cli to setup account 
+wp-cli core install --url=${WORDPRESS_URL} --title="Verfassungsblog" --admin_user=user --admin_password=test --admin_email=user@test.com --skip-email
 wp-cli plugin update --all
 wp-cli theme update --all
 

@@ -1,9 +1,9 @@
 FROM docker.io/library/wordpress:6
 
+# install basic tools
 RUN apt-get update && apt-get install -y less gnupg net-tools && rm -rf /var/lib/apt/lists/*
 
-# RUN apt-get update && apt-get install -y mariadb-server mariadb-client && rm -rf /var/lib/apt/lists/*
-
+# install mysql
 RUN echo 'deb http://repo.mysql.com/apt/debian/ bullseye mysql-apt-config\n\
 deb http://repo.mysql.com/apt/debian/ bullseye mysql-8.0\n\
 deb http://repo.mysql.com/apt/debian/ bullseye mysql-tools\n\
@@ -15,6 +15,11 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
     apt-get update && \
     apt-get install -y mysql-server mysql-client
 
+# make apache listen on port 8080 instead of 80
+RUN sed -i "s/80/8080/" /etc/apache2/sites-enabled/000-default.conf && \
+    sed -i "s/Listen 80/Listen 8080/" /etc/apache2/ports.conf
+
+# copy entrypoint that configures mysql and wordpress
 COPY code/deployment/ci/custom-entrypoint.sh /usr/local/bin/custom-entrypoint.sh
 RUN chmod a+x /usr/local/bin/custom-entrypoint.sh
 

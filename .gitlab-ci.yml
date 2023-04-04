@@ -18,3 +18,7 @@ variables:
   
 build:
   image: "registry.gitlab.com/gitlab-org/cluster-integration/auto-build-image/kaniko:stable"
+
+production:
+  variables:
+    K8S_SECRET_WORDPRESS_URL: "https://verfassungsblog-metadata-wordpress-plugins.in.k8s.knopflogik.de"
