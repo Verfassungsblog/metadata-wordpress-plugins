@@ -40,9 +40,16 @@ cp -R /usr/src/wordpress/* /var/www/html
 cp -R /usr/src/wordpress/.* /var/www/html
 chown -R www-data:www-data /var/www/html
 
+cat <<EOF > /var/www/html/.extra_config
+define('FORCE_SSL_ADMIN', true);
+if ( isset( \$_SERVER['HTTP_X_FORWARDED_PROTO'] ) && strpos( \$_SERVER['HTTP_X_FORWARDED_PROTO'], 'https') !== false ) {
+   \$_SERVER['HTTPS'] = 'on';
+}
+EOF
+chown www-data:www-data /var/www/html/.extra_config
+
 su -l www-data -s /bin/bash <<EOF
-        cd /var/www/html && \
-        echo -e "define('FORCE_SSL_ADMIN', true);\n\\\$_SERVER['HTTPS'] = 'on';" | \
+        cd /var/www/html && cat /var/www/html/.extra_config | \
         php /opt/wp-cli/wp-cli.phar config create --dbname=wordpress --dbuser=wordpress --dbpass=wordpress --dbhost=127.0.0.1 --extra-php
 EOF
 
