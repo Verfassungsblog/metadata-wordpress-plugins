@@ -16,8 +16,8 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
     apt-get install -y mysql-server mysql-client
 
 # make apache listen on port 8080 instead of 80
-RUN sed -i "s/80/8080/" /etc/apache2/sites-enabled/000-default.conf && \
-    sed -i "s/Listen 80/Listen 8080/" /etc/apache2/ports.conf
+# RUN sed -i "s/80/8080/" /etc/apache2/sites-enabled/000-default.conf && \
+#     sed -i "s/Listen 80/Listen 8080/" /etc/apache2/ports.conf
 
 # copy plugins
 COPY code/packages/* /usr/src/wordpress-plugins/
