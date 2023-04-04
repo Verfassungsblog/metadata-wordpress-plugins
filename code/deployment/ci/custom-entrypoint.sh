@@ -66,6 +66,7 @@ EOF
 
 # run wp-cli to setup account 
 wp-cli core install --url=${WORDPRESS_URL} --title="Verfassungsblog" --admin_user=user --admin_password=test --admin_email=user@test.com --skip-email
+wp-cli option update siteurl ${WORDPRESS_URL}
 wp-cli plugin update --all
 wp-cli theme update --all
 
