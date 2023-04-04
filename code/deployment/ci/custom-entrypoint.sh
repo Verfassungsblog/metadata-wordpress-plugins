@@ -3,8 +3,10 @@
 # start database
 su -l mysql -s /bin/bash -c "mysqld_safe" &
 
-# wait for database to start
-sleep 2
+while ! mysqladmin ping -h"127.0.0.1" --silent; do
+    echo "waiting for mysql to start"
+    sleep 1
+done
 
 # create database for wordpress
 mysql -u root <<EOF
