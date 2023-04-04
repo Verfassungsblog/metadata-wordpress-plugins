@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# create directory for mysql
+mkdir -p /var/run/mysqld
+chown mysql:mysql /var/run/mysqld
+
 # start database
 su -l mysql -s /bin/bash -c "mysqld_safe" &
 
