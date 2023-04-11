@@ -43,7 +43,7 @@ wp-cli () {
 EOF
 }
 
-# copy wordpress to target directory, which would be done later in actual wordpress 
+# copy wordpress to target directory, which would be done later in actual wordpress
 # docker entrypoint script, but is required for wp-cli to work
 cp -a /usr/src/wordpress/. /var/www/html/
 
@@ -73,10 +73,16 @@ su -l www-data -s /bin/bash <<EOF
         php /opt/wp-cli/wp-cli.phar config create --dbname=wordpress --dbuser=wordpress --dbpass=wordpress --dbhost=127.0.0.1 --extra-php
 EOF
 
-# run wp-cli to setup account 
+# run wp-cli to setup account
 wp-cli core install --url=${WORDPRESS_URL} --title=\"${WORDPRESS_TITLE}\" --admin_user=${WORDPRESS_USER} --admin_password=${WORDPRESS_PASSWORD} --admin_email=${WORDPRESS_EMAIL} --skip-email
 wp-cli plugin update --all
 wp-cli theme update --all
+
+# activate plugins
+wp-cli plugin activate vb-marc21xml-export
+
+# flush permalinks
+wp-cli rewrite structure
 
 # start wordpress via apache
 bash /usr/local/bin/docker-entrypoint.sh apache2-foreground
