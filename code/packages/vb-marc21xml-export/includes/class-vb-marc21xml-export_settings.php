@@ -1,5 +1,6 @@
 <?php
 
+require_once plugin_dir_path(__FILE__) . 'class-vb-marc21xml-export_common.php';
 require_once plugin_dir_path(__FILE__) . 'class-vb-marc21xml-export_renderer.php';
 
 if (!class_exists('VB_Marc21Xml_Export_Settings')) {
@@ -7,104 +8,61 @@ if (!class_exists('VB_Marc21Xml_Export_Settings')) {
     class VB_Marc21Xml_Export_Settings
     {
 
-        protected $plugin_name;
-
-        protected $fields;
-
-        protected $page_name;
-
-        protected $settings_section;
+        protected $common;
 
         public function __construct($plugin_name)
         {
-            $this->plugin_name = $plugin_name;
-            $this->fields = array(
-                array(
-                    "name" => "leader",
-                    "label" => "Marc21 Leader",
-                    "placeholder" => "marc21 leader attribute",
-                    "description" => "The Marc21 <a href=\"https://www.loc.gov/marc/bibliographic/bdleader.html\"
-                        target=\"_blank\">leader attribute</a>, for example:
-                         <pre><code>     nam  22     uu 4500</code></pre>",
-                    "default" => "     nam  22     uu 4500",
-                ),
-                array(
-                    "name" => "773a",
-                    "label" => "Blog Owner<br>(Marc21 773a)",
-                    "placeholder" => "blog owner",
-                    "description" => "The <a href=\"https://www.loc.gov/marc/bibliographic/bd773.html\"
-                    target=\"_blank\">main entry heading</a> of the host item entry, for example the blog owner.",
-                    "default" => null,
-                ),
-                array(
-                    "name" => "773t",
-                    "label" => "Blog Title<br>(Marc21 773t)",
-                    "placeholder" => "blog title",
-                    "description" => "The <a href=\"https://www.loc.gov/marc/bibliographic/bd773.html\"
-                    target=\"_blank\">title</a> of the host item entry, for example the blog title.",
-                    "default" => get_bloginfo("name"),
-                ),
-                array(
-                    "name" => "773x",
-                    "label" => "ISSN<br>(Marc21 773x)",
-                    "placeholder" => "ISSN",
-                    "description" => "The <a href=\"https://www.loc.gov/marc/bibliographic/bd773.html\"
-                    target=\"_blank\">International Standard Serial Number</a> (ISSN) of the host item entry, for
-                    example the ISSN of this blog.",
-                    "default" => null,
-                )
-            );
-            $this->page_name = $plugin_name . "_settings";
-            $this->settings_section = $this->page_name . "_section";
+            $this->common = new VB_Marc21Xml_Export_Common($plugin_name);
         }
 
         public function action_init()
         {
             add_settings_section(
-                $this->settings_section,
+                $this->common->settings_section_name,
                 __("Settings"),
                 array($this, 'callback_section'),
-                $this->page_name
+                $this->common->settings_page_name
             );
 
             $default_values = array();
 
-            foreach (array_values($this->fields) as $i => $field) {
-                $field_id = $this->page_name . '_field_' . $field["name"] . '_value';
+            foreach (array_values($this->common->get_settings_fields()) as $i => $field) {
+                $field_id = $this->common->get_value_field_id($field["name"]);
 
                 // delete_option($field_id);
-                register_setting($this->page_name, $field_id);
+                register_setting($this->common->settings_page_name, $field_id);
 
                 add_settings_field(
                     $field_id,
                     __($field["label"]),
                     array($this, 'callback_field'),
-                    $this->page_name,
-                    $this->settings_section,
+                    $this->common->settings_page_name,
+                    $this->common->settings_section_name,
                     array(
-                        'label_for' => $field_id,
-                        'index' => $i
+                        'label_for' => $field["name"],
                     )
                 );
             }
-
-
-
         }
 
         public function callback_section($args)
         {
             ?>
             <p id="<?php echo esc_attr($args['id']); ?>">
-                <?php esc_html_e('The following options influence how Marc21 XML documents are created.', $this->plugin_name); ?>
+                <?php echo __(
+                    'The following options influence how Marc21 XML documents are created.',
+                    "vb-marc21xml-export"
+                );
+                ?>
             </p>
             <?php
         }
 
         public function callback_field($args)
         {
-            $field_id = $args['label_for'];
-            $field = $this->fields[$args['index']];
+            $field_name = $args['label_for'];
+            $field_id = $this->common->get_value_field_id($field_name);
+            $field = $this->common->get_settings_field_info($field_name);
             $option = get_option($field_id, $field["default"]);
             ?>
             <input id="<?php echo esc_attr($field_id); ?>" name="<?php echo esc_attr($field_id); ?>" class="regular-text code"
@@ -150,8 +108,8 @@ if (!class_exists('VB_Marc21Xml_Export_Settings')) {
                 </h1>
                 <form action="options.php" method="post">
                     <?php
-                    settings_fields($this->page_name);
-                    do_settings_sections($this->page_name);
+                    settings_fields($this->common->settings_page_name);
+                    do_settings_sections($this->common->settings_page_name);
                     submit_button(__('Save Settings', "vb-marc21xml-export"));
                     ?>
                 </form>
@@ -161,10 +119,12 @@ if (!class_exists('VB_Marc21Xml_Export_Settings')) {
                     'numberposts' => 1,
                 );
                 $posts = get_posts($args);
-                $renderer = new VB_Marc21Xml_Export_Renderer();
+                $renderer = new VB_Marc21Xml_Export_Renderer($this->common->plugin_name);
 
                 ?>
-                <h2><?php echo __("Example", "vb-marc21xml-export") ?></h2>
+                <h2>
+                    <?php echo __("Example", "vb-marc21xml-export") ?>
+                </h2>
 
                 <pre><?php echo esc_html($renderer->render($posts[0])) ?></pre>
             </div>

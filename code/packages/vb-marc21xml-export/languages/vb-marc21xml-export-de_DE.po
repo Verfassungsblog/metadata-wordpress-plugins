@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: vb-marc21xml-export\n"
-"POT-Creation-Date: 2023-04-11 20:01+0200\n"
-"PO-Revision-Date: 2023-04-11 20:01+0200\n"
+"POT-Creation-Date: 2023-04-12 10:38+0200\n"
+"PO-Revision-Date: 2023-04-12 10:39+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: de\n"
@@ -15,18 +15,58 @@ msgstr ""
 "X-Poedit-KeywordsList: __\n"
 "X-Poedit-SearchPath-0: .\n"
 
-#: includes/class-vb-marc21xml-export_settings.php:65
+#: includes/class-vb-marc21xml-export_common.php:24
+msgid "Marc21 Leader"
+msgstr "Marc21 Leader"
+
+#: includes/class-vb-marc21xml-export_common.php:25
+msgid "marc21 leader attribute"
+msgstr "Marc21 Leader-Attribut"
+
+#: includes/class-vb-marc21xml-export_common.php:26
+msgid "The Marc21"
+msgstr "Das Marc21"
+
+#: includes/class-vb-marc21xml-export_common.php:27
+msgid "leader attribute"
+msgstr "Leader-Attribut"
+
+#: includes/class-vb-marc21xml-export_common.php:27
+msgid "for example:"
+msgstr "zum Beispiel:"
+
+#: includes/class-vb-marc21xml-export_common.php:33
+msgid "Blog Owner"
+msgstr "Blog  Eigentümer"
+
+#: includes/class-vb-marc21xml-export_common.php:34
+msgid "blog owner"
+msgstr "Blog Eigentümer"
+
+#: includes/class-vb-marc21xml-export_common.php:41
+msgid "Blog Title"
+msgstr "Blog Titel"
+
+#: includes/class-vb-marc21xml-export_common.php:42
+msgid "blog title"
+msgstr "Blog Titel"
+
+#: includes/class-vb-marc21xml-export_settings.php:22
 msgid "Settings"
 msgstr "Einstellungen"
 
-#: includes/class-vb-marc21xml-export_settings.php:140
+#: includes/class-vb-marc21xml-export_settings.php:53
+msgid "The following options influence how Marc21 XML documents are created."
+msgstr "Die folgenden Einstellungen beeinflussen, wie ein Marc21 XML-Dokument erzeugt wird."
+
+#: includes/class-vb-marc21xml-export_settings.php:98
 msgid "Settings Saved"
 msgstr "Einstellungen gespeichert"
 
-#: includes/class-vb-marc21xml-export_settings.php:155
+#: includes/class-vb-marc21xml-export_settings.php:113
 msgid "Save Settings"
 msgstr "Einstellungen speichern"
 
-#: includes/class-vb-marc21xml-export_settings.php:167
+#: includes/class-vb-marc21xml-export_settings.php:126
 msgid "Example"
 msgstr "Beispiel"

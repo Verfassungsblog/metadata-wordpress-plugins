@@ -13,7 +13,7 @@ function vb_marc21xml_export_render() {
 
     global $post;
 
-    $renderer = new VB_Marc21Xml_Export_Renderer();
+    $renderer = new VB_Marc21Xml_Export_Renderer("vb-marc21xml-export");
     echo $renderer->render($post);
 }
 
