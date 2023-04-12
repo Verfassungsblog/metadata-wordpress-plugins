@@ -11,7 +11,7 @@ deb-src http://repo.mysql.com/apt/debian/ bullseye mysql-8.0\n'\
 >> /etc/apt/sources.list.d/mysql.list
 
 RUN export DEBIAN_FRONTEND=noninteractive && \
-    apt-key adv --keyserver pgp.mit.edu --recv-keys 3A79BD29 && \
+    apt-key adv --keyserver pgp.mit.edu --keyserver keyserver.ubuntu.com --recv-keys 3A79BD29 && \
     apt-get update && \
     apt-get install -y mysql-server mysql-client
 
