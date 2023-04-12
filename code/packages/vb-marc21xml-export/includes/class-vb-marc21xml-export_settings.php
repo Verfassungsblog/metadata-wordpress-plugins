@@ -39,7 +39,6 @@ if (!class_exists('VB_Marc21Xml_Export_Settings')) {
             foreach (array_values($this->common->get_settings_fields()) as $i => $field) {
                 $field_id = $this->common->get_value_field_id($field["name"]);
 
-                // delete_option($field_id);
                 register_setting($this->common->settings_page_name, $field_id);
 
                 add_settings_field(
@@ -128,13 +127,11 @@ if (!class_exists('VB_Marc21Xml_Export_Settings')) {
                 return;
             }
 
-            if (isset($_GET['settings-updated'])) {
-                add_settings_error(
-                    'vb_marc21xml_export_messages',
-                    'vb_marc21xml_export_message',
-                    __('Settings Saved', "vb-marc21xml-export"),
-                    'updated'
-                );
+            if (!empty($_POST["reset"])) {
+                foreach (array_values($this->common->get_settings_fields()) as $field) {
+                    $field_id = $this->common->get_value_field_id($field["name"]);
+                    delete_option($field_id);
+                }
             }
 
             ?>
@@ -150,6 +147,7 @@ if (!class_exists('VB_Marc21Xml_Export_Settings')) {
                     submit_button(__('Save Settings', "vb-marc21xml-export"));
                     ?>
                 </form>
+                <hr/>
                 <?php
 
                 $args = array(
@@ -164,6 +162,14 @@ if (!class_exists('VB_Marc21Xml_Export_Settings')) {
                 </h2>
 
                 <pre><?php echo esc_html($renderer->render($posts[0])) ?></pre>
+
+                <hr>
+                <form method="post" onsubmit="return confirm('Are you sure?');">
+                    <input type="hidden" name="reset" value="true" />
+                    <?php
+                    submit_button(__('Reset Settings to Default', "vb-marc21xml-export"), "secondary", "reset");
+                    ?>
+                </form>
             </div>
             <?php
         }
