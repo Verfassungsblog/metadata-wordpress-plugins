@@ -88,6 +88,9 @@ if (!class_exists('VB_Marc21Xml_Export_Renderer')) {
 
         public function render_doi($post)
         {
+            if (!function_exists("get_field")) {
+                return "";
+            }
             $default = $this->common->get_settings_field_info("doi_acf_key")["default"];
             $doi_acf_key = get_option($this->common->get_value_field_id("doi_acf_key"), $default);
             $doi = esc_html(get_field($doi_acf_key, $post->ID));
