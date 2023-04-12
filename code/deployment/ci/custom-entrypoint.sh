@@ -88,7 +88,7 @@ wp-cli plugin activate query-monitor
 wp-cli plugin activate vb-marc21xml-export
 
 # flush permalinks
-wp-cli rewrite structure
+wp-cli rewrite structure "/%postname%/"
 
 # start wordpress via apache
 bash /usr/local/bin/docker-entrypoint.sh apache2-foreground
