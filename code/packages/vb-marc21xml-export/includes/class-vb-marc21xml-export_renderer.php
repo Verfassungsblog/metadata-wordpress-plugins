@@ -64,8 +64,8 @@ if (!class_exists('VB_Marc21Xml_Export_Renderer')) {
         public function render_leader($post)
         {
             // leader definition see: https://www.loc.gov/marc/bibliographic/bdleader.html
-            $leader = esc_html(get_option($this->common->get_value_field_id("leader")));
-            # $leader = "     nam  22     uu 4500";
+            $default = $this->common->get_settings_field_info("leader")["default"];
+            $leader = esc_html(get_option($this->common->get_value_field_id("leader"), $default));
             if (!empty($leader)) {
                 return "<marc21:leader>{$leader}</marc21:leader>";
             }
