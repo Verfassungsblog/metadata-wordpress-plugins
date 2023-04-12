@@ -27,6 +27,9 @@ services:
       WORDPRESS_DB_USER: ${MYSQL_USER:-wordpress}
       WORDPRESS_DB_PASSWORD: ${MYSQL_PASSWORD:-wordpress}
       WORDPRESS_DB_NAME: ${MYSQL_DATABASE:-wordpress}
+      WORDPRESS_DEBUG: true
+      WORDPRESS_CONFIG_EXTRA: |
+        define( 'SAVEQUERIES', true );
     volumes:
       - ${DATA_DIR}/wordpress:/var/www/html:Z
       - ${WORKSPACE_DIR}/code/packages/vb-crossref:/var/www/html/wp-content/plugins/vb-crossref:Z

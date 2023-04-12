@@ -33,11 +33,6 @@ if (!class_exists('VB_Marc21Xml_Export')) {
 
         }
 
-        public function uninstall()
-        {
-
-        }
-
         public function action_init()
         {
             # add_rewrite_rule('^marc21/?$', 'index.php?vb_marc21xml_export=true', 'top');
@@ -66,7 +61,7 @@ if (!class_exists('VB_Marc21Xml_Export')) {
 
             register_activation_hook($this->base_file, array($this, 'activate'));
             register_deactivation_hook($this->base_file, array($this, 'deactivate'));
-            register_uninstall_hook($this->base_file, array($this, 'uninstall'));
+            register_uninstall_hook($this->base_file, 'vb_marc21xml_export_uninstall');
 
             add_action("init", array($this, 'action_init'));
             add_action("template_include", array($this, 'action_template_include'));

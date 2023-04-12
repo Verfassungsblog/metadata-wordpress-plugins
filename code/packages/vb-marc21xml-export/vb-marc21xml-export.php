@@ -19,6 +19,11 @@ define('VB_MARC21XML_EXPORT_VERSION', '0.0.1');
 
 require_once plugin_dir_path(__FILE__) . 'includes/class-vb-marc21xml-export.php';
 
+
+function vb_marc21xml_export_uninstall() {
+
+}
+
 function run_vb_marc21xml_export()
 {
     $vb_marc21xml_export = new VB_Marc21Xml_Export(__FILE__, "vb-marc21xml-export", "0.0.1");
