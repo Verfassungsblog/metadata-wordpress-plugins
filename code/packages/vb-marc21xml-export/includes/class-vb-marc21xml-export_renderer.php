@@ -35,8 +35,8 @@ if (!class_exists('VB_Marc21Xml_Export_Renderer')) {
 
         public function render_subfield_245c($post)
         {
-            $last_name = get_the_author_meta("last_name", $post->post_author);
-            $first_name = get_the_author_meta("first_name", $post->post_author);
+            $last_name = esc_html(get_the_author_meta("last_name", $post->post_author));
+            $first_name = esc_html(get_the_author_meta("first_name", $post->post_author));
 
             $post_author = "";
             if (!empty($last_name) && !empty($first_name)) {
@@ -64,7 +64,7 @@ if (!class_exists('VB_Marc21Xml_Export_Renderer')) {
         public function render_leader($post)
         {
             // leader definition see: https://www.loc.gov/marc/bibliographic/bdleader.html
-            $leader = get_option($this->common->get_value_field_id("leader"));
+            $leader = esc_html(get_option($this->common->get_value_field_id("leader")));
             # $leader = "     nam  22     uu 4500";
             if (!empty($leader)) {
                 return "<marc21:leader>{$leader}</marc21:leader>";
@@ -86,9 +86,24 @@ if (!class_exists('VB_Marc21Xml_Export_Renderer')) {
             return "";
         }
 
-        public function render_subfield_from_option($field_name, $subfield_code) {
+        public function render_doi($post)
+        {
+            $default = $this->common->get_settings_field_info("doi_acf_key")["default"];
+            $doi_acf_key = get_option($this->common->get_value_field_id("doi_acf_key"), $default);
+            $doi = esc_html(get_field($doi_acf_key, $post->ID));
+            if (!empty($doi)) {
+                return "<marc21:datafield tag=\"024\" ind1=\"7\" ind2=\" \">
+                    <marc21:subfield code=\"a\">{$doi}</marc21:subfield>
+                    <marc21:subfield code=\"2\">doi</marc21:subfield>
+                </marc21:datafield>";
+            }
+            return "";
+        }
+
+        public function render_subfield_from_option($field_name, $subfield_code)
+        {
             $default = $this->common->get_settings_field_info($field_name)["default"];
-            $value = get_option($this->common->get_value_field_id($field_name), $default);
+            $value = esc_html(get_option($this->common->get_value_field_id($field_name), $default));
             if (!empty($value)) {
                 return "<marc21:subfield code=\"{$subfield_code}\">{$value}</marc21:subfield>";
             }
@@ -113,11 +128,12 @@ if (!class_exists('VB_Marc21Xml_Export_Renderer')) {
             $marc21_record_end = "</marc21:record>";
             $datafield_245 = $this->render_datafield_245($post);
             $datafield_773 = $this->render_datafield_773($post);
+            $doi = $this->render_doi($post);
             $leader = $this->render_leader($post);
             $control_number = $this->render_control_number($post);
 
-            $xml_str = $xml_header . $marc21_record_start . $leader . $control_number . $datafield_245 . $datafield_773
-                . $marc21_record_end;
+            $xml_str = $xml_header . $marc21_record_start . $leader . $control_number . $doi .
+                $datafield_245 . $datafield_773 . $marc21_record_end;
 
             return $this->formatXml($xml_str);
         }

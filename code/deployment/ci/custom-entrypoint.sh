@@ -75,10 +75,12 @@ EOF
 
 # run wp-cli to setup account
 wp-cli core install --url=${WORDPRESS_URL} --title=\"${WORDPRESS_TITLE}\" --admin_user=${WORDPRESS_USER} --admin_password=${WORDPRESS_PASSWORD} --admin_email=${WORDPRESS_EMAIL} --skip-email
+wp-cli plugin install advanced-custom-fields
 wp-cli plugin update --all
 wp-cli theme update --all
 
 # activate plugins
+wp-cli plugin activate advanced-custom-fields
 wp-cli plugin activate vb-marc21xml-export
 
 # flush permalinks

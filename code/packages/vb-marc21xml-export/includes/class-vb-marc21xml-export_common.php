@@ -9,19 +9,17 @@ if (!class_exists('VB_Marc21Xml_Export_Common')) {
 
         public $settings_page_name;
 
-        public $settings_section_name;
-
         public function __construct($plugin_name)
         {
             $this->plugin_name = $plugin_name;
             $this->settings_page_name = $plugin_name . "_settings";
-            $this->settings_section_name = $this->settings_page_name . "_section";
         }
 
         public function get_settings_fields() {
             return array(
                 array(
                     "name" => "leader",
+                    "section" => "general",
                     "label" => __("Marc21 Leader", "vb-marc21xml-export"),
                     "placeholder" => __("marc21 leader attribute", "vb-marc21xml-export"),
                     "description" => __("The Marc21", "vb-marc21xml-export") . " <a href=\"https://www.loc.gov/marc/bibliographic/bdleader.html\"
@@ -31,6 +29,7 @@ if (!class_exists('VB_Marc21Xml_Export_Common')) {
                 ),
                 array(
                     "name" => "773a",
+                    "section" => "general",
                     "label" => __("Blog Owner", "vb-marc21xml-export") . "<br>(Marc21 773a)",
                     "placeholder" => __("blog owner", "vb-marc21xml-export"),
                     "description" => "The <a href=\"https://www.loc.gov/marc/bibliographic/bd773.html\"
@@ -39,6 +38,7 @@ if (!class_exists('VB_Marc21Xml_Export_Common')) {
                 ),
                 array(
                     "name" => "773t",
+                    "section" => "general",
                     "label" => __("Blog Title", "vb-marc21xml-export") . "<br>(Marc21 773t)",
                     "placeholder" => __("blog title", "vb-marc21xml-export"),
                     "description" => "The <a href=\"https://www.loc.gov/marc/bibliographic/bd773.html\"
@@ -47,12 +47,21 @@ if (!class_exists('VB_Marc21Xml_Export_Common')) {
                 ),
                 array(
                     "name" => "773x",
+                    "section" => "general",
                     "label" => "ISSN<br>(Marc21 773x)",
                     "placeholder" => "ISSN",
                     "description" => "The <a href=\"https://www.loc.gov/marc/bibliographic/bd773.html\"
                     target=\"_blank\">International Standard Serial Number</a> (ISSN) of the host item entry, for
                     example the ISSN of this blog.",
                     "default" => null,
+                ),
+                array(
+                    "name" => "doi_acf_key",
+                    "section" => "post",
+                    "label" => "DOI ACF Field Key<br>(Marc21 024a)",
+                    "placeholder" => "ACF field key for DOI field",
+                    "description" => "The Advanced Custom Fields key for the DOI field.",
+                    "default" => "doi",
                 )
             );
         }

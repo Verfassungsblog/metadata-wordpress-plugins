@@ -14,5 +14,8 @@ EOF
 }
 
 wp-cli core install --url=localhost:8080 --title="Verfassungsblog" --admin_user=user --admin_password=test --admin_email=user@test.com
+wp-cli plugin install advanced-custom-fields
 wp-cli plugin update --all
 wp-cli theme update --all
+
+wp-cli plugin activate advanced-custom-fields

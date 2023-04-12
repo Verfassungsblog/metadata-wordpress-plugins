@@ -17,14 +17,24 @@ if (!class_exists('VB_Marc21Xml_Export_Settings')) {
 
         public function action_init()
         {
+            $section_names = array(
+                "general" => $this->common->settings_page_name . "_general",
+                "post" => $this->common->settings_page_name . "_post",
+            );
+
             add_settings_section(
-                $this->common->settings_section_name,
-                __("Settings"),
-                array($this, 'callback_section'),
+                $section_names["general"],
+                __("General"),
+                array($this, 'callback_general_section'),
                 $this->common->settings_page_name
             );
 
-            $default_values = array();
+            add_settings_section(
+                $section_names["post"],
+                __("Post"),
+                array($this, 'callback_post_section'),
+                $this->common->settings_page_name
+            );
 
             foreach (array_values($this->common->get_settings_fields()) as $i => $field) {
                 $field_id = $this->common->get_value_field_id($field["name"]);
@@ -37,7 +47,7 @@ if (!class_exists('VB_Marc21Xml_Export_Settings')) {
                     __($field["label"]),
                     array($this, 'callback_field'),
                     $this->common->settings_page_name,
-                    $this->common->settings_section_name,
+                    $section_names[$field["section"]],
                     array(
                         'label_for' => $field["name"],
                     )
@@ -45,12 +55,25 @@ if (!class_exists('VB_Marc21Xml_Export_Settings')) {
             }
         }
 
-        public function callback_section($args)
+        public function callback_general_section($args)
         {
             ?>
             <p id="<?php echo esc_attr($args['id']); ?>">
                 <?php echo __(
                     'The following options influence how Marc21 XML documents are created.',
+                    "vb-marc21xml-export"
+                );
+                ?>
+            </p>
+            <?php
+        }
+
+        public function callback_post_section($args)
+        {
+            ?>
+            <p id="<?php echo esc_attr($args['id']); ?>">
+                <?php echo __(
+                    'Settings that add additional meta data for each individual post.',
                     "vb-marc21xml-export"
                 );
                 ?>
