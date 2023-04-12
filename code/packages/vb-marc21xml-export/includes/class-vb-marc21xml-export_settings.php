@@ -98,13 +98,27 @@ if (!class_exists('VB_Marc21Xml_Export_Settings')) {
 
         public function action_admin_menu()
         {
-            add_submenu_page(
+            $admin_page_hook = add_submenu_page(
                 'options-general.php',
                 'Verfassungsblog Marc21Xml Export',
                 'VB Marc21Xml Export',
                 'manage_options',
                 'vb_marc21xml_export',
                 array($this, 'render')
+            );
+
+            add_action("load-" . $admin_page_hook, array($this, "help_tab"));
+        }
+
+        public function help_tab()
+        {
+            $screen = get_current_screen();
+            $screen->add_help_tab(
+                array(
+                    "id" => $this->common->plugin_name . "_help_tab",
+                    "title" => __("Help"),
+                    "content" => "<h2>VB Marc21Xml Export</h2>",
+                )
             );
         }
 
