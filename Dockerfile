@@ -15,9 +15,9 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
     apt-get update && \
     apt-get install -y mysql-server mysql-client
 
-# make apache listen on port 8080 instead of 80
-# RUN sed -i "s/80/8080/" /etc/apache2/sites-enabled/000-default.conf && \
-#     sed -i "s/Listen 80/Listen 8080/" /etc/apache2/ports.conf
+# install xsl php extension
+RUN apt-get update && apt-get install -y libxslt-dev && rm -rf /var/lib/apt/lists/*
+RUN docker-php-ext-install xsl
 
 # copy plugins
 COPY code/packages/* /usr/src/wordpress-plugins/

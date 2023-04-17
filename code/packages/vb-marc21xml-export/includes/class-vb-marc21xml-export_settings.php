@@ -1,6 +1,7 @@
 <?php
 
 require_once plugin_dir_path(__FILE__) . 'class-vb-marc21xml-export_common.php';
+require_once plugin_dir_path(__FILE__) . 'class-vb-marc21xml-export_converter.php';
 require_once plugin_dir_path(__FILE__) . 'class-vb-marc21xml-export_renderer.php';
 
 if (!class_exists('VB_Marc21Xml_Export_Settings')) {
@@ -31,7 +32,7 @@ if (!class_exists('VB_Marc21Xml_Export_Settings')) {
 
             add_settings_section(
                 $section_names["post"],
-                __("Post"),
+                __("Advanced Custom Fields"),
                 array($this, 'callback_post_section'),
                 $this->common->settings_page_name
             );
@@ -72,7 +73,8 @@ if (!class_exists('VB_Marc21Xml_Export_Settings')) {
             ?>
             <p id="<?php echo esc_attr($args['id']); ?>">
                 <?php echo __(
-                    'Settings that add additional meta data for each individual post.',
+                    'Settings that add additional meta data for each individual post via the Advanced Custom Fields'
+                    . ' (ACF) plugin.',
                     "vb-marc21xml-export"
                 );
                 ?>
@@ -147,7 +149,7 @@ if (!class_exists('VB_Marc21Xml_Export_Settings')) {
                     submit_button(__('Save Settings', "vb-marc21xml-export"));
                     ?>
                 </form>
-                <hr/>
+                <hr />
                 <?php
 
                 $args = array(
@@ -155,13 +157,37 @@ if (!class_exists('VB_Marc21Xml_Export_Settings')) {
                 );
                 $posts = get_posts($args);
                 $renderer = new VB_Marc21Xml_Export_Renderer($this->common->plugin_name);
+                $converter = new VB_Marc21Xml_Export_Converter();
+
+                $marc21xml = $renderer->render($posts[0]);
+                $mods_xml = $converter->convertMarc21ToMods($marc21xml);
+                $rdf_dc = $converter->convertMarc21ToRdfDc($marc21xml);
+                $oai_dc = $converter->convertMarc21ToOaiDc($marc21xml);
 
                 ?>
                 <h2>
-                    <?php echo __("Example", "vb-marc21xml-export") ?>
+                    <?php echo __("Marc21 Example", "vb-marc21xml-export") ?>
                 </h2>
 
-                <pre><?php echo esc_html($renderer->render($posts[0])) ?></pre>
+                <pre><?php echo esc_html($marc21xml) ?></pre>
+
+                <h2>
+                    <?php echo __("MODS Example", "vb-marc21xml-export") ?>
+                </h2>
+
+                <pre><?php echo esc_html($mods_xml) ?></pre>
+
+                <h2>
+                    <?php echo __("RDF Dublin Core Example", "vb-marc21xml-export") ?>
+                </h2>
+
+                <pre><?php echo esc_html($rdf_dc) ?></pre>
+
+                <h2>
+                    <?php echo __("OAI DC Example", "vb-marc21xml-export") ?>
+                </h2>
+
+                <pre><?php echo esc_html($oai_dc) ?></pre>
 
                 <hr>
                 <form method="post" onsubmit="return confirm('Are you sure?');">

@@ -4,7 +4,6 @@ if (!class_exists('VB_Marc21Xml_Export_Common')) {
 
     class VB_Marc21Xml_Export_Common
     {
-
         public $plugin_name;
 
         public $settings_page_name;
@@ -58,9 +57,9 @@ if (!class_exists('VB_Marc21Xml_Export_Common')) {
                 array(
                     "name" => "doi_acf_key",
                     "section" => "post",
-                    "label" => "DOI ACF Field Key<br>(Marc21 024a)",
-                    "placeholder" => "ACF field key for DOI field",
-                    "description" => "The Advanced Custom Fields key for the DOI field.",
+                    "label" => "DOI Key<br>(Marc21 024a)",
+                    "placeholder" => "ACF field key for DOI",
+                    "description" => "The key of the Advanced Custom Fields (ACF) field that contains the DOI.",
                     "default" => "doi",
                 )
             );
