@@ -25,17 +25,93 @@ if (!class_exists('VB_Marc21Xml_Export_Renderer')) {
             return get_field($doi_acf_key, $post->ID);
         }
 
-        protected function get_post_author($post) {
-            $last_name = esc_html(get_the_author_meta("last_name", $post->post_author));
-            $first_name = esc_html(get_the_author_meta("first_name", $post->post_author));
-
-            $post_author = "";
-            if (!empty($last_name) && !empty($first_name)) {
-                $post_author = $last_name . ", " . $first_name;
-            } else if (!empty($last_name)) {
-                $post_author = $last_name;
+        protected function render_subfield_from_option($field_name, $subfield_code)
+        {
+            $default = $this->common->get_settings_field_info($field_name)["default"];
+            $value = esc_html(get_option($this->common->get_value_field_id($field_name), $default));
+            if (!empty($value)) {
+                return "<marc21:subfield code=\"{$subfield_code}\">{$value}</marc21:subfield>";
             }
-            return $post_author;
+            return "";
+        }
+
+        protected function get_author_name($author)
+        {
+            $last_name = esc_html(get_the_author_meta("last_name", $author));
+            $first_name = esc_html(get_the_author_meta("first_name", $author));
+
+            $author = "";
+            if (!empty($last_name) && !empty($first_name)) {
+                $author = $last_name . ", " . $first_name;
+            } else if (!empty($last_name)) {
+                $author = $last_name;
+            }
+            return $author;
+        }
+
+        protected function get_post_author($post)
+        {
+            return $this->get_author_name($post->post_author);
+        }
+
+        protected function get_post_coauthors($post)
+        {
+            if (!function_exists("get_coauthors")) {
+                return;
+            }
+            $coauthors = array_map(function ($author) {
+                return $author->ID;
+            }, array_slice(get_coauthors($post), 1));
+            return array_map(array($this, 'get_author_name'), $coauthors);
+        }
+
+        public function render_leader($post)
+        {
+            // leader definition see: https://www.loc.gov/marc/bibliographic/bdleader.html
+            $leader = esc_html(str_replace("_", " ", $this->get_general_field_value("leader")));
+            if (!empty($leader)) {
+                return "<marc21:leader>{$leader}</marc21:leader>";
+            }
+            return "";
+        }
+
+        public function render_control_number($post)
+        {
+            // control number definition see: https://www.loc.gov/marc/bibliographic/bd001.html
+            $control_number = $post->ID;
+
+            if (!empty($control_number)) {
+                return "<marc21:controlfield tag=\"001\">{$control_number}</marc21:controlfield>";
+            }
+            return "";
+        }
+
+        public function render_datafield_024($post)
+        {
+            $doi = esc_html($this->get_acf_field_value("doi_acf", $post));
+            if (!empty($doi)) {
+                return "<marc21:datafield tag=\"024\" ind1=\"7\" ind2=\" \">
+                    <marc21:subfield code=\"a\">{$doi}</marc21:subfield>
+                    <marc21:subfield code=\"2\">doi</marc21:subfield>
+                </marc21:datafield>";
+            }
+            return "";
+        }
+
+        public function render_datafield_084($post)
+        {
+            $global_ddc = $this->get_general_field_value("ddc_general");
+            $post_ddc = $this->get_acf_field_value("ddc_acf", $post);
+            $combined_ddc = array_merge(explode(",", $global_ddc), explode(",", $post_ddc));
+            $trimmed_ddc = array_filter(array_map('trim', $combined_ddc));
+            $xml = "";
+            foreach ($trimmed_ddc as $ddc) {
+                $xml = $xml . "<marc21:datafield tag=\"084\" ind1=\" \" ind2=\" \">
+                    <marc21:subfield code=\"a\">{$ddc}</marc21:subfield>
+                    <marc21:subfield code=\"2\">ddc</marc21:subfield>
+                </marc21:datafield>";
+            }
+            return $xml;
         }
 
         public function render_datafield_100($post)
@@ -85,7 +161,7 @@ if (!class_exists('VB_Marc21Xml_Export_Renderer')) {
         public function render_datafield_264($post)
         {
             $date = get_the_date("Y-m-d", $post);
-            if(!empty($date)) {
+            if (!empty($date)) {
                 return "<marc21:datafield tag=\"264\" ind1=\" \" ind2=\"1\">
                     <marc21:subfield code=\"c\">{$date}</marc21:subfield>
                 </marc21:datafield>";
@@ -120,80 +196,51 @@ if (!class_exists('VB_Marc21Xml_Export_Renderer')) {
             </marc21:datafield>";
         }
 
-        public function render_datafield_536($post) {
+        public function render_datafield_536($post)
+        {
             $funding_general = $this->get_general_field_value("funding_general");
             $funding_acf = $this->get_acf_field_value("funding_acf", $post);
             $funding = !empty($funding_acf) ? $funding_acf : $funding_general;
             if (!empty($funding)) {
-                return implode("", array(
-                    "<marc21:datafield tag=\"536\" ind1=\" \" ind2=\" \">",
-                    "<marc21:subfield code=\"a\">{$funding}</marc21:subfield>",
-                    "</marc21:datafield>"
-                ));
+                return implode(
+                    "",
+                    array(
+                        "<marc21:datafield tag=\"536\" ind1=\" \" ind2=\" \">",
+                        "<marc21:subfield code=\"a\">{$funding}</marc21:subfield>",
+                        "</marc21:datafield>"
+                    )
+                );
             }
             return "";
         }
 
-        public function render_datafield_540($post) {
+        public function render_datafield_540($post)
+        {
             $copyright_general = $this->get_general_field_value("copyright_general");
             $copyright_acf = $this->get_acf_field_value("copyright_acf", $post);
             $copyright = !empty($copyright_acf) ? $copyright_acf : $copyright_general;
             if (!empty($copyright)) {
-                return implode("", array(
-                    "<marc21:datafield tag=\"540\" ind1=\" \" ind2=\" \">",
-                    "<marc21:subfield code=\"a\">{$copyright}</marc21:subfield>",
-                    "</marc21:datafield>"
-                ));
+                return implode(
+                    "",
+                    array(
+                        "<marc21:datafield tag=\"540\" ind1=\" \" ind2=\" \">",
+                        "<marc21:subfield code=\"a\">{$copyright}</marc21:subfield>",
+                        "</marc21:datafield>"
+                    )
+                );
             }
             return "";
         }
 
-        public function render_datafield_856($post)
+        public function render_datafield_700($post)
         {
-            $post_url = get_the_permalink($post);
-            if (!empty($post_url)) {
-                return implode("", array(
-                    "<marc21:datafield tag=\"856\" ind1=\" \" ind2=\" \">",
-                    "<marc21:subfield code=\"u\">{$post_url}</marc21:subfield>",
-                    "<marc21:subfield code=\"y\">raw object</marc21:subfield>",
-                    "</marc21:datafield>"
-                ));
-            }
-            return "";
-        }
-
-        public function render_control_number($post)
-        {
-            // control number definition see: https://www.loc.gov/marc/bibliographic/bd001.html
-            $control_number = $post->ID;
-
-            if (!empty($control_number)) {
-                return "<marc21:controlfield tag=\"001\">{$control_number}</marc21:controlfield>";
-            }
-            return "";
-        }
-
-        public function render_leader($post)
-        {
-            // leader definition see: https://www.loc.gov/marc/bibliographic/bdleader.html
-            $leader = esc_html(str_replace("_", " ", $this->get_general_field_value("leader")));
-            if (!empty($leader)) {
-                return "<marc21:leader>{$leader}</marc21:leader>";
-            }
-            return "";
-        }
-
-        public function render_datafield_084($post)
-        {
-            $global_ddc = $this->get_general_field_value("ddc_general");
-            $post_ddc = $this->get_acf_field_value("ddc_acf", $post);
-            $combined_ddc = array_merge(explode(",", $global_ddc), explode(",", $post_ddc));
-            $trimmed_ddc = array_filter(array_map('trim', $combined_ddc));
+            $coauthors = $this->get_post_coauthors($post);
             $xml = "";
-            foreach ($trimmed_ddc as $ddc) {
-                $xml = $xml . "<marc21:datafield tag=\"084\" ind1=\" \" ind2=\" \">
-                    <marc21:subfield code=\"a\">{$ddc}</marc21:subfield>
-                    <marc21:subfield code=\"2\">ddc</marc21:subfield>
+            foreach ($coauthors as $coauthor) {
+                $xml = $xml . "<marc21:datafield tag=\"700\" ind1=\"1\" ind2=\" \">
+                    <marc21:subfield code=\"a\">{$coauthor}</marc21:subfield>
+                    <marc21:subfield code=\"e\">Author</marc21:subfield>
+                    <marc21:subfield code=\"4\">aut</marc21:subfield>
                 </marc21:datafield>";
             }
             return $xml;
@@ -213,24 +260,19 @@ if (!class_exists('VB_Marc21Xml_Export_Renderer')) {
             return "";
         }
 
-        public function render_doi($post)
+        public function render_datafield_856($post)
         {
-            $doi = esc_html($this->get_acf_field_value("doi_acf", $post));
-            if (!empty($doi)) {
-                return "<marc21:datafield tag=\"024\" ind1=\"7\" ind2=\" \">
-                    <marc21:subfield code=\"a\">{$doi}</marc21:subfield>
-                    <marc21:subfield code=\"2\">doi</marc21:subfield>
-                </marc21:datafield>";
-            }
-            return "";
-        }
-
-        public function render_subfield_from_option($field_name, $subfield_code)
-        {
-            $default = $this->common->get_settings_field_info($field_name)["default"];
-            $value = esc_html(get_option($this->common->get_value_field_id($field_name), $default));
-            if (!empty($value)) {
-                return "<marc21:subfield code=\"{$subfield_code}\">{$value}</marc21:subfield>";
+            $post_url = get_the_permalink($post);
+            if (!empty($post_url)) {
+                return implode(
+                    "",
+                    array(
+                        "<marc21:datafield tag=\"856\" ind1=\" \" ind2=\" \">",
+                        "<marc21:subfield code=\"u\">{$post_url}</marc21:subfield>",
+                        "<marc21:subfield code=\"y\">raw object</marc21:subfield>",
+                        "</marc21:datafield>"
+                    )
+                );
             }
             return "";
         }
@@ -247,25 +289,29 @@ if (!class_exists('VB_Marc21Xml_Export_Renderer')) {
         public function render($post)
         {
             // marc21 definition see: https://www.loc.gov/marc/bibliographic/
-            $xml_str = implode("", array(
-                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n",
-                "<marc21:record xmlns:marc21=\"http://www.loc.gov/MARC21/slim\">\n",
-                $this->render_leader($post),
-                $this->render_control_number($post),
-                $this->render_doi($post),
-                $this->render_datafield_084($post),
-                $this->render_datafield_100($post),
-                $this->render_datafield_245($post),
-                $this->render_datafield_264($post),
-                $this->render_datafield_336($post),
-                $this->render_datafield_337($post),
-                $this->render_datafield_338($post),
-                $this->render_datafield_536($post),
-                $this->render_datafield_540($post),
-                $this->render_datafield_773($post),
-                $this->render_datafield_856($post),
-                "</marc21:record>"
-            ));
+            $xml_str = implode(
+                "",
+                array(
+                    "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n",
+                    "<marc21:record xmlns:marc21=\"http://www.loc.gov/MARC21/slim\">\n",
+                    $this->render_leader($post),
+                    $this->render_control_number($post),
+                    $this->render_datafield_024($post),
+                    $this->render_datafield_084($post),
+                    $this->render_datafield_100($post),
+                    $this->render_datafield_245($post),
+                    $this->render_datafield_264($post),
+                    $this->render_datafield_336($post),
+                    $this->render_datafield_337($post),
+                    $this->render_datafield_338($post),
+                    $this->render_datafield_536($post),
+                    $this->render_datafield_540($post),
+                    $this->render_datafield_700($post),
+                    $this->render_datafield_773($post),
+                    $this->render_datafield_856($post),
+                    "</marc21:record>"
+                )
+            );
 
             return $this->formatXml($xml_str);
         }
