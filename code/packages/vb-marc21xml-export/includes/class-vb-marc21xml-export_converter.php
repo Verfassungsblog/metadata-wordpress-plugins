@@ -9,7 +9,8 @@ if (!class_exists('VB_Marc21Xml_Export_Converter')) {
             "MARC21slimUtils.xsl" => "https://www.loc.gov/standards/marcxml/xslt/MARC21slimUtils.xsl",
             "MARC21slim2MODS3-7.xsl" => "https://www.loc.gov/standards/mods/v3/MARC21slim2MODS3-7.xsl",
             "MARC21slim2RDFDC.xsl" => "https://www.loc.gov/standards/marcxml/xslt/MARC21slim2RDFDC.xsl",
-            "MARC21slim2OAIDC.xsl" => "https://www.loc.gov/standards/marcxml/xslt/MARC21slim2OAIDC.xsl"
+            "MARC21slim2OAIDC.xsl" => "https://www.loc.gov/standards/marcxml/xslt/MARC21slim2OAIDC.xsl",
+            "MODS3-7_DC_XSLT1-0.xsl" => "https://www.loc.gov/standards/mods/v3/MODS3-7_DC_XSLT1-0.xsl"
         );
 
         public function __construct()
@@ -67,7 +68,8 @@ if (!class_exists('VB_Marc21Xml_Export_Converter')) {
         }
 
         public function convertMarc21ToOaiDc($marc21xml) {
-            return $this->convertFromMarc21Xml($marc21xml, array("MARC21slim2OAIDC.xsl"));
+            $mods = $this->convertMarc21ToMods($marc21xml);
+            return $this->convertFromMarc21Xml($mods, array("MODS3-7_DC_XSLT1-0.xsl"));
         }
 
     }

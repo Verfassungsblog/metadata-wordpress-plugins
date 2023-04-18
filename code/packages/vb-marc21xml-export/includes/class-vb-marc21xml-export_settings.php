@@ -40,7 +40,10 @@ if (!class_exists('VB_Marc21Xml_Export_Settings')) {
             foreach (array_values($this->common->get_settings_fields()) as $i => $field) {
                 $field_id = $this->common->get_value_field_id($field["name"]);
 
-                register_setting($this->common->settings_page_name, $field_id);
+                register_setting($this->common->settings_page_name, $field_id, array(
+                    "type" => $field["type"],
+                    "default" => $field["default"]
+                ));
 
                 add_settings_field(
                     $field_id,
@@ -49,7 +52,8 @@ if (!class_exists('VB_Marc21Xml_Export_Settings')) {
                     $this->common->settings_page_name,
                     $section_names[$field["section"]],
                     array(
-                        'label_for' => $field["name"],
+                        'label_for' => $field_id,
+                        "field_name" => $field["name"]
                     )
                 );
             }
@@ -73,8 +77,8 @@ if (!class_exists('VB_Marc21Xml_Export_Settings')) {
             ?>
             <p id="<?php echo esc_attr($args['id']); ?>">
                 <?php echo __(
-                    'Settings that add additional meta data for each individual post via the Advanced Custom Fields'
-                    . ' (ACF) plugin.',
+                    "The following settings add or overwrite meta data for each individual post via the Advanced Custom
+                    Fields (ACF) plugin. Each option specifies the ACF field key that contains the relevant information.",
                     "vb-marc21xml-export"
                 );
                 ?>
@@ -84,10 +88,10 @@ if (!class_exists('VB_Marc21Xml_Export_Settings')) {
 
         public function callback_field($args)
         {
-            $field_name = $args['label_for'];
-            $field_id = $this->common->get_value_field_id($field_name);
+            $field_id = $args['label_for'];
+            $field_name = $args["field_name"];
             $field = $this->common->get_settings_field_info($field_name);
-            $option = get_option($field_id, $field["default"]);
+            $option = get_option($field_id);
             ?>
             <input id="<?php echo esc_attr($field_id); ?>" name="<?php echo esc_attr($field_id); ?>" class="regular-text code"
                 type="text" value="<?php echo $option ?>" placeholder="<?php echo $field["placeholder"] ?>">
