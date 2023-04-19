@@ -286,6 +286,7 @@ if (!class_exists('VB_Marc21Xml_Export_Renderer')) {
         public function render_datafield_650($post)
         {
             $tags = get_the_tags($post);
+            $tags = $tags ? $tags : array();
             $xml = "";
             foreach($tags as $tag) {
                 $tag_escaped = esc_html($tag->name);
