@@ -93,6 +93,17 @@ if (!class_exists('VB_Marc21Xml_Export_Renderer')) {
             return array_slice(get_coauthors($post->ID), 1);
         }
 
+        protected function get_post_language($post) {
+            $language = esc_html($this->get_general_field_value("language"));
+            $language_alternate = esc_html($this->get_general_field_value("language_alternate"));
+            $language_alternate_category = esc_html($this->get_general_field_value("language_alternate_category"));
+            $categories = array_map(function($category) { return $category->name; }, get_the_category($post->ID));
+            if (in_array($language_alternate_category, $categories)) {
+                $language = $language_alternate;
+            }
+            return $language;
+        }
+
         public function render_leader($post)
         {
             // leader definition see: https://www.loc.gov/marc/bibliographic/bdleader.html
@@ -103,13 +114,23 @@ if (!class_exists('VB_Marc21Xml_Export_Renderer')) {
             return "";
         }
 
-        public function render_control_number($post)
+        public function render_control_numbers($post)
         {
             // control number definition see: https://www.loc.gov/marc/bibliographic/bd001.html
             $control_number = $post->ID;
+            $date = get_the_date("ymd", $post);
+            $date = empty($date) ? "||||||" : $date;
+            $year = get_the_date("Y", $post);
+            $year = empty($year) ? "||||" : $year;
+            $language = $this->get_post_language($post);
+            $language = empty($language) ? "|||" : $language;
 
             if (!empty($control_number)) {
-                return "<marc21:controlfield tag=\"001\">{$control_number}</marc21:controlfield>";
+                return "
+                    <marc21:controlfield tag=\"001\">{$control_number}</marc21:controlfield>
+                    <marc21:controlfield tag=\"007\">cr|||||</marc21:controlfield>
+                    <marc21:controlfield tag=\"008\">{$date}s{$year}||||xx#|||||o|||| ||| 0|{$language}||</marc21:controlfield>
+                ";
             }
             return "";
         }
@@ -118,7 +139,7 @@ if (!class_exists('VB_Marc21Xml_Export_Renderer')) {
         {
             $orcid = $this->get_acf_user_field_value("orcid_acf", $user_id);
             if (!empty($orcid)) {
-                $orcid = "https://orcid.org/" .$orcid;
+                $orcid = "(orcid)" .$orcid;
             }
             return $this->render_subfield_from_value($orcid, "0");
         }
@@ -137,13 +158,7 @@ if (!class_exists('VB_Marc21Xml_Export_Renderer')) {
 
         public function render_datafield_041($post)
         {
-            $language = esc_html($this->get_general_field_value("language"));
-            $language_alternate = esc_html($this->get_general_field_value("language_alternate"));
-            $language_alternate_category = esc_html($this->get_general_field_value("language_alternate_category"));
-            $categories = array_map(function($category) { return $category->name; }, get_the_category($post->ID));
-            if (in_array($language_alternate_category, $categories)) {
-                $language = $language_alternate;
-            }
+            $language = $this->get_post_language($post);
             if (!empty($language)) {
                 return "<marc21:datafield tag=\"041\" ind1=\" \" ind2=\" \">
                     <marc21:subfield code=\"a\">{$language}</marc21:subfield>
@@ -368,7 +383,7 @@ if (!class_exists('VB_Marc21Xml_Export_Renderer')) {
                     "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n",
                     "<marc21:record xmlns:marc21=\"http://www.loc.gov/MARC21/slim\">\n",
                     $this->render_leader($post),
-                    $this->render_control_number($post),
+                    $this->render_control_numbers($post),
                     $this->render_datafield_024($post),
                     $this->render_datafield_041($post),
                     $this->render_datafield_084($post),
