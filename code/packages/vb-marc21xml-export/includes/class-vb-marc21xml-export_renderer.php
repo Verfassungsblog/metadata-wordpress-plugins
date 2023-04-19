@@ -135,6 +135,23 @@ if (!class_exists('VB_Marc21Xml_Export_Renderer')) {
             return "";
         }
 
+        public function render_datafield_041($post)
+        {
+            $language = esc_html($this->get_general_field_value("language"));
+            $language_alternate = esc_html($this->get_general_field_value("language_alternate"));
+            $language_alternate_category = esc_html($this->get_general_field_value("language_alternate_category"));
+            $categories = array_map(function($category) { return $category->name; }, get_the_category($post->ID));
+            if (in_array($language_alternate_category, $categories)) {
+                $language = $language_alternate;
+            }
+            if (!empty($language)) {
+                return "<marc21:datafield tag=\"041\" ind1=\" \" ind2=\" \">
+                    <marc21:subfield code=\"a\">{$language}</marc21:subfield>
+                </marc21:datafield>";
+            }
+            return "";
+        }
+
         public function render_datafield_084($post)
         {
             $global_ddc = $this->get_general_field_value("ddc_general");
@@ -266,6 +283,20 @@ if (!class_exists('VB_Marc21Xml_Export_Renderer')) {
             return "";
         }
 
+        public function render_datafield_650($post)
+        {
+            $tags = get_the_tags($post);
+            $xml = "";
+            foreach($tags as $tag) {
+                $tag_escaped = esc_html($tag->name);
+                $xml = $xml . "<marc21:datafield tag=\"650\" ind1=\"1\" ind2=\"4\">
+                        <marc21:subfield code=\"a\">{$tag_escaped}</marc21:subfield>
+                    </marc21:datafield>
+                ";
+            }
+            return $xml;
+        }
+
         public function render_datafield_700($post)
         {
             $coauthors = $this->get_post_coauthors($post);
@@ -338,6 +369,7 @@ if (!class_exists('VB_Marc21Xml_Export_Renderer')) {
                     $this->render_leader($post),
                     $this->render_control_number($post),
                     $this->render_datafield_024($post),
+                    $this->render_datafield_041($post),
                     $this->render_datafield_084($post),
                     $this->render_datafield_100($post),
                     $this->render_datafield_245($post),
@@ -347,6 +379,7 @@ if (!class_exists('VB_Marc21Xml_Export_Renderer')) {
                     $this->render_datafield_338($post),
                     $this->render_datafield_536($post),
                     $this->render_datafield_540($post),
+                    $this->render_datafield_650($post),
                     $this->render_datafield_700($post),
                     $this->render_datafield_773($post),
                     $this->render_datafield_856($post),

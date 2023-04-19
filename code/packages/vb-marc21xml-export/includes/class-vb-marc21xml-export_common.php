@@ -86,6 +86,43 @@ if (!class_exists('VB_Marc21Xml_Export_Common')) {
                     "default" => get_bloginfo("name"),
                 ),
                 array(
+                    "name" => "language",
+                    "type" => "string",
+                    "section" => "general",
+                    "label" => "Language<br>Code",
+                    "placeholder" => "language code",
+                    "description" => "The default <a href=\"https://www.loc.gov/marc/languages/language_code.html\"
+                        target=\"_blank\">Marc21 Language Code</a> (see
+                        <a href=\"https://www.loc.gov/marc/bibliographic/bd041.html\" target=\"_blank\">Marc21 041a</a>).
+                        The language can be overwritten by assigning posts to a category, see below.
+                        <br>For Example: <code>ger</code> = \"German\"",
+                    "default" => "ger",
+                ),
+                array(
+                    "name" => "language_alternate",
+                    "type" => "string",
+                    "section" => "general",
+                    "label" => "Alternate Language<br>Code",
+                    "placeholder" => "language code",
+                    "description" => "The alternate <a href=\"https://www.loc.gov/marc/languages/language_code.html\"
+                        target=\"_blank\">Marc21 Language Code</a> (see
+                        <a href=\"https://www.loc.gov/marc/bibliographic/bd041.html\" target=\"_blank\">Marc21 041a</a>).
+                        This language code is used in case a post is assigned to a specific category, see below.
+                        <br>For Example: <code>eng</code> = \"English\"",
+                    "default" => "eng",
+                ),
+                array(
+                    "name" => "language_alternate_category",
+                    "type" => "string",
+                    "section" => "general",
+                    "label" => "Alternate Language<br>Category",
+                    "placeholder" => "category name",
+                    "description" => "The name of the category, which posts are assigned to, in case they are written
+                        in the alternate language.
+                        <br>For Example: <code>English Articles</code>",
+                    "default" => "English Articles",
+                ),
+                array(
                     "name" => "ddc_general",
                     "type" => "string",
                     "section" => "general",
