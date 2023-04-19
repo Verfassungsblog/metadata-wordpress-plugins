@@ -76,6 +76,16 @@ if (!class_exists('VB_Marc21Xml_Export_Common')) {
                     "default" => "2366-7044",
                 ),
                 array(
+                    "name" => "publisher",
+                    "type" => "string",
+                    "section" => "general",
+                    "label" => __("Publisher", "vb-marc21xml-export"),
+                    "placeholder" => __("name of publisher", "vb-marc21xml-export"),
+                    "description" => "The publisher (see <a href=\"https://www.loc.gov/marc/bibliographic/bd264.html\"
+                    target=\"_blank\">Marc21 264b</a>), for example the blog title.",
+                    "default" => get_bloginfo("name"),
+                ),
+                array(
                     "name" => "ddc_general",
                     "type" => "string",
                     "section" => "general",
@@ -137,9 +147,14 @@ if (!class_exists('VB_Marc21Xml_Export_Common')) {
                     "name" => "orcid_acf",
                     "type" => "string",
                     "section" => "post",
-                    "label" => "ORCID<br>(TODO)",
+                    "label" => "ORCID<br>(ACF key)",
                     "placeholder" => "ACF field key for a ORCID",
-                    "description" => "The ACF field key that contains the ORCID of the post author.",
+                    "description" => "The ACF field key that contains the ORCID of the post author (see
+                        <a href=\"https://www.loc.gov/marc/bibliographic/bd100.html\" target=\"_blank\">Marc21 100 0</a>).
+                        <br/>
+                        The corresponding ACF field needs to be assigned to users instead of posts.<br/>
+                        This can be achieved by an ACF \"location rule\" for the field group:
+                        <code>User Role : is equal to : All</code>.",
                     "default" => "orcid",
                 ),
                 array(

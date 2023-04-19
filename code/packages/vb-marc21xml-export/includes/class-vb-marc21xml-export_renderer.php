@@ -13,26 +13,43 @@ if (!class_exists('VB_Marc21Xml_Export_Renderer')) {
 
         protected function get_general_field_value($field_name)
         {
-            return get_option($this->common->get_value_field_id($field_name));
+            $default = $this->common->get_settings_field_info($field_name)["default"];
+            return get_option($this->common->get_value_field_id($field_name), $default);
         }
 
-        protected function get_acf_field_value($field_name, $post)
+        protected function get_acf_post_field_value($field_name, $post)
         {
             if (!function_exists("get_field")) {
                 return;
             }
-            $doi_acf_key = get_option($this->common->get_value_field_id($field_name));
-            return get_field($doi_acf_key, $post->ID);
+            $default = $this->common->get_settings_field_info($field_name)["default"];
+            $acf_key = get_option($this->common->get_value_field_id($field_name), $default);
+            return get_field($acf_key, $post->ID);
         }
 
-        protected function render_subfield_from_option($field_name, $subfield_code)
+        protected function get_acf_user_field_value($field_name, $user_id)
         {
+            if (!function_exists("get_field")) {
+                return;
+            }
+            $field_id = $this->common->get_value_field_id($field_name);
             $default = $this->common->get_settings_field_info($field_name)["default"];
-            $value = esc_html(get_option($this->common->get_value_field_id($field_name), $default));
+            $acf_key = get_option($field_id, $default);
+            return get_field($acf_key, 'user_' . $user_id);
+        }
+
+        protected function render_subfield_from_value($value, $subfield_code)
+        {
             if (!empty($value)) {
                 return "<marc21:subfield code=\"{$subfield_code}\">{$value}</marc21:subfield>";
             }
             return "";
+        }
+
+        protected function render_subfield_from_option($field_name, $subfield_code)
+        {
+            $value = esc_html($this->get_general_field_value($field_name));
+            return $this->render_subfield_from_value($value, $subfield_code);
         }
 
         protected function get_author_name($author)
@@ -49,7 +66,21 @@ if (!class_exists('VB_Marc21Xml_Export_Renderer')) {
             return $author;
         }
 
-        protected function get_post_author($post)
+        protected function get_coauthor_name($coauthor)
+        {
+            $last_name = esc_html($coauthor->last_name);
+            $first_name = esc_html($coauthor->first_name);
+
+            $author = "";
+            if (!empty($last_name) && !empty($first_name)) {
+                $author = $last_name . ", " . $first_name;
+            } else if (!empty($last_name)) {
+                $author = $last_name;
+            }
+            return $author;
+        }
+
+        protected function get_post_author_name($post)
         {
             return $this->get_author_name($post->post_author);
         }
@@ -57,12 +88,9 @@ if (!class_exists('VB_Marc21Xml_Export_Renderer')) {
         protected function get_post_coauthors($post)
         {
             if (!function_exists("get_coauthors")) {
-                return;
+                return array();
             }
-            $coauthors = array_map(function ($author) {
-                return $author->ID;
-            }, array_slice(get_coauthors($post), 1));
-            return array_map(array($this, 'get_author_name'), $coauthors);
+            return array_slice(get_coauthors($post->ID), 1);
         }
 
         public function render_leader($post)
@@ -86,9 +114,18 @@ if (!class_exists('VB_Marc21Xml_Export_Renderer')) {
             return "";
         }
 
+        public function render_subfield_orcid($user_id)
+        {
+            $orcid = $this->get_acf_user_field_value("orcid_acf", $user_id);
+            if (!empty($orcid)) {
+                $orcid = "https://orcid.org/" .$orcid;
+            }
+            return $this->render_subfield_from_value($orcid, "0");
+        }
+
         public function render_datafield_024($post)
         {
-            $doi = esc_html($this->get_acf_field_value("doi_acf", $post));
+            $doi = esc_html($this->get_acf_post_field_value("doi_acf", $post));
             if (!empty($doi)) {
                 return "<marc21:datafield tag=\"024\" ind1=\"7\" ind2=\" \">
                     <marc21:subfield code=\"a\">{$doi}</marc21:subfield>
@@ -101,14 +138,14 @@ if (!class_exists('VB_Marc21Xml_Export_Renderer')) {
         public function render_datafield_084($post)
         {
             $global_ddc = $this->get_general_field_value("ddc_general");
-            $post_ddc = $this->get_acf_field_value("ddc_acf", $post);
+            $post_ddc = $this->get_acf_post_field_value("ddc_acf", $post);
             $combined_ddc = array_merge(explode(",", $global_ddc), explode(",", $post_ddc));
             $trimmed_ddc = array_filter(array_map('trim', $combined_ddc));
             $xml = "";
             foreach ($trimmed_ddc as $ddc) {
-                $xml = $xml . "<marc21:datafield tag=\"084\" ind1=\" \" ind2=\" \">
+                $xml = $xml . "<marc21:datafield tag=\"082\" ind1=\"0\" ind2=\"4\">
                     <marc21:subfield code=\"a\">{$ddc}</marc21:subfield>
-                    <marc21:subfield code=\"2\">ddc</marc21:subfield>
+                    <marc21:subfield code=\"2\">23</marc21:subfield>
                 </marc21:datafield>";
             }
             return $xml;
@@ -116,54 +153,51 @@ if (!class_exists('VB_Marc21Xml_Export_Renderer')) {
 
         public function render_datafield_100($post)
         {
-            $post_author = $this->get_post_author($post);
+            $post_author = $this->get_post_author_name($post);
             if (!empty($post_author)) {
-                return "<marc21:datafield tag=\"100\" ind1=\"1\" ind2=\" \">
-                    <marc21:subfield code=\"a\">${post_author}</marc21:subfield>
-                    <marc21:subfield code=\"e\">Author</marc21:subfield>
-                    <marc21:subfield code=\"4\">aut</marc21:subfield>
-                </marc21:datafield>";
+                return implode("", array(
+                    "<marc21:datafield tag=\"100\" ind1=\"1\" ind2=\" \">",
+                    "<marc21:subfield code=\"a\">${post_author}</marc21:subfield>",
+                    "<marc21:subfield code=\"e\">Author</marc21:subfield>",
+                    "<marc21:subfield code=\"4\">aut</marc21:subfield>",
+                    $this->render_subfield_orcid($post->post_author),
+                    "</marc21:datafield>")
+                );
             }
             return "";
         }
 
         public function render_datafield_245($post)
         {
-            $subfield_245a = $this->render_subfield_245a($post);
-            $subfield_245c = $this->render_subfield_245c($post);
+            $title = esc_html(get_the_title($post));
+            $subheadline = esc_html($this->get_acf_post_field_value("subheadline_acf", $post));
+            $author_name = $this->get_post_author_name($post);
 
-            $subfields = $subfield_245a . $subfield_245c;
+            $subfields = implode("", array(
+                $this->render_subfield_from_value($title, "a"),
+                $this->render_subfield_from_value($subheadline, "b"),
+                $this->render_subfield_from_value($author_name, "c"),
+            ));
+
             if (!empty($subfields)) {
                 return "<marc21:datafield tag=\"245\" ind1=\"1\" ind2=\"0\">{$subfields}</marc21:datafield>";
             }
             return "";
         }
 
-        public function render_subfield_245a($post)
-        {
-            $post_title = esc_html(get_the_title($post));
-
-            if (!empty($post_title)) {
-                return "<marc21:subfield code=\"a\">{$post_title}</marc21:subfield>";
-            }
-            return "";
-        }
-
-        public function render_subfield_245c($post)
-        {
-            $post_author = $this->get_post_author($post);
-            if (!empty($post_author)) {
-                return "<marc21:subfield code=\"c\">{$post_author}</marc21:subfield>";
-            }
-            return "";
-        }
-
         public function render_datafield_264($post)
         {
+            $publisher = esc_html($this->get_general_field_value("publisher"));
             $date = get_the_date("Y-m-d", $post);
-            if (!empty($date)) {
+
+            $subfields = implode("", array(
+                $this->render_subfield_from_value($publisher, "b"),
+                $this->render_subfield_from_value($date, "c"),
+            ));
+
+            if (!empty($subfields)) {
                 return "<marc21:datafield tag=\"264\" ind1=\" \" ind2=\"1\">
-                    <marc21:subfield code=\"c\">{$date}</marc21:subfield>
+                    {$subfields}
                 </marc21:datafield>";
             }
             return "";
@@ -199,7 +233,7 @@ if (!class_exists('VB_Marc21Xml_Export_Renderer')) {
         public function render_datafield_536($post)
         {
             $funding_general = $this->get_general_field_value("funding_general");
-            $funding_acf = $this->get_acf_field_value("funding_acf", $post);
+            $funding_acf = $this->get_acf_post_field_value("funding_acf", $post);
             $funding = !empty($funding_acf) ? $funding_acf : $funding_general;
             if (!empty($funding)) {
                 return implode(
@@ -217,7 +251,7 @@ if (!class_exists('VB_Marc21Xml_Export_Renderer')) {
         public function render_datafield_540($post)
         {
             $copyright_general = $this->get_general_field_value("copyright_general");
-            $copyright_acf = $this->get_acf_field_value("copyright_acf", $post);
+            $copyright_acf = $this->get_acf_post_field_value("copyright_acf", $post);
             $copyright = !empty($copyright_acf) ? $copyright_acf : $copyright_general;
             if (!empty($copyright)) {
                 return implode(
@@ -237,11 +271,18 @@ if (!class_exists('VB_Marc21Xml_Export_Renderer')) {
             $coauthors = $this->get_post_coauthors($post);
             $xml = "";
             foreach ($coauthors as $coauthor) {
-                $xml = $xml . "<marc21:datafield tag=\"700\" ind1=\"1\" ind2=\" \">
-                    <marc21:subfield code=\"a\">{$coauthor}</marc21:subfield>
-                    <marc21:subfield code=\"e\">Author</marc21:subfield>
-                    <marc21:subfield code=\"4\">aut</marc21:subfield>
-                </marc21:datafield>";
+                $coauthor_name = $this->get_coauthor_name($coauthor);
+                if (empty($coauthor_name)) {
+                    continue;
+                }
+                $xml = $xml . implode("", array(
+                    "<marc21:datafield tag=\"700\" ind1=\"1\" ind2=\" \">",
+                    "<marc21:subfield code=\"a\">{$coauthor_name}</marc21:subfield>",
+                    "<marc21:subfield code=\"e\">Author</marc21:subfield>",
+                    "<marc21:subfield code=\"4\">aut</marc21:subfield>",
+                    $this->render_subfield_orcid($coauthor->ID),
+                    "</marc21:datafield>",
+                ));
             }
             return $xml;
         }
