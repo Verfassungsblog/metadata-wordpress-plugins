@@ -1,19 +1,19 @@
 <?php
 
-require_once plugin_dir_path(__FILE__) . 'class-vb-marc21xml-export_common.php';
-require_once plugin_dir_path(__FILE__) . 'class-vb-marc21xml-export_converter.php';
-require_once plugin_dir_path(__FILE__) . 'class-vb-marc21xml-export_renderer.php';
+require_once plugin_dir_path(__FILE__) . 'class-vb-metadata-export_common.php';
+require_once plugin_dir_path(__FILE__) . 'class-vb-metadata-export_converter.php';
+require_once plugin_dir_path(__FILE__) . 'class-vb-metadata-export_renderer.php';
 
-if (!class_exists('VB_Marc21Xml_Export_Settings')) {
+if (!class_exists('VB_Metadata_Export_Settings')) {
 
-    class VB_Marc21Xml_Export_Settings
+    class VB_Metadata_Export_Settings
     {
 
         protected $common;
 
         public function __construct($plugin_name)
         {
-            $this->common = new VB_Marc21Xml_Export_Common($plugin_name);
+            $this->common = new VB_Metadata_Export_Common($plugin_name);
         }
 
         public function action_init()
@@ -65,7 +65,7 @@ if (!class_exists('VB_Marc21Xml_Export_Settings')) {
             <p id="<?php echo esc_attr($args['id']); ?>">
                 <?php echo __(
                     'The following options influence how Marc21 XML documents are created.',
-                    "vb-marc21xml-export"
+                    "vb-metadata-export"
                 );
                 ?>
             </p>
@@ -79,7 +79,7 @@ if (!class_exists('VB_Marc21Xml_Export_Settings')) {
                 <?php echo __(
                     "The following settings add or overwrite meta data for each individual post via the Advanced Custom
                     Fields (ACF) plugin. Each option specifies the ACF field key that contains the relevant information.",
-                    "vb-marc21xml-export"
+                    "vb-metadata-export"
                 );
                 ?>
             </p>
@@ -105,10 +105,10 @@ if (!class_exists('VB_Marc21Xml_Export_Settings')) {
         {
             $admin_page_hook = add_submenu_page(
                 'options-general.php',
-                'Verfassungsblog Marc21Xml Export',
-                'VB Marc21Xml Export',
+                'Verfassungsblog Metadata Export',
+                'VB Metadata Export',
                 'manage_options',
-                'vb_marc21xml_export',
+                'vb_metadata_export',
                 array($this, 'render')
             );
 
@@ -122,7 +122,7 @@ if (!class_exists('VB_Marc21Xml_Export_Settings')) {
                 array(
                     "id" => $this->common->plugin_name . "_help_tab",
                     "title" => __("Help"),
-                    "content" => "<h2>VB Marc21Xml Export</h2>",
+                    "content" => "<h2>Verfassungsblog Metadata Export</h2>",
                 )
             );
         }
@@ -150,7 +150,7 @@ if (!class_exists('VB_Marc21Xml_Export_Settings')) {
                     <?php
                     settings_fields($this->common->settings_page_name);
                     do_settings_sections($this->common->settings_page_name);
-                    submit_button(__('Save Settings', "vb-marc21xml-export"));
+                    submit_button(__('Save Settings', "vb-metadata-export"));
                     ?>
                 </form>
                 <hr />
@@ -160,8 +160,8 @@ if (!class_exists('VB_Marc21Xml_Export_Settings')) {
                     'numberposts' => 1,
                 );
                 $posts = get_posts($args);
-                $renderer = new VB_Marc21Xml_Export_Renderer($this->common->plugin_name);
-                $converter = new VB_Marc21Xml_Export_Converter();
+                $renderer = new VB_Metadata_Export_Renderer($this->common->plugin_name);
+                $converter = new VB_Metadata_Export_Converter();
 
                 $marc21xml = $renderer->render($posts[0]);
                 $mods_xml = $converter->convertMarc21ToMods($marc21xml);
@@ -170,25 +170,25 @@ if (!class_exists('VB_Marc21Xml_Export_Settings')) {
 
                 ?>
                 <h2>
-                    <?php echo __("Marc21 Example", "vb-marc21xml-export") ?>
+                    <?php echo __("Marc21 Example", "vb-metadata-export") ?>
                 </h2>
 
                 <pre><?php echo esc_html($marc21xml) ?></pre>
 
                 <h2>
-                    <?php echo __("MODS Example", "vb-marc21xml-export") ?>
+                    <?php echo __("MODS Example", "vb-metadata-export") ?>
                 </h2>
 
                 <pre><?php echo esc_html($mods_xml) ?></pre>
 
                 <h2>
-                    <?php echo __("RDF Dublin Core Example", "vb-marc21xml-export") ?>
+                    <?php echo __("RDF Dublin Core Example", "vb-metadata-export") ?>
                 </h2>
 
                 <pre><?php echo esc_html($rdf_dc) ?></pre>
 
                 <h2>
-                    <?php echo __("OAI DC Example", "vb-marc21xml-export") ?>
+                    <?php echo __("OAI DC Example", "vb-metadata-export") ?>
                 </h2>
 
                 <pre><?php echo esc_html($oai_dc) ?></pre>
@@ -197,7 +197,7 @@ if (!class_exists('VB_Marc21Xml_Export_Settings')) {
                 <form method="post" onsubmit="return confirm('Are you sure?');">
                     <input type="hidden" name="reset" value="true" />
                     <?php
-                    submit_button(__('Reset Settings to Default', "vb-marc21xml-export"), "secondary", "reset");
+                    submit_button(__('Reset Settings to Default', "vb-metadata-export"), "secondary", "reset");
                     ?>
                 </form>
             </div>

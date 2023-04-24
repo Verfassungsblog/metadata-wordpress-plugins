@@ -1,8 +1,8 @@
 <?php
 
-if (!class_exists('VB_Marc21Xml_Export_Converter')) {
+if (!class_exists('VB_Metadata_Export_Converter')) {
 
-    class VB_Marc21Xml_Export_Converter
+    class VB_Metadata_Export_Converter
     {
 
         protected $xsl_urls = array(

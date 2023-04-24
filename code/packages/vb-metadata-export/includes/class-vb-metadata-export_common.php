@@ -1,8 +1,8 @@
 <?php
 
-if (!class_exists('VB_Marc21Xml_Export_Common')) {
+if (!class_exists('VB_Metadata_Export_Common')) {
 
-    class VB_Marc21Xml_Export_Common
+    class VB_Metadata_Export_Common
     {
         public $plugin_name;
 
@@ -28,16 +28,16 @@ if (!class_exists('VB_Marc21Xml_Export_Common')) {
                     "name" => "leader",
                     "type" => "string",
                     "section" => "general",
-                    "label" => __("Marc21 Leader", "vb-marc21xml-export"),
-                    "placeholder" => __("marc21 leader attribute", "vb-marc21xml-export"),
+                    "label" => __("Marc21 Leader", "vb-metadata-export"),
+                    "placeholder" => __("marc21 leader attribute", "vb-metadata-export"),
                     "description" => implode("", array(
-                        __("The", "vb-marc21xml-export"),
+                        __("The", "vb-metadata-export"),
                         " <a href=\"https://www.loc.gov/marc/bibliographic/bdleader.html\" target=\"_blank\">",
-                        __("Marc21 leader attribute", "vb-marc21xml-export"),
+                        __("Marc21 leader attribute", "vb-metadata-export"),
                         "</a>. ",
-                        __("Use the underscore (_) instead of a space ( ).", "vb-marc21xml-export"),
+                        __("Use the underscore (_) instead of a space ( ).", "vb-metadata-export"),
                         "<br>",
-                        __("For example:", "vb-marc21xml-export"),
+                        __("For example:", "vb-metadata-export"),
                         "<code>_____nam__22_____uu_4500</code>",
                     )),
                     "default" => "_____nam__22_____uu_4500",
@@ -46,8 +46,8 @@ if (!class_exists('VB_Marc21Xml_Export_Common')) {
                     "name" => "blog_owner",
                     "type" => "string",
                     "section" => "general",
-                    "label" => __("Blog Owner", "vb-marc21xml-export"),
-                    "placeholder" => __("blog owner", "vb-marc21xml-export"),
+                    "label" => __("Blog Owner", "vb-metadata-export"),
+                    "placeholder" => __("blog owner", "vb-metadata-export"),
                     "description" => "The main entry heading (see <a href=\"https://www.loc.gov/marc/bibliographic/bd773.html\"
                     target=\"_blank\">Marc21 773a</a>) of the host item entry, for example the
                         blog owner.",
@@ -57,8 +57,8 @@ if (!class_exists('VB_Marc21Xml_Export_Common')) {
                     "name" => "blog_title",
                     "type" => "string",
                     "section" => "general",
-                    "label" => __("Blog Title", "vb-marc21xml-export"),
-                    "placeholder" => __("blog title", "vb-marc21xml-export"),
+                    "label" => __("Blog Title", "vb-metadata-export"),
+                    "placeholder" => __("blog title", "vb-metadata-export"),
                     "description" => "The title (see <a href=\"https://www.loc.gov/marc/bibliographic/bd773.html\"
                     target=\"_blank\">Marc21 773t</a>) of the host item entry, for example the blog title.",
                     "default" => get_bloginfo("name"),
@@ -79,8 +79,8 @@ if (!class_exists('VB_Marc21Xml_Export_Common')) {
                     "name" => "publisher",
                     "type" => "string",
                     "section" => "general",
-                    "label" => __("Publisher", "vb-marc21xml-export"),
-                    "placeholder" => __("name of publisher", "vb-marc21xml-export"),
+                    "label" => __("Publisher", "vb-metadata-export"),
+                    "placeholder" => __("name of publisher", "vb-metadata-export"),
                     "description" => "The publisher (see <a href=\"https://www.loc.gov/marc/bibliographic/bd264.html\"
                     target=\"_blank\">Marc21 264b</a>), for example the blog title.",
                     "default" => get_bloginfo("name"),

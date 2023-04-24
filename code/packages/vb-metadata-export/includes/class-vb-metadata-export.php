@@ -1,10 +1,10 @@
 <?php
 
-require_once plugin_dir_path(__FILE__) . 'class-vb-marc21xml-export_settings.php';
+require_once plugin_dir_path(__FILE__) . 'class-vb-metadata-export_settings.php';
 
-if (!class_exists('VB_Marc21Xml_Export')) {
+if (!class_exists('VB_Metadata_Export')) {
 
-    class VB_Marc21Xml_Export
+    class VB_Metadata_Export
     {
         protected $plugin_name;
 
@@ -19,7 +19,7 @@ if (!class_exists('VB_Marc21Xml_Export')) {
             $this->plugin_name = $plugin_name;
             $this->plugin_version = $plugin_version;
             $this->base_file = $base_file;
-            $this->settings = new VB_Marc21Xml_Export_Settings($plugin_name);
+            $this->settings = new VB_Metadata_Export_Settings($plugin_name);
         }
 
         public function activate()
@@ -35,7 +35,7 @@ if (!class_exists('VB_Marc21Xml_Export')) {
 
         public function action_init()
         {
-            # add_rewrite_rule('^marc21/?$', 'index.php?vb_marc21xml_export=true', 'top');
+            # add_rewrite_rule('^marc21/?$', 'index.php?vb_metadata_export=true', 'top');
             add_rewrite_tag('%marc21xml%', '([^&]+)');
 
             load_plugin_textdomain(
@@ -61,7 +61,7 @@ if (!class_exists('VB_Marc21Xml_Export')) {
 
             register_activation_hook($this->base_file, array($this, 'activate'));
             register_deactivation_hook($this->base_file, array($this, 'deactivate'));
-            register_uninstall_hook($this->base_file, 'vb_marc21xml_export_uninstall');
+            register_uninstall_hook($this->base_file, 'vb_metadata_export_uninstall');
 
             add_action("init", array($this, 'action_init'));
             add_action("template_include", array($this, 'action_template_include'));

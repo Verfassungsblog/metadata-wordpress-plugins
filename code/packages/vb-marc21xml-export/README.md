@@ -1,1 +1,0 @@
-# Verfassungsblog OAI PMH Plugin

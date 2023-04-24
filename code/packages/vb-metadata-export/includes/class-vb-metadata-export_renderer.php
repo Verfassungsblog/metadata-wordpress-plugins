@@ -1,14 +1,14 @@
 <?php
 
-if (!class_exists('VB_Marc21Xml_Export_Renderer')) {
+if (!class_exists('VB_Metadata_Export_Renderer')) {
 
-    class VB_Marc21Xml_Export_Renderer
+    class VB_Metadata_Export_Renderer
     {
         protected $common;
 
         public function __construct($plugin_name)
         {
-            $this->common = new VB_Marc21Xml_Export_Common($plugin_name);
+            $this->common = new VB_Metadata_Export_Common($plugin_name);
         }
 
         protected function get_general_field_value($field_name)
