@@ -1,6 +1,6 @@
 <?php
 
-require_once plugin_dir_path(__FILE__) . 'class-vb-metadata-export_settings.php';
+require_once plugin_dir_path(__FILE__) . '../admin/class-vb-metadata-export_settings.php';
 
 if (!class_exists('VB_Metadata_Export')) {
 

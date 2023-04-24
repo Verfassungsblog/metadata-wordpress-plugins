@@ -1,0 +1,36 @@
+body.settings_page_vb_metadata_export div#wpcontent {
+    padding-left: 0;
+}
+
+.vb-metadata-export-admin-header {
+    padding: 20px 0 0 0;
+    background-color: #fff;
+    text-align: center;
+    border-bottom: 1px solid #dcdcde;
+}
+
+.vb-metadata-export-admin-header-nav {
+
+
+}
+
+.vb-metadata-export-admin-header-tab {
+    display: inline-block;
+    padding: 20px 15px 15px 15px;
+    margin: 0 5px;
+    text-decoration: none;
+    color: rgb(60, 67, 74);
+    border-bottom: 3px solid #fff;
+    box-sizing: border-box;
+
+}
+
+.vb-metadata-export-admin-header-tab.active {
+    font-weight: 500;
+    border-bottom: 3px solid #2271b1;
+}
+
+
+.vb-metadata-export-admin-content {
+    margin: 20px 20px 0 20px;
+}
