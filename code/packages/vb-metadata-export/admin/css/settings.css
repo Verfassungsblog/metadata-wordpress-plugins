@@ -9,9 +9,14 @@ body.settings_page_vb_metadata_export div#wpcontent {
     border-bottom: 1px solid #dcdcde;
 }
 
+.vb-metadata-export-admin-header h1 {
+    line-height: 1.5em;
+}
+
 .vb-metadata-export-admin-header-nav {
-
-
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
 }
 
 .vb-metadata-export-admin-header-tab {

@@ -1,20 +1,25 @@
 <?php
 
-if (!class_exists('VB_Metadata_Export_Renderer')) {
+require_once plugin_dir_path(__FILE__) . '/class-vb-metadata-export_common.php';
 
-    class VB_Metadata_Export_Renderer
+if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
+
+    class VB_Metadata_Export_Marc21Xml
     {
         protected $common;
 
-        public function __construct($plugin_name)
+        protected $dc_author_fix;
+
+        public function __construct($plugin_name, $dc_author_fix=false)
         {
             $this->common = new VB_Metadata_Export_Common($plugin_name);
+            $this->dc_author_fix = $dc_author_fix;
         }
 
         protected function get_general_field_value($field_name)
         {
-            $default = $this->common->get_settings_field_info($field_name)["default"];
-            return get_option($this->common->get_value_field_id($field_name), $default);
+            $default = $this->common->get_setting_field_default_value($field_name);
+            return get_option($this->common->get_setting_field_id($field_name), $default);
         }
 
         protected function get_acf_post_field_value($field_name, $post)
@@ -22,8 +27,8 @@ if (!class_exists('VB_Metadata_Export_Renderer')) {
             if (!function_exists("get_field")) {
                 return;
             }
-            $default = $this->common->get_settings_field_info($field_name)["default"];
-            $acf_key = get_option($this->common->get_value_field_id($field_name), $default);
+            $default = $this->common->get_setting_field_default_value($field_name);
+            $acf_key = get_option($this->common->get_setting_field_id($field_name), $default);
             return get_field($acf_key, $post->ID);
         }
 
@@ -32,8 +37,8 @@ if (!class_exists('VB_Metadata_Export_Renderer')) {
             if (!function_exists("get_field")) {
                 return;
             }
-            $field_id = $this->common->get_value_field_id($field_name);
-            $default = $this->common->get_settings_field_info($field_name)["default"];
+            $default = $this->common->get_setting_field_default_value($field_name);
+            $field_id = $this->common->get_setting_field_id($field_name);
             $acf_key = get_option($field_id, $default);
             return get_field($acf_key, 'user_' . $user_id);
         }
@@ -95,11 +100,13 @@ if (!class_exists('VB_Metadata_Export_Renderer')) {
 
         protected function get_post_language($post) {
             $language = esc_html($this->get_general_field_value("language"));
-            $language_alternate = esc_html($this->get_general_field_value("language_alternate"));
             $language_alternate_category = esc_html($this->get_general_field_value("language_alternate_category"));
-            $categories = array_map(function($category) { return $category->name; }, get_the_category($post->ID));
-            if (in_array($language_alternate_category, $categories)) {
-                $language = $language_alternate;
+            if (!empty($language_alternate_category)) {
+                $categories = array_map(function($category) { return $category->name; }, get_the_category($post->ID));
+                if (in_array($language_alternate_category, $categories)) {
+                    $language_alternate = esc_html($this->get_general_field_value("language_alternate"));
+                    $language = $language_alternate;
+                }
             }
             return $language;
         }
@@ -107,7 +114,7 @@ if (!class_exists('VB_Metadata_Export_Renderer')) {
         public function render_leader($post)
         {
             // leader definition see: https://www.loc.gov/marc/bibliographic/bdleader.html
-            $leader = esc_html(str_replace("_", " ", $this->get_general_field_value("leader")));
+            $leader = esc_html(str_replace("_", " ", $this->get_general_field_value("marc21_leader")));
             if (!empty($leader)) {
                 return "<marc21:leader>{$leader}</marc21:leader>";
             }
@@ -190,9 +197,9 @@ if (!class_exists('VB_Metadata_Export_Renderer')) {
                 return implode("", array(
                     "<marc21:datafield tag=\"100\" ind1=\"1\" ind2=\" \">",
                     "<marc21:subfield code=\"a\">${post_author}</marc21:subfield>",
-                    "<marc21:subfield code=\"e\">Author</marc21:subfield>",
-                    "<marc21:subfield code=\"4\">aut</marc21:subfield>",
-                    $this->render_subfield_orcid($post->post_author),
+                    $this->dc_author_fix ? "" : "<marc21:subfield code=\"e\">Author</marc21:subfield>",
+                    $this->dc_author_fix ? "": "<marc21:subfield code=\"4\">aut</marc21:subfield>",
+                    $this->dc_author_fix ? "" : $this->render_subfield_orcid($post->post_author),
                     "</marc21:datafield>")
                 );
             }
@@ -325,9 +332,9 @@ if (!class_exists('VB_Metadata_Export_Renderer')) {
                 $xml = $xml . implode("", array(
                     "<marc21:datafield tag=\"700\" ind1=\"1\" ind2=\" \">",
                     "<marc21:subfield code=\"a\">{$coauthor_name}</marc21:subfield>",
-                    "<marc21:subfield code=\"e\">Author</marc21:subfield>",
-                    "<marc21:subfield code=\"4\">aut</marc21:subfield>",
-                    $this->render_subfield_orcid($coauthor->ID),
+                    $this->dc_author_fix ? "" : "<marc21:subfield code=\"e\">Author</marc21:subfield>",
+                    $this->dc_author_fix ? "" : "<marc21:subfield code=\"4\">aut</marc21:subfield>",
+                    $this->dc_author_fix ? "" : $this->render_subfield_orcid($coauthor->ID),
                     "</marc21:datafield>",
                 ));
             }

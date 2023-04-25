@@ -54,9 +54,6 @@ if (!class_exists('VB_Metadata_Export_Converter')) {
             $mods = $xsltproc->transformToDoc($marcxml);
             $mods->formatOutput = true;
             return $mods->saveXML();
-
-
-
         }
 
         public function convertMarc21ToMods($marc21xml) {
@@ -70,6 +67,7 @@ if (!class_exists('VB_Metadata_Export_Converter')) {
         public function convertMarc21ToOaiDc($marc21xml) {
             $mods = $this->convertMarc21ToMods($marc21xml);
             return $this->convertFromMarc21Xml($mods, array("MODS3-7_DC_XSLT1-0.xsl"));
+            // return $this->convertFromMarc21Xml($marc21xml, array("MARC21slim2OAIDC.xsl"));
         }
 
     }
