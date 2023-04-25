@@ -1,12 +1,13 @@
 <?php
 
 require_once plugin_dir_path(__FILE__) . '../admin/class-vb-metadata-export_admin.php';
+require_once plugin_dir_path(__FILE__) . '/class-vb-metadata-export_shortcode.php';
 
 if (!class_exists('VB_Metadata_Export')) {
 
     class VB_Metadata_Export
     {
-        protected $plugin_name;
+        protected $common;
 
         protected $plugin_version;
 
@@ -14,12 +15,15 @@ if (!class_exists('VB_Metadata_Export')) {
 
         protected $admin;
 
+        protected $shortcode;
+
         public function __construct($base_file, $plugin_name, $plugin_version)
         {
-            $this->plugin_name = $plugin_name;
             $this->plugin_version = $plugin_version;
             $this->base_file = $base_file;
+            $this->common = new VB_Metadata_Export_Common($plugin_name);
             $this->admin = new VB_Metadata_Export_Admin($plugin_name);
+            $this->shortcode = new VB_Metadata_Export_Shortcode($plugin_name);
         }
 
         public function activate()
@@ -37,18 +41,18 @@ if (!class_exists('VB_Metadata_Export')) {
         {
             # add_rewrite_rule('^marc21/?$', 'index.php?vb_metadata_export=true', 'top');
             add_rewrite_tag('%marc21xml%', '([^&]+)');
-            add_shortcode("vb-metadata-export-marc21xml-link", array($this, "shortcode_marc21xml_link"));
-            register_block_type("vb-metadata-export/marc21xml_link", array(
+
+            /*register_block_type("vb-metadata-export/marc21xml-link", array(
                 "api_version" => 2,
                 "title" => "Marc21 XML Link",
                 "description" => "Adds a link to download the post metadata as Marc21 XML document.",
                 "category" => "text",
                 "icon" => "star",
                 "render_callback" => array($this, "shortcode_marc21xml_link")
-            ));
+            ));*/
 
             load_plugin_textdomain(
-                $this->plugin_name,
+                $this->common->plugin_name,
                 false,
                 dirname(plugin_basename($this->base_file)) . '/languages'
             );
@@ -57,30 +61,17 @@ if (!class_exists('VB_Metadata_Export')) {
         public function action_template_include($template)
         {
             global $wp_query;
+            global $post;
 
-            if (isset($wp_query->query_vars['marc21xml']) && is_single()) {
-                return dirname($this->base_file) . '/public/index.php';
+            if (isset($_GET[$this->common->plugin_name]) && is_single()) {
+                $format = $_GET[$this->common->plugin_name];
+                if (in_array($format, $this->common->get_available_formats())) {
+                    if ($this->common->is_format_available($format, $post)) {
+                        return dirname($this->base_file) . '/public/' . $format . '.php';
+                    }
+                }
             }
             return $template;
-        }
-
-        public function get_the_marc21xml_permalink () {
-            $permalink = get_the_permalink() ?? get_post_permalink();
-            if (empty($permalink)) {
-                return;
-            }
-            if (str_contains($permalink, "?")) {
-                return $permalink . "&marc21xml";
-            }
-            return $permalink . "?marc21xml";
-        }
-
-        public function shortcode_marc21xml_link() {
-            $marc21_permalink = $this->get_the_marc21xml_permalink();
-            if (empty($marc21_permalink)) {
-                return "<a>Marc21 XML (not available)</a>";
-            }
-            return "<a href=\"{$marc21_permalink}\">Marc21 XML</a>";
         }
 
         public function run()
@@ -93,6 +84,7 @@ if (!class_exists('VB_Metadata_Export')) {
             add_action("template_include", array($this, 'action_template_include'));
 
             $this->admin->run();
+            $this->shortcode->run();
         }
 
     }

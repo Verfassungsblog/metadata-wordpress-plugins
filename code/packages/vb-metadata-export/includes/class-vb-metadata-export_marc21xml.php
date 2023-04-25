@@ -16,33 +16,6 @@ if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
             $this->dc_author_fix = $dc_author_fix;
         }
 
-        protected function get_general_field_value($field_name)
-        {
-            $default = $this->common->get_setting_field_default_value($field_name);
-            return get_option($this->common->get_setting_field_id($field_name), $default);
-        }
-
-        protected function get_acf_post_field_value($field_name, $post)
-        {
-            if (!function_exists("get_field")) {
-                return;
-            }
-            $default = $this->common->get_setting_field_default_value($field_name);
-            $acf_key = get_option($this->common->get_setting_field_id($field_name), $default);
-            return get_field($acf_key, $post->ID);
-        }
-
-        protected function get_acf_user_field_value($field_name, $user_id)
-        {
-            if (!function_exists("get_field")) {
-                return;
-            }
-            $default = $this->common->get_setting_field_default_value($field_name);
-            $field_id = $this->common->get_setting_field_id($field_name);
-            $acf_key = get_option($field_id, $default);
-            return get_field($acf_key, 'user_' . $user_id);
-        }
-
         protected function render_subfield_from_value($value, $subfield_code)
         {
             if (!empty($value)) {
@@ -53,7 +26,7 @@ if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
 
         protected function render_subfield_from_option($field_name, $subfield_code)
         {
-            $value = esc_html($this->get_general_field_value($field_name));
+            $value = esc_html($this->common->get_settings_field_value($field_name));
             return $this->render_subfield_from_value($value, $subfield_code);
         }
 
@@ -99,12 +72,12 @@ if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
         }
 
         protected function get_post_language($post) {
-            $language = esc_html($this->get_general_field_value("language"));
-            $language_alternate_category = esc_html($this->get_general_field_value("language_alternate_category"));
+            $language = esc_html($this->common->get_settings_field_value("language"));
+            $language_alternate_category = esc_html($this->common->get_settings_field_value("language_alternate_category"));
             if (!empty($language_alternate_category)) {
                 $categories = array_map(function($category) { return $category->name; }, get_the_category($post->ID));
                 if (in_array($language_alternate_category, $categories)) {
-                    $language_alternate = esc_html($this->get_general_field_value("language_alternate"));
+                    $language_alternate = esc_html($this->common->get_settings_field_value("language_alternate"));
                     $language = $language_alternate;
                 }
             }
@@ -114,7 +87,7 @@ if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
         public function render_leader($post)
         {
             // leader definition see: https://www.loc.gov/marc/bibliographic/bdleader.html
-            $leader = esc_html(str_replace("_", " ", $this->get_general_field_value("marc21_leader")));
+            $leader = esc_html(str_replace("_", " ", $this->common->get_settings_field_value("marc21_leader")));
             if (!empty($leader)) {
                 return "<marc21:leader>{$leader}</marc21:leader>";
             }
@@ -144,7 +117,7 @@ if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
 
         public function render_subfield_orcid($user_id)
         {
-            $orcid = $this->get_acf_user_field_value("orcid_acf", $user_id);
+            $orcid = $this->common->get_acf_settings_user_field_value("orcid_acf", $user_id);
             if (!empty($orcid)) {
                 $orcid = "(orcid)" .$orcid;
             }
@@ -153,7 +126,7 @@ if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
 
         public function render_datafield_024($post)
         {
-            $doi = esc_html($this->get_acf_post_field_value("doi_acf", $post));
+            $doi = esc_html($this->common->get_acf_settings_post_field_value("doi_acf", $post));
             if (!empty($doi)) {
                 return "<marc21:datafield tag=\"024\" ind1=\"7\" ind2=\" \">
                     <marc21:subfield code=\"a\">{$doi}</marc21:subfield>
@@ -176,8 +149,8 @@ if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
 
         public function render_datafield_084($post)
         {
-            $global_ddc = $this->get_general_field_value("ddc_general");
-            $post_ddc = $this->get_acf_post_field_value("ddc_acf", $post);
+            $global_ddc = $this->common->get_settings_field_value("ddc_general");
+            $post_ddc = $this->common->get_acf_settings_post_field_value("ddc_acf", $post);
             $combined_ddc = array_merge(explode(",", $global_ddc), explode(",", $post_ddc));
             $trimmed_ddc = array_filter(array_map('trim', $combined_ddc));
             $xml = "";
@@ -209,7 +182,7 @@ if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
         public function render_datafield_245($post)
         {
             $title = esc_html(get_the_title($post));
-            $subheadline = esc_html($this->get_acf_post_field_value("subheadline_acf", $post));
+            $subheadline = esc_html($this->common->get_acf_settings_post_field_value("subheadline_acf", $post));
             $author_name = $this->get_post_author_name($post);
 
             $subfields = implode("", array(
@@ -226,7 +199,7 @@ if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
 
         public function render_datafield_264($post)
         {
-            $publisher = esc_html($this->get_general_field_value("publisher"));
+            $publisher = esc_html($this->common->get_settings_field_value("publisher"));
             $date = get_the_date("Y-m-d", $post);
 
             $subfields = implode("", array(
@@ -271,8 +244,8 @@ if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
 
         public function render_datafield_536($post)
         {
-            $funding_general = $this->get_general_field_value("funding_general");
-            $funding_acf = $this->get_acf_post_field_value("funding_acf", $post);
+            $funding_general = $this->common->get_settings_field_value("funding_general");
+            $funding_acf = $this->common->get_acf_settings_post_field_value("funding_acf", $post);
             $funding = !empty($funding_acf) ? $funding_acf : $funding_general;
             if (!empty($funding)) {
                 return implode(
@@ -289,8 +262,8 @@ if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
 
         public function render_datafield_540($post)
         {
-            $copyright_general = $this->get_general_field_value("copyright_general");
-            $copyright_acf = $this->get_acf_post_field_value("copyright_acf", $post);
+            $copyright_general = $this->common->get_settings_field_value("copyright_general");
+            $copyright_acf = $this->common->get_acf_settings_post_field_value("copyright_acf", $post);
             $copyright = !empty($copyright_acf) ? $copyright_acf : $copyright_general;
             if (!empty($copyright)) {
                 return implode(

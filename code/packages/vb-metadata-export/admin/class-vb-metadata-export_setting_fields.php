@@ -21,7 +21,7 @@ if (!class_exists('VB_Metadata_Export_Setting_Fields')) {
             }
             $this->settings_fields = array(
                 array(
-                    "name" => "marc21_enabled",
+                    "name" => "marc21xml_enabled",
                     "type" => "boolean",
                     "section" => "marc21",
                     "label" => __("Marc21 Export Enabled", "vb-metadata-export"),
@@ -35,7 +35,7 @@ if (!class_exists('VB_Metadata_Export_Setting_Fields')) {
                     "description" => "Whether the MODS export is active or not.",
                 ),
                 array(
-                    "name" => "oai_pmh_enabled",
+                    "name" => "oai-pmh_enabled",
                     "type" => "boolean",
                     "section" => "oai_pmh",
                     "label" => __("OAI-PMH 2.0 Enabled", "vb-metadata-export"),
@@ -64,6 +64,13 @@ if (!class_exists('VB_Metadata_Export_Setting_Fields')) {
                         __("For example:", "vb-metadata-export"),
                         "<code>_____nam__22_____uu_4500</code>",
                     )),
+                ),
+                array(
+                    "name" => "marc21_doi_as_control_number",
+                    "type" => "boolean",
+                    "section" => "marc21",
+                    "label" => __("Use DOI as Control Number", "vb-metadata-export"),
+                    "description" => "Whether to use the DOI (see ACF tab) for the Marc21 Control Number Field, or otherwise the sequential post number (post id). If enabled, posts without a DOI will not output any metadata.",
                 ),
                 array(
                     "name" => "blog_owner",
