@@ -2,7 +2,7 @@
 
 # define environment variables
 WORDPRESS_URL=${WORDPRESS_URL:-http://localhost:8080}
-WORDPRESS_TITLE=${WORDPRESS_TITLE:-Wordpress Title}
+WORDPRESS_TITLE=${WORDPRESS_TITLE:-Verfassungsblog}
 WORDPRESS_USER=${WORDPRESS_USER:-admin}
 WORDPRESS_PASSWORD=${WORDPRESS_PASSWORD:-password}
 WORDPRESS_EMAIL=${WORDPRESS_EMAIL:-test@example.com}
