@@ -58,6 +58,13 @@ if (!class_exists('VB_Metadata_Export_Common')) {
             }
         }
 
+        protected function is_format_requiring_doi($format) {
+            if($format == "marc21xml") {
+                return $this->get_settings_field_value("require_doi") || $this->get_settings_field_value("marc21_doi_as_control_number");
+            }
+            return $this->get_settings_field_value("require_doi");
+        }
+
         public function get_available_formats() {
             return array_keys($this->get_format_labels());
         }
@@ -69,6 +76,10 @@ if (!class_exists('VB_Metadata_Export_Common')) {
                 "dc" => "Dublin Core",
                 "oai-pmh" => "OAI PMH 2.0",
             );
+        }
+
+        public function is_valid_format($format) {
+            return in_array($format, $this->get_available_formats());
         }
 
         public function is_format_enabled($format) {
@@ -92,16 +103,9 @@ if (!class_exists('VB_Metadata_Export_Common')) {
             return true;
         }
 
-        public function is_format_requiring_doi($format) {
-            if($format == "marc21xml") {
-                return $this->get_settings_field_value("require_doi") || $this->get_settings_field_value("marc21_doi_as_control_number");
-            }
-            return $this->get_settings_field_value("require_doi");
-        }
-
         public function get_settings_field_value($field_name) {
-            $default = $this->get_setting_field_default_value($field_name);
-            return get_option($this->get_setting_field_id($field_name), $default);
+            $default = $this->get_settings_field_default_value($field_name);
+            return get_option($this->get_settings_field_id($field_name), $default);
         }
 
         public function get_acf_settings_post_field_value($field_name, $post)
@@ -122,12 +126,12 @@ if (!class_exists('VB_Metadata_Export_Common')) {
             return get_field($acf_key, 'user_' . $user_id);
         }
 
-        public function get_setting_field_id($field_name)
+        public function get_settings_field_id($field_name)
         {
             return $this->plugin_name . '_field_' . $field_name . '_value';
         }
 
-        public function get_setting_field_default_value($field_name)
+        public function get_settings_field_default_value($field_name)
         {
             if (array_key_exists($field_name, $this->setting_field_defaults)) {
                 return $this->setting_field_defaults[$field_name];
@@ -140,7 +144,7 @@ if (!class_exists('VB_Metadata_Export_Common')) {
                 // format must be valid and enabled
                 return;
             }
-            $permalink = get_the_permalink() ?? get_post_permalink();
+            $permalink = get_the_permalink($post) ?? get_post_permalink($post);
             if (empty($permalink)) {
                 return;
             }

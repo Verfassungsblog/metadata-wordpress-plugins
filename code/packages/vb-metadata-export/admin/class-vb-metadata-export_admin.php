@@ -97,8 +97,8 @@ if (!class_exists('VB_Metadata_Export_Admin')) {
 
             // create fields
             foreach ($this->setting_fields->get_list() as $field) {
-                $field_id = $this->common->get_setting_field_id($field["name"]);
-                $default = $this->common->get_setting_field_default_value($field["name"]);
+                $field_id = $this->common->get_settings_field_id($field["name"]);
+                $default = $this->common->get_settings_field_default_value($field["name"]);
                 $settings_page_id = $this->get_setting_page_id_by_tab($tab_by_section[$field["section"]]);
 
                 register_setting(
@@ -279,7 +279,7 @@ if (!class_exists('VB_Metadata_Export_Admin')) {
                 'Verfassungsblog Metadata Export',
                 'VB Metadata Export',
                 'manage_options',
-                'vb_metadata_export',
+                $this->common->plugin_name,
                 array($this, 'render')
             );
 
@@ -312,7 +312,7 @@ if (!class_exists('VB_Metadata_Export_Admin')) {
 
             if (!empty($_POST["reset"])) {
                 foreach ($this->setting_fields->get_list() as $field) {
-                    $field_id = $this->common->get_setting_field_id($field["name"]);
+                    $field_id = $this->common->get_settings_field_id($field["name"]);
                     delete_option($field_id);
                 }
             }
@@ -331,7 +331,7 @@ if (!class_exists('VB_Metadata_Export_Admin')) {
                     foreach ($this->get_tab_labels() as $tab_name => $tab_label) {
                         ?>
                         <a class="vb-metadata-export-admin-header-tab <?php echo $current_tab == $tab_name ? "active" : "" ?>"
-                            href="?page=vb_metadata_export&tab=<?php echo $tab_name ?>">
+                            href="?page=<?php echo $this->common->plugin_name ?>&tab=<?php echo $tab_name ?>">
                             <?php echo $tab_label ?>
                         </a>
                         <?php

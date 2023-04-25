@@ -2,19 +2,44 @@
 
 require_once plugin_dir_path(__FILE__) . '/class-vb-metadata-export_common.php';
 
-if (!function_exists('get_the_vb_metadata_export_marc21xml_permalink')) {
-    function get_the_vb_metadata_export_marc21xml_permalink()
+if (!function_exists('get_the_vb_metadata_export_permalink')) {
+    function get_the_vb_metadata_export_permalink($format)
     {
+        global $post;
         $common = new VB_Metadata_Export_Common("vb-metadata-export");
-        return $common->get_the_permalink("marc21xml");
+        return $common->get_the_permalink($format, $post);
     }
 }
 
-if (!function_exists('get_the_vb_metadata_export_mods_permalink')) {
-    function get_the_vb_metadata_export_mods_permalink()
-    {
+if (!function_exists('get_the_vb_metadata_export_link')) {
+    function get_the_vb_metadata_export_link($format, $title = "", $extra_class = "", $unavailable = "") {
+        global $post;
         $common = new VB_Metadata_Export_Common("vb-metadata-export");
-        return $common->get_the_permalink("mods");
+
+        if (!$common->is_valid_format($format)) {
+            return "invalid format";
+        }
+
+        $permalink = $common->get_the_permalink($format, $post);
+        $title = empty($title) ? $common->get_format_labels()[$format] : $title;
+
+        $classes = implode(" ", array(
+            $common->plugin_name . "-link",
+            $common->plugin_name . "-" . $format . "-link",
+            empty($marc21_permalink) ? $common->plugin_name . "-unavailable" : "",
+            $extra_class,
+        ));
+
+        if (empty($permalink)) {
+            return "<a class=\"{$classes}\">" . $unavailable . "</a>";
+        }
+        return "<a class=\"{$classes}\" href=\"{$permalink}\">" . $title . "</a>";
+    }
+}
+
+if (!function_exists('the_vb_metadata_export_link')) {
+    function the_vb_metadata_export_link($format, $title = "", $extra_class = "", $unavailable = "") {
+        echo get_the_vb_metadata_export_link($format, $title, $extra_class, $unavailable);
     }
 }
 

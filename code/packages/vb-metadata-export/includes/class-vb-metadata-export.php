@@ -40,7 +40,7 @@ if (!class_exists('VB_Metadata_Export')) {
         public function action_init()
         {
             # add_rewrite_rule('^marc21/?$', 'index.php?vb_metadata_export=true', 'top');
-            add_rewrite_tag('%marc21xml%', '([^&]+)');
+            add_rewrite_tag('%' . $this->common->plugin_name . '%', '([^&]+)');
 
             /*register_block_type("vb-metadata-export/marc21xml-link", array(
                 "api_version" => 2,
@@ -63,10 +63,10 @@ if (!class_exists('VB_Metadata_Export')) {
             global $wp_query;
             global $post;
 
-            if (isset($_GET[$this->common->plugin_name]) && is_single()) {
-                $format = $_GET[$this->common->plugin_name];
+            if (isset($wp_query->query_vars[$this->common->plugin_name]) && is_single()) {
+                $format = $wp_query->query_vars[$this->common->plugin_name];
                 if (in_array($format, $this->common->get_available_formats())) {
-                    if ($this->common->is_format_available($format, $post)) {
+                    if ($this->common->is_format_enabled($format)) {
                         return dirname($this->base_file) . '/public/' . $format . '.php';
                     }
                 }

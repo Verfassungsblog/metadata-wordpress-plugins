@@ -22,37 +22,24 @@ if (!class_exists('VB_Metadata_Export_Shortcode')) {
             add_shortcode($this->plugin_name . "-link", array($this, "render_link"));
         }
 
-        public function render_link($atts, $content, $shortcode_tag) {
-            global $post;
+        public function render_link($atts, $content, $shortcode_tag)
+        {
+            $format = $atts["format"];
 
-            $format_labels = $this->common->get_format_labels();
-
-            if (!array_key_exists("format", $atts) || !array_key_exists($atts["format"], $format_labels)) {
+            if (!$this->common->is_valid_format($format)) {
                 // format is mandatory argument
                 return;
             }
 
-            $format = $atts["format"];
-            $permalink = $this->common->get_the_permalink($format, $post);
+            $attributes = shortcode_atts(
+                array(
+                    "format" => $format,
+                    "title" => $this->common->get_format_labels()[$format],
+                    "unavailable" => "",
+                    "class" => "",
+                ), $atts);
 
-            $attributes = shortcode_atts( array(
-                "format" => "",
-                "title" => $format_labels[$format],
-                "unavailable" => "",
-                "class" => "",
-            ), $atts );
-
-            $classes = implode(" ", array(
-                $this->plugin_name . "-link",
-                $this->plugin_name . "-" . $attributes["format"] . "-link",
-                empty($marc21_permalink) ? $this->plugin_name . "-unavailable" : "",
-                $attributes["class"],
-            ));
-
-            if (empty($permalink)) {
-                return "<a class=\"{$classes}\">" . $attributes["unavailable"] . "</a>";
-            }
-            return "<a class=\"{$classes}\" href=\"{$permalink}\">" . $attributes["title"] . "</a>";
+            return get_the_vb_metadata_export_link($format, $attributes["title"], $attributes["class"], $attributes["unavailable"]);
         }
 
         public function run()
