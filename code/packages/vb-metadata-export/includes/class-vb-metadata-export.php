@@ -72,16 +72,10 @@ if (!class_exists('VB_Metadata_Export')) {
             global $wp_query;
             global $post;
 
-            // print_r($wp_query->query_vars);
-
             if (isset($wp_query->query_vars[$this->common->plugin_name])) {
                 $format = $wp_query->query_vars[$this->common->plugin_name];
                 if (in_array($format, $this->common->get_available_formats())) {
-                    if ($this->common->is_format_enabled($format)) {
-                        if (is_single() || $format == "oai-pmh") {
-                            return dirname($this->base_file) . '/public/' . $format . '.php';
-                        }
-                    }
+                    return dirname($this->base_file) . '/public/' . $format . '.php';
                 }
             }
 

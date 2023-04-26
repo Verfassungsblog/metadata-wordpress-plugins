@@ -53,22 +53,11 @@ if (!function_exists('vb_metadata_export_render_format')) {
 
         $common = new VB_Metadata_Export_Common("vb-metadata-export");
 
-        if (!$common->is_format_available($format, $post)) {
+        if (!$common->is_format_available($format, $post) || !is_single()) {
             return;
         }
 
         header('Content-Type: application/xml');
-
-        if ($format == "oai-pmh") {
-            $oaipmh = new VB_Metadata_Export_OaiPmh($common->plugin_name);
-            echo $oaipmh->render();
-            return;
-        }
-
-        // disable exports for other formats if not referencing a single post
-        if (!is_single()) {
-            return;
-        }
 
         if ($format == "marc21xml") {
             $marc21xml = new VB_Metadata_Export_Marc21Xml($common->plugin_name);
