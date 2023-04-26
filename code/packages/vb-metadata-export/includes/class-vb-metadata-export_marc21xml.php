@@ -124,6 +124,15 @@ if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
             return $this->render_subfield_from_value($orcid, "0");
         }
 
+        public function render_subfield_gndid($user_id)
+        {
+            $gndid = $this->common->get_acf_settings_user_field_value("gndid_acf", $user_id);
+            if (!empty($gndid)) {
+                $gndid = "(DE-588)" .$gndid;
+            }
+            return $this->render_subfield_from_value($gndid, "0");
+        }
+
         public function render_datafield_024($post)
         {
             $doi = esc_html($this->common->get_acf_settings_post_field_value("doi_acf", $post));
@@ -173,6 +182,7 @@ if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
                     $this->dc_author_fix ? "" : "<marc21:subfield code=\"e\">Author</marc21:subfield>",
                     $this->dc_author_fix ? "": "<marc21:subfield code=\"4\">aut</marc21:subfield>",
                     $this->dc_author_fix ? "" : $this->render_subfield_orcid($post->post_author),
+                    $this->dc_author_fix ? "" : $this->render_subfield_gndid($post->post_author),
                     "</marc21:datafield>")
                 );
             }
@@ -308,6 +318,7 @@ if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
                     $this->dc_author_fix ? "" : "<marc21:subfield code=\"e\">Author</marc21:subfield>",
                     $this->dc_author_fix ? "" : "<marc21:subfield code=\"4\">aut</marc21:subfield>",
                     $this->dc_author_fix ? "" : $this->render_subfield_orcid($coauthor->ID),
+                    $this->dc_author_fix ? "" : $this->render_subfield_gndid($coauthor->ID),
                     "</marc21:datafield>",
                 ));
             }
