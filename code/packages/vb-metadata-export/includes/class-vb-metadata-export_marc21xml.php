@@ -97,7 +97,21 @@ if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
         public function render_control_numbers($post)
         {
             // control number definition see: https://www.loc.gov/marc/bibliographic/bd001.html
-            $control_number = $post->ID;
+            $use_doi = $this->common->get_settings_field_value("marc21_doi_as_control_number");
+            if ($use_doi) {
+                $doi = $this->common->get_acf_settings_post_field_value("doi_acf", $post);
+                $doi_splitted = explode("/", $doi);
+                if (count($doi_splitted) == 2) {
+                    $control_number = esc_html($doi_splitted[1]);
+                } else {
+                    $control_number = "invalid-doi";
+                }
+            } else {
+                $control_number = $post->ID;
+            }
+            $identifier = $this->common->get_settings_field_value("marc21_control_number_identifier");
+            $physical_description = $this->common->get_settings_field_value("marc21_physical_description");
+
             $date = get_the_date("ymd", $post);
             $date = empty($date) ? "||||||" : $date;
             $year = get_the_date("Y", $post);
@@ -106,11 +120,12 @@ if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
             $language = empty($language) ? "|||" : $language;
 
             if (!empty($control_number)) {
-                return "
-                    <marc21:controlfield tag=\"001\">{$control_number}</marc21:controlfield>
-                    <marc21:controlfield tag=\"007\">cr|||||</marc21:controlfield>
-                    <marc21:controlfield tag=\"008\">{$date}s{$year}||||xx#|||||o|||| ||| 0|{$language}||</marc21:controlfield>
-                ";
+                return implode("", array(
+                    "<marc21:controlfield tag=\"001\">{$control_number}</marc21:controlfield>",
+                    !empty($identifier) ? "<marc21:controlfield tag=\"003\">{$identifier}</marc21:controlfield>" : "",
+                    !empty($physical_description) ? "<marc21:controlfield tag=\"007\">{$physical_description}</marc21:controlfield>" : "",
+                    "<marc21:controlfield tag=\"008\">{$date}s{$year}||||xx#|||||o|||| ||| 0|{$language}||</marc21:controlfield>"
+                ));
             }
             return "";
         }

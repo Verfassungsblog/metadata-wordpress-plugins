@@ -70,7 +70,32 @@ if (!class_exists('VB_Metadata_Export_Setting_Fields')) {
                     "type" => "boolean",
                     "section" => "marc21",
                     "label" => __("Use DOI as Control Number", "vb-metadata-export"),
-                    "description" => "Whether to use the DOI (see ACF tab) for the Marc21 Control Number Field, or otherwise the sequential post number (post id). If enabled, posts without a DOI will not output any metadata.",
+                    "description" => "Whether to use the DOI (see ACF tab) for the Marc21 Control Number Field (see
+                        <a href=\"https://www.loc.gov/marc/bibliographic/bd001.html\" target=\"_blank\">Marc21 001</a>),
+                        or otherwise the sequential post number (post id). If enabled, posts without a DOI will not output
+                        any metadata.",
+                ),
+                array(
+                    "name" => "marc21_control_number_identifier",
+                    "type" => "string",
+                    "section" => "marc21",
+                    "label" => __("Control Number Identifier", "vb-metadata-export"),
+                    "placeholder" => __("marc21 control number identifier", "vb-metadata-export"),
+                    "description" => "The Marc Code for the organization that provides control numbers (see
+                        <a href=\"https://www.loc.gov/marc/bibliographic/bd003.html\" target=\"_blank\">Marc21 003</a>).
+                        This code is issued by the Library of Congress and other national libraries, for example the
+                        <a href=\"https://sigel.staatsbibliothek-berlin.de/vergabe/marc-orgcode\">
+                        Staatsbibliothek zu Berlin</a>.",
+                ),
+                array(
+                    "name" => "marc21_physical_description",
+                    "type" => "string",
+                    "section" => "marc21",
+                    "label" => __("Physical Description", "vb-metadata-export"),
+                    "placeholder" => __("marc21 physical description code", "vb-metadata-export"),
+                    "description" => "The physical description code (see
+                        <a href=\"https://www.loc.gov/marc/bibliographic/bd007.html\" target=\"_blank\">Marc21 007</a>).
+                        <br>For example: <code>cr|||||</code> = Remote Electronic Resource",
                 ),
                 array(
                     "name" => "blog_owner",
