@@ -17,6 +17,8 @@ if (!class_exists('VB_Metadata_Export')) {
 
         protected $shortcode;
 
+        protected $oaipmh;
+
         public function __construct($base_file, $plugin_name, $plugin_version)
         {
             $this->plugin_version = $plugin_version;
@@ -24,6 +26,7 @@ if (!class_exists('VB_Metadata_Export')) {
             $this->common = new VB_Metadata_Export_Common($plugin_name);
             $this->admin = new VB_Metadata_Export_Admin($plugin_name);
             $this->shortcode = new VB_Metadata_Export_Shortcode($plugin_name);
+            $this->oaipmh = new VB_Metadata_Export_OaiPmh($plugin_name);
         }
 
         public function activate()
@@ -39,8 +42,14 @@ if (!class_exists('VB_Metadata_Export')) {
 
         public function action_init()
         {
-            # add_rewrite_rule('^marc21/?$', 'index.php?vb_metadata_export=true', 'top');
+            // general format (marc21, mods, dc, oai-pmh)
             add_rewrite_tag('%' . $this->common->plugin_name . '%', '([^&]+)');
+
+            // specific oai rewrites
+            add_rewrite_rule('^oai/?([^/]*)', 'index.php?' . $this->common->plugin_name . '=oai-pmh&$matches[1]', 'top');
+            add_rewrite_tag('%verb%', '([^&]+)');
+            add_rewrite_tag('%identifier%', '([^&]+)');
+            add_rewrite_tag('%metadataPrefix%', '([^&]+)');
 
             /*register_block_type("vb-metadata-export/marc21xml-link", array(
                 "api_version" => 2,
@@ -63,14 +72,20 @@ if (!class_exists('VB_Metadata_Export')) {
             global $wp_query;
             global $post;
 
-            if (isset($wp_query->query_vars[$this->common->plugin_name]) && is_single()) {
+            // print_r($wp_query->query_vars);
+
+            if (isset($wp_query->query_vars[$this->common->plugin_name])) {
                 $format = $wp_query->query_vars[$this->common->plugin_name];
                 if (in_array($format, $this->common->get_available_formats())) {
                     if ($this->common->is_format_enabled($format)) {
-                        return dirname($this->base_file) . '/public/' . $format . '.php';
+                        if (is_single() || $format == "oai-pmh") {
+                            return dirname($this->base_file) . '/public/' . $format . '.php';
+                        }
                     }
                 }
             }
+
+
             return $template;
         }
 
@@ -85,6 +100,7 @@ if (!class_exists('VB_Metadata_Export')) {
 
             $this->admin->run();
             $this->shortcode->run();
+            $this->oaipmh->run();
         }
 
     }

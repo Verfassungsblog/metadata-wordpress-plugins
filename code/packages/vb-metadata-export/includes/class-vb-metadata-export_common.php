@@ -157,6 +157,15 @@ if (!class_exists('VB_Metadata_Export_Common')) {
             return  $permalink . "?" . $this->plugin_name . "={$format}";
         }
 
+        public function formatXml($xml_str)
+        {
+            $dom = new DOMDocument("1.0");
+            $dom->preserveWhiteSpace = false;
+            $dom->formatOutput = true;
+            $dom->loadXML($xml_str);
+            return $dom->saveXML();
+        }
+
     }
 
 }

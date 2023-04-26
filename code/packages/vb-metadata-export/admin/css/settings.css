@@ -2,6 +2,14 @@ body.settings_page_vb-metadata-export div#wpcontent {
     padding-left: 0;
 }
 
+body.settings_page_vb-metadata-export pre {
+    padding: 0.5em;
+    background-color: #fff;
+    border: 1px solid #dcdcde;
+    box-sizing: border-box;
+    overflow: auto;
+}
+
 .vb-metadata-export-admin-header {
     padding: 20px 0 0 0;
     background-color: #fff;

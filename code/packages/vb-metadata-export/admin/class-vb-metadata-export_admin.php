@@ -3,7 +3,7 @@
 require_once plugin_dir_path(__FILE__) . '../includes/class-vb-metadata-export_common.php';
 require_once plugin_dir_path(__FILE__) . '../includes/class-vb-metadata-export_converter.php';
 require_once plugin_dir_path(__FILE__) . '../includes/class-vb-metadata-export_marc21xml.php';
-
+require_once plugin_dir_path(__FILE__) . '../includes/class-vb-metadata-export_oaipmh.php';
 require_once plugin_dir_path(__FILE__) . '/class-vb-metadata-export_setting_fields.php';
 
 if (!class_exists('VB_Metadata_Export_Admin')) {
@@ -381,9 +381,12 @@ if (!class_exists('VB_Metadata_Export_Admin')) {
             $posts = get_posts(array('numberposts' => 1));
             $renderer = new VB_Metadata_Export_Marc21Xml($this->common->plugin_name);
             $marc21xml = $renderer->render($posts[0]);
+            $example_url = $this->common->get_the_permalink("marc21xml", $posts[0]);
             ?>
             <h2>
+                <a href="<?php echo $example_url ?>">
                 <?php echo __("Example", "vb-metadata-export") ?>
+                </a>
             </h2>
 
             <pre><?php echo esc_html($marc21xml) ?></pre>
@@ -399,10 +402,13 @@ if (!class_exists('VB_Metadata_Export_Admin')) {
 
             $marc21xml = $renderer->render($posts[0]);
             $mods_xml = $converter->convertMarc21ToMods($marc21xml);
+            $example_url = $this->common->get_the_permalink("mods", $posts[0]);
 
             ?>
             <h2>
+                <a href="<?php echo $example_url ?>">
                 <?php echo __("Example", "vb-metadata-export") ?>
+                </a>
             </h2>
 
             <pre><?php echo esc_html($mods_xml) ?></pre>
@@ -413,18 +419,50 @@ if (!class_exists('VB_Metadata_Export_Admin')) {
         public function render_oai_pmh_tab()
         {
             $posts = get_posts(array('numberposts' => 1));
-            $renderer = new VB_Metadata_Export_Marc21Xml($this->common->plugin_name);
-            $converter = new VB_Metadata_Export_Converter();
+            $oaipmh = new VB_Metadata_Export_OaiPmh($this->common->plugin_name);
 
-            $marc21xml = $renderer->render($posts[0]);
-            $oai_dc = $converter->convertMarc21ToOaiDc($marc21xml);
+            $identify = $oaipmh->render_identify();
+            $oai_baseurl = $oaipmh->get_base_url();
+            $list_sets = $oaipmh->render_list_sets();
+            $list_metadata_formats = $oaipmh->render_list_metadata_formats();
+            $get_record = $oaipmh->render_get_record($posts[0]->ID, "oai_dc");
+            $list_records = $oaipmh->render_list_records();
+            $list_identifiers = $oaipmh->render_list_identifiers();
 
             ?>
             <h2>
-                <?php echo __("Example", "vb-metadata-export") ?>
+                <a href="<?php echo $oai_baseurl ?>?verb=Identify">
+                <?php echo __("Example Identify", "vb-metadata-export") ?>
+                </a>
             </h2>
+            <pre><?php echo esc_html($identify) ?></pre>
+            <h2>
+                <a href="<?php echo $oai_baseurl ?>?verb=ListSets">
+                <?php echo __("Example ListSets", "vb-metadata-export") ?>
+                </a>
+            </h2>
+            <pre><?php echo esc_html($list_sets) ?></pre>
+            <h2>
+                <a href="<?php echo $oai_baseurl ?>?verb=ListMetadataFormats">
+                <?php echo __("Example ListMetadataFormats", "vb-metadata-export") ?>
+                </a>
+            </h2>
+            <pre><?php echo esc_html($list_metadata_formats) ?></pre>
+            <h2>
+                <a href="<?php echo $oai_baseurl ?>?verb=GetRecord&identifier=<?php echo $posts[0]->ID ?>&metadataPrefix=oai_dc">
+                <?php echo __("Example GetRecord", "vb-metadata-export") ?>
+                </a>
+            </h2>
+            <pre><?php echo esc_html($get_record) ?></pre>
+            <h2>
+                <?php echo __("Example ListRecords", "vb-metadata-export") ?>
+            </h2>
+            <pre><?php echo esc_html($list_records) ?></pre>
+            <h2>
+                <?php echo __("Example ListIdentifiers", "vb-metadata-export") ?>
+            </h2>
+            <pre><?php echo esc_html($list_identifiers) ?></pre>
 
-            <pre><?php echo esc_html($oai_dc) ?></pre>
             <?php
         }
 
@@ -436,10 +474,13 @@ if (!class_exists('VB_Metadata_Export_Admin')) {
 
             $marc21xml = $renderer->render($posts[0]);
             $rdf_dc = $converter->convertMarc21ToRdfDc($marc21xml);
+            $example_url = $this->common->get_the_permalink("dc", $posts[0]);
 
             ?>
             <h2>
+                <a href="<?php echo $example_url ?>">
                 <?php echo __("Example", "vb-metadata-export") ?>
+                </a>
             </h2>
 
             <pre><?php echo esc_html($rdf_dc) ?></pre>

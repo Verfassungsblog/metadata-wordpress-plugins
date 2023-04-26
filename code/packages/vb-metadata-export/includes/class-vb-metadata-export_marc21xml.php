@@ -160,6 +160,17 @@ if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
             return "";
         }
 
+        public function render_datafield_035($post)
+        {
+            $control_number = $post->ID;
+            if (!empty($control_number)) {
+                return "<marc21:datafield tag=\"035\" ind1=\" \" ind2=\" \">
+                    <marc21:subfield code=\"a\">{$control_number}</marc21:subfield>
+                </marc21:datafield>";
+            }
+            return "";
+        }
+
         public function render_datafield_041($post)
         {
             $language = $this->get_post_language($post);
@@ -361,7 +372,7 @@ if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
                 return implode(
                     "",
                     array(
-                        "<marc21:datafield tag=\"856\" ind1=\" \" ind2=\" \">",
+                        "<marc21:datafield tag=\"856\" ind1=\"4\" ind2=\"0\">",
                         "<marc21:subfield code=\"u\">{$post_url}</marc21:subfield>",
                         "<marc21:subfield code=\"y\">raw object</marc21:subfield>",
                         "</marc21:datafield>"
@@ -369,15 +380,6 @@ if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
                 );
             }
             return "";
-        }
-
-        public function formatXml($xml_str)
-        {
-            $dom = new DOMDocument("1.0");
-            $dom->preserveWhiteSpace = false;
-            $dom->formatOutput = true;
-            $dom->loadXML($xml_str);
-            return $dom->saveXML();
         }
 
         public function render($post)
@@ -391,6 +393,7 @@ if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
                     $this->render_leader($post),
                     $this->render_control_numbers($post),
                     $this->render_datafield_024($post),
+                    // $this->render_datafield_035($post),
                     $this->render_datafield_041($post),
                     $this->render_datafield_084($post),
                     $this->render_datafield_100($post),
@@ -409,7 +412,7 @@ if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
                 )
             );
 
-            return $this->formatXml($xml_str);
+            return $this->common->formatXml($xml_str);
         }
 
     }
