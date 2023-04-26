@@ -48,7 +48,7 @@ if (!class_exists('VB_Metadata_Export_OaiPmh')) {
                 return $this->render_list_sets();
             }
             if ($verb == "ListMetadataFormats") {
-                return $this->render_list_sets();
+                return $this->render_list_metadata_formats();
             }
             if ($verb == "GetRecord") {
                 $identifier = get_query_var('identifier');
