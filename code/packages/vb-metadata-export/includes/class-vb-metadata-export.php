@@ -45,11 +45,15 @@ if (!class_exists('VB_Metadata_Export')) {
             // general format (marc21, mods, dc, oai-pmh)
             add_rewrite_tag('%' . $this->common->plugin_name . '%', '([^&]+)');
 
-            // specific oai rewrites
+            // specific oai-pmh rewrites
             add_rewrite_rule('^oai/?([^/]*)', 'index.php?' . $this->common->plugin_name . '=oai-pmh&$matches[1]', 'top');
             add_rewrite_tag('%verb%', '([^&]+)');
             add_rewrite_tag('%identifier%', '([^&]+)');
             add_rewrite_tag('%metadataPrefix%', '([^&]+)');
+            add_rewrite_tag('%from%', '([^&]+)');
+            add_rewrite_tag('%until%', '([^&]+)');
+            add_rewrite_tag('%resumptionToken%', '([^&]+)');
+            add_rewrite_tag('%set%', '([^&]+)');
 
             /*register_block_type("vb-metadata-export/marc21xml-link", array(
                 "api_version" => 2,
@@ -79,7 +83,6 @@ if (!class_exists('VB_Metadata_Export')) {
                 }
             }
 
-
             return $template;
         }
 
@@ -94,7 +97,6 @@ if (!class_exists('VB_Metadata_Export')) {
 
             $this->admin->run();
             $this->shortcode->run();
-            $this->oaipmh->run();
         }
 
     }

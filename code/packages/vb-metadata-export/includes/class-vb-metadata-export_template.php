@@ -81,8 +81,7 @@ if (!function_exists('vb_metadata_export_render_format')) {
             return;
         }
 
-
-
+        // should not happen
         return "unkown format";
     }
 }

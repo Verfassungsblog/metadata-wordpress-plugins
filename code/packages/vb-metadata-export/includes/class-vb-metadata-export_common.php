@@ -1,5 +1,7 @@
 <?php
 
+require_once plugin_dir_path(__FILE__) . '/class-vb-metadata-export_oaipmh.php';
+
 if (!class_exists('VB_Metadata_Export_Common')) {
 
     class VB_Metadata_Export_Common
@@ -17,27 +19,24 @@ if (!class_exists('VB_Metadata_Export_Common')) {
             $blog_title = get_bloginfo("name");
 
             if ($blog_title == "Verfassungsblog") {
+                // default settings for Verfassungsblog
                 $this->setting_field_defaults = array(
-                    "marc21xml_enabled" => true,
-                    "mods_enabled" => true,
-                    "oai-pmh_enabled" => true,
-                    "oai-pmh_admin_email" => "admin@example.com",
-                    "dc_enabled" => true,
-                    "marc21_leader" => "_____nam__22_____uu_4500",
-                    "marc21_doi_as_control_number" => true,
-                    "marc21_control_number_identifier" => "DE-Verfassungsblog",
-                    "marc21_physical_description" => "cr|||||",
+                    // general
                     "blog_owner" => "Max Steinbeis Verfassungsblog gGmbH",
-                    "blog_title" => get_bloginfo("name"),
+                    "blog_title" => $blog_title,
                     "issn" => "2366-7044",
-                    "publisher" => get_bloginfo("name"),
+                    "publisher" => $blog_title,
                     "require_doi" => true,
-                    "language" => "ger",
-                    "language_alternate" => "eng",
-                    "language_alternate_category" => "English Articles",
                     "ddc_general" => "342",
                     "copyright_general" => "CC BY-SA 4.0",
                     "funding_general" => "funded by the government",
+
+                    // language
+                    "language" => "ger",
+                    "language_alternate" => "eng",
+                    "language_alternate_category" => "English Articles",
+
+                    // acf
                     "doi_acf" => "doi",
                     "subheadline_acf" => "subheadline",
                     "orcid_acf" => "orcid",
@@ -45,35 +44,69 @@ if (!class_exists('VB_Metadata_Export_Common')) {
                     "ddc_acf" => "ddc",
                     "copyright_acf" => "copyright",
                     "funding_acf" => "funding",
+
+                    // marc21xml
+                    "marc21xml_enabled" => true,
+                    "marc21_leader" => "_____nam__22_____uu_4500",
+                    "marc21_doi_as_control_number" => true,
+                    "marc21_control_number_identifier" => "DE-Verfassungsblog",
+                    "marc21_physical_description" => "cr|||||",
+
+                    // mods
+                    "mods_enabled" => true,
+
+                    // oai-pmh
+                    "oai-pmh_enabled" => true,
+                    "oai-pmh_admin_email" => "admin@example.com",
+                    "oai-pmh_list_size" => 10,
+
+                    // dublin core
+                    "dc_enabled" => true,
                 );
             } else {
+                // default settings for any other blog than Verfassungsblog
                 $this->setting_field_defaults = array(
+                    // general
+                    "blog_title" => $blog_title,
+                    "require_doi" => false,
+
+                    // language
+                    "language" => "eng",
+
+                    // marc21xml
                     "marc21xml_enabled" => true,
                     "marc21_leader" => "_____nam__22_____uu_4500",
                     "marc21_doi_as_control_number" => false,
                     "marc21_physical_description" => "cr|||||",
+
+                    // mods
                     "mods_enabled" => true,
+
+                    // oai-pmh
                     "oai-pmh_enabled" => true,
+                    "oai-pmh_list_size" => 10,
+
+                    // dublin core
                     "dc_enabled" => true,
-                    "require_doi" => false,
-                    "blog_title" => get_bloginfo("name"),
-                    "language" => "eng",
                 );
             }
         }
 
-        protected function is_format_requiring_doi($format) {
-            if($format == "marc21xml") {
+        protected function is_format_requiring_doi($format)
+        {
+            if ($format == "marc21xml") {
                 return $this->get_settings_field_value("require_doi") || $this->get_settings_field_value("marc21_doi_as_control_number");
             }
             return $this->get_settings_field_value("require_doi");
         }
 
-        public function get_available_formats() {
+        public function get_available_formats()
+        {
             return array_keys($this->get_format_labels());
         }
 
-        public function get_format_labels() {
+        public function get_format_labels()
+        {
             return array(
                 "marc21xml" => "Marc21 XML",
                 "mods" => "MODS",
@@ -82,23 +115,25 @@ if (!class_exists('VB_Metadata_Export_Common')) {
             );
         }
 
-        public function is_valid_format($format) {
+        public function is_valid_format($format)
+        {
             return in_array($format, $this->get_available_formats());
         }
 
-        public function is_format_enabled($format) {
+        public function is_format_enabled($format)
+        {
             if (in_array($format, $this->get_available_formats())) {
                 return $this->get_settings_field_value($format . "_enabled");
             }
             return false;
         }
 
-        public function is_format_available($format, $post) {
+        public function is_format_available($format, $post)
+        {
             if (!$this->is_format_enabled($format)) {
                 return false;
             }
             if ($this->is_format_requiring_doi($format)) {
-
                 $doi = $this->get_acf_settings_post_field_value("doi_acf", $post);
                 if (empty($doi)) {
                     return false;
@@ -107,7 +142,8 @@ if (!class_exists('VB_Metadata_Export_Common')) {
             return true;
         }
 
-        public function get_settings_field_value($field_name) {
+        public function get_settings_field_value($field_name)
+        {
             $default = $this->get_settings_field_default_value($field_name);
             return get_option($this->get_settings_field_id($field_name), $default);
         }
@@ -143,19 +179,30 @@ if (!class_exists('VB_Metadata_Export_Common')) {
             return false;
         }
 
-        public function get_the_permalink($format, $post) {
+        public function get_the_permalink($format, $post)
+        {
+            // check settings
             if (!$this->is_format_available($format, $post)) {
                 // format must be valid and enabled
                 return;
             }
+
+            // check permalink
             $permalink = get_the_permalink($post) ?? get_post_permalink($post);
             if (empty($permalink)) {
                 return;
             }
-            if (str_contains($permalink, "?")) {
-                return  $permalink . "&" . $this->plugin_name . "={$format}";
+
+            if ($format == "oai-pmh") {
+                $oaipmh = new VB_Metadata_Export_OaiPmh($this->plugin_name);
+                return $oaipmh->get_permalink($post);
             }
-            return  $permalink . "?" . $this->plugin_name . "={$format}";
+
+            // transform permalink
+            if (str_contains($permalink, "?")) {
+                return $permalink . "&" . $this->plugin_name . "={$format}";
+            }
+            return $permalink . "?" . $this->plugin_name . "={$format}";
         }
 
         public function formatXml($xml_str)

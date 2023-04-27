@@ -19,6 +19,14 @@ if (!class_exists('VB_Metadata_Export_OaiPmh')) {
             return $date->format("Y-m-d\TH:i:s\Z");
         }
 
+        protected function iso8601_to_date($iso) {
+            $date = date_create_immutable_from_format('Y-m-d\\TH:i:s\\Z', $iso, new DateTimeZone('UTC'));
+            if (!$date) {
+                $date = date_create_immutable_from_format('Y-m-d', $iso, new DateTimeZone('UTC'));
+            }
+            return $date;
+        }
+
         protected function get_post_id_from_identifier($identifier) {
             $permalink = str_replace("oai:", "http://", $identifier);
             return url_to_postid($permalink);
@@ -42,44 +50,34 @@ if (!class_exists('VB_Metadata_Export_OaiPmh')) {
             return in_array($metadataPrefix, array("oai_dc", "mods-xml", "MARC21-xml"));
         }
 
-        public function get_base_url() {
-            return get_home_url() . "/oai/repository/";
+        protected function get_list_arguments_error($verb, $metadataPrefix, $from, $until, $resumptionToken) {
+            if (empty($metadataPrefix)) {
+                return $this->render_error($verb, "badArgument", "metadataPrefix is required");
+            }
+            if (!$this->is_valid_metadata_prefix($metadataPrefix)) {
+                return $this->render_error($verb, "cannotDisseminateFormat", "invalid metadataPrefix format");
+            }
+            if (!empty($from) && !$this->iso8601_to_date($from)) {
+                return $this->render_error($verb, "badArgument", "from date is not iso8601");
+            }
+            if (!empty($until) && !$this->iso8601_to_date($until)) {
+                return $this->render_error($verb, "badArgument", "until date is not iso8601");
+            }
+            if (!empty($from) && !empty($until) && str_contains($from, "T") != str_contains($until, "T")) {
+                return $this->render_error($verb, "badArgument", "both from and until date should have same granularity");
+            }
+            if (!empty($resumptionToken) && (!empty($from) || !empty($until))) {
+                return $this->render_error($verb, "badArgument", "date not allowed in combination with resumptionToken");
+            }
+            return false;
         }
 
-        public function get_post_identifier($post) {
-            return "oai:" . str_replace(array("http://", "https://"), "", get_the_permalink($post));
-        }
-
-        public function render() {
-            $verb = get_query_var('verb');
-            $identifier = get_query_var('identifier');
-            $metadataPrefix = get_query_var('metadataPrefix');
-            $from = get_query_var('from');
-            $until = get_query_var('until');
-            $set = get_query_var('set');
-            $resumptionToken = get_query_var('resumptionToken');
-
-            if ($verb == "Identify") {
-                return $this->render_identify();
+        protected function get_list_size() {
+            $list_size = (int)$this->common->get_settings_field_value("oai-pmh_list_size");
+            if ($list_size <= 0) {
+                return 10;
             }
-            if ($verb == "ListSets") {
-                return $this->render_list_sets();
-            }
-            if ($verb == "ListMetadataFormats") {
-                return $this->render_list_metadata_formats();
-            }
-            if ($verb == "GetRecord") {
-
-                return $this->render_get_record($identifier, $metadataPrefix);
-            }
-            if ($verb == "ListIdentifiers") {
-
-                return $this->render_list_identifiers($metadataPrefix, $from, $until, $set, $resumptionToken);
-            }
-            if ($verb == "ListRecords") {
-                return $this->render_list_records($metadataPrefix, $from, $until, $set, $resumptionToken);
-            }
-            return $this->render_error($verb, "badVerb", "verb argument is not a legal OAI-PMH verb");
+            return $list_size;
         }
 
         protected function implode_query_arguments($query) {
@@ -124,12 +122,13 @@ if (!class_exists('VB_Metadata_Export_OaiPmh')) {
             return "<metadata>" . $metadata . "</metadata>";
         }
 
-        protected function query_for_posts($from, $until) {
+        protected function query_for_posts($offset, $from, $until) {
             $after = empty($from) ? $this->get_earliest_post_date() : $from;
             $before = empty($until) ? $this->date_to_iso8601(new DateTime()) : $until;
             $require_doi = $this->common->get_settings_field_value("require_doi");
 
             $query_args = array(
+                'offset' => $offset,
                 'date_query' => array(
                     array(
                         'after'     => $after,
@@ -138,7 +137,7 @@ if (!class_exists('VB_Metadata_Export_OaiPmh')) {
                     ),
                 ),
                 'post_status' => 'publish',
-                'posts_per_page' => 10,
+                'posts_per_page' => $this->get_list_size(),
             );
 
             if ($require_doi) {
@@ -152,7 +151,131 @@ if (!class_exists('VB_Metadata_Export_OaiPmh')) {
                 );
             }
 
-            return (new WP_Query( $query_args ))->get_posts();
+            return new WP_Query( $query_args );
+        }
+
+        protected function parse_resumption_token($token) {
+            if (empty($token)) {
+                return false;
+            }
+            parse_str(base64_decode($token), $options);
+            $allowed_options = array("offset", "from", "until", "metadataPrefix", "set");
+            return array_intersect_key($options, array_flip($allowed_options));
+        }
+
+        protected function get_resumption_token($offset, $list_count, $total_count, $from, $until, $metadataPrefix, $set) {
+            $next_offset = $offset + $list_count;
+            $options = array_filter(array(
+                "offset" => $next_offset,
+                "from" => $from,
+                "until" => $until,
+                "metadataPrefix" => $metadataPrefix,
+                "set" => $set
+            ));
+            $token = http_build_query($options);
+            return array(
+                "<resumptionToken cursor=\"{$offset}\" completeListSize=\"{$total_count}\">",
+                base64_encode($token),
+                "</resumptionToken>",
+            );
+        }
+
+        protected function render_list_request($verb, $metadataPrefix, $from, $until, $set, $resumptionToken) {
+            $requestOptions = array_filter(array(
+                "verb" => $verb,
+                "from" => $from,
+                "until" => $until,
+                "metadataPrefix" => $metadataPrefix,
+                "set" => $set,
+                "resumptionToken" => $resumptionToken
+            ));
+
+            $resumptionOptions = $this->parse_resumption_token($resumptionToken);
+            if (!empty($resumptionToken) && !$resumptionOptions) {
+                return $this->render_error($verb, "badResumptionToken", "invalid resumption token");
+            }
+
+            $offset = 0;
+            if ($resumptionOptions) {
+                $offset = $resumptionOptions["offset"] ?? $offset;
+                $from = $resumptionOptions["from"] ?? $from;
+                $until = $resumptionOptions["until"] ?? $until;
+                $metadataPrefix = $resumptionOptions["metadataPrefix"] ?? $metadataPrefix;
+                $set = $resumptionOptions["set"] ?? $set;
+            }
+
+            $error = $this->get_list_arguments_error($verb, $metadataPrefix, $from, $until, $resumptionToken);
+            if ($error) {
+                return $error;
+            }
+
+            $query = $this->query_for_posts($offset, $from, $until);
+            $total_count = $query->found_posts;
+            $list_count = $query->post_count;
+            $posts = $query->get_posts();
+
+            if ($list_count == 0) {
+                return $this->render_error($verb, "noRecordsMatch", "no records match the provided criteria");
+            }
+
+            $xml_array = array("<{$verb}>");
+            foreach($posts as $post) {
+                $xml_array = array_merge($xml_array, array(
+                    "<record>",
+                    $this->get_post_header($post),
+                    $verb == "ListRecords" ? $this->get_post_metadata($post, $metadataPrefix) : "",
+                    "</record>",
+                ));
+            }
+            if($total_count > $list_count + $offset) {
+                // there are more results, use resumptionToken
+                $xml_array = array_merge($xml_array, $this->get_resumption_token($offset, $list_count, $total_count, $from, $until, $metadataPrefix, $set));
+            }
+            $xml_array = array_merge($xml_array, array("</{$verb}>"));
+
+            return $this->render_response($requestOptions, implode("", $xml_array));
+        }
+
+        public function get_base_url() {
+            return get_home_url() . "/oai/repository/";
+        }
+
+        public function get_post_identifier($post) {
+            return "oai:" . str_replace(array("http://", "https://"), "", get_the_permalink($post));
+        }
+
+        public function get_permalink($post) {
+            return $this->get_base_url() . "?verb=GetRecord&metadataPrefix=oai_dc&identifier=" . $this->get_post_identifier($post);
+        }
+
+        public function render() {
+            $verb = get_query_var('verb');
+            $identifier = get_query_var('identifier');
+            $metadataPrefix = get_query_var('metadataPrefix');
+            $from = get_query_var('from');
+            $until = get_query_var('until');
+            $set = get_query_var('set');
+            $resumptionToken = get_query_var('resumptionToken');
+
+            if ($verb == "Identify") {
+                return $this->render_identify();
+            }
+            if ($verb == "ListSets") {
+                return $this->render_list_sets();
+            }
+            if ($verb == "ListMetadataFormats") {
+                return $this->render_list_metadata_formats();
+            }
+            if ($verb == "GetRecord") {
+                return $this->render_get_record($identifier, $metadataPrefix);
+            }
+            if ($verb == "ListIdentifiers") {
+                return $this->render_list_identifiers($metadataPrefix, $from, $until, $set, $resumptionToken);
+            }
+            if ($verb == "ListRecords") {
+                return $this->render_list_records($metadataPrefix, $from, $until, $set, $resumptionToken);
+            }
+            return $this->render_error($verb, "badVerb", "verb argument is not a legal OAI-PMH verb");
         }
 
         public function render_response($query, $content) {
@@ -220,7 +343,8 @@ if (!class_exists('VB_Metadata_Export_OaiPmh')) {
                 "<schema>http://www.openarchives.org/OAI/2.0/oai_dc.xsd</schema>",
                 "<metadataNamespace>http://www.openarchives.org/OAI/2.0/oai_dc</metadataNamespace>",
                 "</metadataFormat>",
-                "<metadataFormat><metadataPrefix>mods-xml</metadataPrefix>",
+                "<metadataFormat>",
+                "<metadataPrefix>mods-xml</metadataPrefix>",
                 "<schema>http://www.loc.gov/standards/mods/v3/mods-3-7.xsd</schema>",
                 "<metadataNamespace>http://www.loc.gov/mods/v3</metadataNamespace>",
                 "</metadataFormat>",
@@ -236,9 +360,14 @@ if (!class_exists('VB_Metadata_Export_OaiPmh')) {
 
         public function render_get_record($identifier, $metadataPrefix) {
             // example: https://services.dnb.de/oai/repository?verb=GetRecord&metadataPrefix=oai_dc&identifier=oai:dnb.de/dnb/1277033072
-
+            if (empty($metadataPrefix)) {
+                return $this->render_error("GetRecord", "badArgument", "metadataPrefix required");
+            }
             if (!$this->is_valid_metadata_prefix($metadataPrefix)) {
                 return $this->render_error("GetRecord", "cannotDisseminateFormat", "invalid metadataPrefix format");
+            }
+            if (empty($identifier)) {
+                return $this->render_error("GetRecord", "badArgument", "identifier required");
             }
             $post_id = $this->get_post_id_from_identifier($identifier);
             if ($post_id <= 0) {
@@ -261,56 +390,13 @@ if (!class_exists('VB_Metadata_Export_OaiPmh')) {
             ), $xml);
         }
 
-        public function render_list_records($metadataPrefix = "oai_dc", $from = null, $until = null, $set = null, $resumptionToken = null) {
-
-            $posts = $this->query_for_posts($from, $until);
-
-            $xml_array = array("<ListRecords>");
-            foreach($posts as $post) {
-                $xml_array = array_merge($xml_array, array(
-                    $this->get_post_header($post),
-                    $this->get_post_metadata($post, $metadataPrefix),
-                ));
-            }
-            $xml_array = array_merge($xml_array, array("</ListRecords>"));
-
-            return $this->render_response(array_filter(array(
-                "verb" => "ListIdentifiers",
-                "from" => $from,
-                "until" => $until,
-                "metadataPrefix" => $metadataPrefix,
-                "set" => $set,
-                "resumptionToken" => $resumptionToken
-            )), implode("", $xml_array));
-
+        public function render_list_records($metadataPrefix, $from = null, $until = null, $set = null, $resumptionToken = null) {
+            return $this->render_list_request("ListRecords", $metadataPrefix, $from, $until, $set, $resumptionToken);
         }
 
-        public function render_list_identifiers($metadataPrefix = "oai_dc", $from = null, $until = null, $set = null, $resumptionToken = null) {
+        public function render_list_identifiers($metadataPrefix, $from = null, $until = null, $set = null, $resumptionToken = null) {
             // example: https://services.dnb.de/oai/repository?verb=ListIdentifiers&metadataPrefix=oai_dc&from=2023-01-01&until=2023-01-02
-            if (!$this->is_valid_metadata_prefix($metadataPrefix)) {
-                return $this->render_error("ListIdentifiers", "cannotDisseminateFormat", "invalid metadataPrefix format");
-            }
-
-            $posts = $this->query_for_posts($from, $until);
-
-            $xml_array = array("<ListIdentifiers>");
-            foreach($posts as $post) {
-                $xml_array = array_merge($xml_array, array($this->get_post_header($post)));
-            }
-            $xml_array = array_merge($xml_array, array("</ListIdentifiers>"));
-
-            return $this->render_response(array_filter(array(
-                "verb" => "ListIdentifiers",
-                "from" => $from,
-                "until" => $until,
-                "metadataPrefix" => $metadataPrefix,
-                "set" => $set,
-                "resumptionToken" => $resumptionToken
-            )), implode("", $xml_array));
-        }
-
-        public function run() {
-
+            return $this->render_list_request("ListIdentifiers", $metadataPrefix, $from, $until, $set, $resumptionToken);
         }
 
     }

@@ -33,8 +33,8 @@ if (!class_exists('VB_Metadata_Export_Admin')) {
                 "acf" => "ACF",
                 "marc21" => "Marc21 XML",
                 "mods" => "MODS",
+                "dc" => "Dublin Core",
                 "oai_pmh" => "OAI-PMH 2.0",
-                "dc" => "Dublin Core"
             );
         }
 
@@ -418,53 +418,66 @@ if (!class_exists('VB_Metadata_Export_Admin')) {
 
         public function render_oai_pmh_tab()
         {
-            $posts = get_posts(array('numberposts' => 1));
-            $oaipmh = new VB_Metadata_Export_OaiPmh($this->common->plugin_name);
+            $oaipmh_enabled = $this->common->get_settings_field_value("oai-pmh_enabled");
+            if ($oaipmh_enabled) {
+                $posts = get_posts(array('numberposts' => 1));
+                $oaipmh = new VB_Metadata_Export_OaiPmh($this->common->plugin_name);
+                $oai_baseurl = $oaipmh->get_base_url();
+                $post_identifier = $oaipmh->get_post_identifier($posts[0]);
+                ?>
+                <h2>
+                    Example Requests
+                </h2>
 
-            $identify = $oaipmh->render_identify();
-            $oai_baseurl = $oaipmh->get_base_url();
-            $list_sets = $oaipmh->render_list_sets();
-            $list_metadata_formats = $oaipmh->render_list_metadata_formats();
-            $post_identifier = $oaipmh->get_post_identifier($posts[0]);
-            $get_record = $oaipmh->render_get_record($post_identifier, "oai_dc");
-            $list_records = $oaipmh->render_list_records();
-            $list_identifiers = $oaipmh->render_list_identifiers();
-
-            ?>
-            <h2>
-                <a href="<?php echo $oai_baseurl ?>?verb=Identify">
-                <?php echo __("Example Identify", "vb-metadata-export") ?>
-                </a>
-            </h2>
-            <pre><?php echo esc_html($identify) ?></pre>
-            <h2>
-                <a href="<?php echo $oai_baseurl ?>?verb=ListSets">
-                <?php echo __("Example ListSets", "vb-metadata-export") ?>
-                </a>
-            </h2>
-            <pre><?php echo esc_html($list_sets) ?></pre>
-            <h2>
-                <a href="<?php echo $oai_baseurl ?>?verb=ListMetadataFormats">
-                <?php echo __("Example ListMetadataFormats", "vb-metadata-export") ?>
-                </a>
-            </h2>
-            <pre><?php echo esc_html($list_metadata_formats) ?></pre>
-            <h2>
-                <a href="<?php echo $oai_baseurl ?>?verb=GetRecord&identifier=<?php echo $post_identifier ?>&metadataPrefix=oai_dc">
-                <?php echo __("Example GetRecord", "vb-metadata-export") ?>
-                </a>
-            </h2>
-            <pre><?php echo esc_html($get_record) ?></pre>
-            <h2>
-                <?php echo __("Example ListRecords", "vb-metadata-export") ?>
-            </h2>
-            <pre><?php echo esc_html($list_records) ?></pre>
-            <h2>
-                <?php echo __("Example ListIdentifiers", "vb-metadata-export") ?>
-            </h2>
-            <pre><?php echo esc_html($list_identifiers) ?></pre>
-
+                <ul>
+                    <li>
+                        <a href="<?php echo $oai_baseurl ?>?verb=Identify">
+                        <?php echo __("Identify", "vb-metadata-export") ?>
+                        </a>
+                    <li>
+                    <li>
+                        <a href="<?php echo $oai_baseurl ?>?verb=ListSets">
+                        <?php echo __("ListSets", "vb-metadata-export") ?>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="<?php echo $oai_baseurl ?>?verb=ListMetadataFormats">
+                        <?php echo __("ListMetadataFormats", "vb-metadata-export") ?>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="<?php echo $oai_baseurl ?>?verb=GetRecord&identifier=<?php echo $post_identifier ?>&metadataPrefix=oai_dc">
+                        <?php echo __("GetRecord", "vb-metadata-export") ?>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="<?php echo $oai_baseurl ?>?verb=ListRecords&metadataPrefix=oai_dc">
+                        <?php echo __("ListRecords", "vb-metadata-export") ?>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="<?php echo $oai_baseurl ?>?verb=ListIdentifiers&metadataPrefix=oai_dc">
+                        <?php echo __("ListIdentifiers", "vb-metadata-export") ?>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="<?php echo $oai_baseurl ?>?verb=something">
+                        <?php echo __("Error: BadVerb", "vb-metadata-export") ?>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="<?php echo $oai_baseurl ?>?verb=GetRecord">
+                        <?php echo __("Error: BadArgument", "vb-metadata-export") ?>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="<?php echo $oai_baseurl ?>?verb=ListIdentifiers&metadataPrefix=bad">
+                        <?php echo __("Error: CannotDisseminateFormat", "vb-metadata-export") ?>
+                        </a>
+                    </li>
+                </ul>
             <?php
+            }
         }
 
         public function render_dc_tab()

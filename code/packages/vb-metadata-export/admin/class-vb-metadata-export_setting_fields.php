@@ -106,6 +106,14 @@ if (!class_exists('VB_Metadata_Export_Setting_Fields')) {
                     "description" => "The admin email address that provides support for the OAI PMH interface.",
                 ),
                 array(
+                    "name" => "oai-pmh_list_size",
+                    "type" => "integer",
+                    "section" => "oai_pmh",
+                    "label" => __("OAI List Size", "vb-metadata-export"),
+                    "placeholder" => __("the list size", "vb-metadata-export"),
+                    "description" => "The maximum number of records to show in a response to a OAI-PMH list request.",
+                ),
+                array(
                     "name" => "blog_owner",
                     "type" => "string",
                     "section" => "general",
