@@ -20,99 +20,7 @@ if (!class_exists('VB_Metadata_Export_Setting_Fields')) {
                 return;
             }
             $this->settings_fields = array(
-                array(
-                    "name" => "marc21xml_enabled",
-                    "type" => "boolean",
-                    "section" => "marc21",
-                    "label" => __("Marc21 Export Enabled", "vb-metadata-export"),
-                    "description" => "Whether the Marc21 XML export is active or not.",
-                ),
-                array(
-                    "name" => "mods_enabled",
-                    "type" => "boolean",
-                    "section" => "mods",
-                    "label" => __("MODS Export Enabled", "vb-metadata-export"),
-                    "description" => "Whether the MODS export is active or not.",
-                ),
-                array(
-                    "name" => "oai-pmh_enabled",
-                    "type" => "boolean",
-                    "section" => "oai_pmh",
-                    "label" => __("OAI-PMH 2.0 Enabled", "vb-metadata-export"),
-                    "description" => "Whether the OAI-PMH 2.0 interface is active or not.",
-                ),
-                array(
-                    "name" => "dc_enabled",
-                    "type" => "boolean",
-                    "section" => "dc",
-                    "label" => __("Dublin Core Export Enabled", "vb-metadata-export"),
-                    "description" => "Whether the Dublin Core export is active or not.",
-                ),
-                array(
-                    "name" => "marc21_leader",
-                    "type" => "string",
-                    "section" => "marc21",
-                    "label" => __("Marc21 Leader", "vb-metadata-export"),
-                    "placeholder" => __("marc21 leader attribute", "vb-metadata-export"),
-                    "description" => implode("", array(
-                        __("The", "vb-metadata-export"),
-                        " <a href=\"https://www.loc.gov/marc/bibliographic/bdleader.html\" target=\"_blank\">",
-                        __("Marc21 leader attribute", "vb-metadata-export"),
-                        "</a>. ",
-                        __("Use the underscore (_) instead of a space ( ).", "vb-metadata-export"),
-                        "<br>",
-                        __("For example:", "vb-metadata-export"),
-                        "<code>_____nam__22_____uu_4500</code>",
-                    )),
-                ),
-                array(
-                    "name" => "marc21_doi_as_control_number",
-                    "type" => "boolean",
-                    "section" => "marc21",
-                    "label" => __("Use DOI as Control Number", "vb-metadata-export"),
-                    "description" => "Whether to use the DOI (see ACF tab) for the Marc21 Control Number Field (see
-                        <a href=\"https://www.loc.gov/marc/bibliographic/bd001.html\" target=\"_blank\">Marc21 001</a>),
-                        or otherwise the sequential post number (post id). If enabled, posts without a DOI will not output
-                        any metadata.",
-                ),
-                array(
-                    "name" => "marc21_control_number_identifier",
-                    "type" => "string",
-                    "section" => "marc21",
-                    "label" => __("Control Number Identifier", "vb-metadata-export"),
-                    "placeholder" => __("marc21 control number identifier", "vb-metadata-export"),
-                    "description" => "The Marc Code for the organization that provides control numbers (see
-                        <a href=\"https://www.loc.gov/marc/bibliographic/bd003.html\" target=\"_blank\">Marc21 003</a>).
-                        This code is issued by the Library of Congress and other national libraries, for example the
-                        <a href=\"https://sigel.staatsbibliothek-berlin.de/vergabe/marc-orgcode\">
-                        Staatsbibliothek zu Berlin</a>.",
-                ),
-                array(
-                    "name" => "marc21_physical_description",
-                    "type" => "string",
-                    "section" => "marc21",
-                    "label" => __("Physical Description", "vb-metadata-export"),
-                    "placeholder" => __("marc21 physical description code", "vb-metadata-export"),
-                    "description" => "The physical description code (see
-                        <a href=\"https://www.loc.gov/marc/bibliographic/bd007.html\" target=\"_blank\">Marc21 007</a>).
-                        <br>For example: <code>cr|||||</code> = Remote Electronic Resource",
-                ),
-                array(
-                    "name" => "oai-pmh_admin_email",
-                    "type" => "string",
-                    "section" => "oai_pmh",
-                    "label" => __("OAI Admin Email", "vb-metadata-export"),
-                    "placeholder" => __("the OAI admin email address", "vb-metadata-export"),
-                    "description" => "The admin email address that provides support for the OAI PMH interface.",
-                ),
-                array(
-                    "name" => "oai-pmh_list_size",
-                    "type" => "integer",
-                    "section" => "oai_pmh",
-                    "label" => __("OAI List Size", "vb-metadata-export"),
-                    "placeholder" => __("the list size", "vb-metadata-export"),
-                    "description" => "The maximum number of records to show in a response to a OAI-PMH list request.",
-                ),
+                // ------------------- general settings ---------------------
                 array(
                     "name" => "blog_owner",
                     "type" => "string",
@@ -162,38 +70,12 @@ if (!class_exists('VB_Metadata_Export_Setting_Fields')) {
                         metadata output.",
                 ),
                 array(
-                    "name" => "language",
-                    "type" => "string",
-                    "section" => "language",
-                    "label" => "Language<br>Code",
-                    "placeholder" => "language code",
-                    "description" => "The default <a href=\"https://www.loc.gov/marc/languages/language_code.html\"
-                        target=\"_blank\">Marc21 Language Code</a> (see
-                        <a href=\"https://www.loc.gov/marc/bibliographic/bd041.html\" target=\"_blank\">Marc21 041a</a>).
-                        The language can be overwritten by assigning posts to a category, see below.
-                        <br>For Example: <code>ger</code> = \"German\"",
-                ),
-                array(
-                    "name" => "language_alternate",
-                    "type" => "string",
-                    "section" => "language",
-                    "label" => "Alternate Language<br>Code",
-                    "placeholder" => "language code",
-                    "description" => "The alternate <a href=\"https://www.loc.gov/marc/languages/language_code.html\"
-                        target=\"_blank\">Marc21 Language Code</a> (see
-                        <a href=\"https://www.loc.gov/marc/bibliographic/bd041.html\" target=\"_blank\">Marc21 041a</a>).
-                        This language code is used in case a post is assigned to a specific category, see below.
-                        <br>For Example: <code>eng</code> = \"English\"",
-                ),
-                array(
-                    "name" => "language_alternate_category",
-                    "type" => "string",
-                    "section" => "language",
-                    "label" => "Alternate Language<br>Category",
-                    "placeholder" => "category name",
-                    "description" => "The name of the category, which posts are assigned to, in case they are written
-                        in the alternate language.
-                        <br>For Example: <code>English Articles</code>",
+                    "name" => "include_excerpt",
+                    "type" => "boolean",
+                    "section" => "general",
+                    "label" => __("Include Excerpt", "vb-metadata-export"),
+                    "description" => "Whether to include the article excerpt when exporting metadata (see
+                        <a href=\"https://www.loc.gov/marc/bibliographic/bd520.html\" target=\"_blank\">Marc21 520a</a>).",
                 ),
                 array(
                     "name" => "ddc_general",
@@ -230,6 +112,46 @@ if (!class_exists('VB_Metadata_Export_Setting_Fields')) {
                         <a href=\"https://www.loc.gov/marc/bibliographic/bd540.html\" target=\"_blank\">Marc21 536a</a>).
                         This note can be overwritten with a post-specific funding note if it is provided via an ACF field.",
                 ),
+
+                // ------------------ language settings ---------------------
+
+                array(
+                    "name" => "language",
+                    "type" => "string",
+                    "section" => "language",
+                    "label" => "Language<br>Code",
+                    "placeholder" => "language code",
+                    "description" => "The default <a href=\"https://www.loc.gov/marc/languages/language_code.html\"
+                        target=\"_blank\">Marc21 Language Code</a> (see
+                        <a href=\"https://www.loc.gov/marc/bibliographic/bd041.html\" target=\"_blank\">Marc21 041a</a>).
+                        The language can be overwritten by assigning posts to a category, see below.
+                        <br>For Example: <code>ger</code> = \"German\"",
+                ),
+                array(
+                    "name" => "language_alternate",
+                    "type" => "string",
+                    "section" => "language",
+                    "label" => "Alternate Language<br>Code",
+                    "placeholder" => "language code",
+                    "description" => "The alternate <a href=\"https://www.loc.gov/marc/languages/language_code.html\"
+                        target=\"_blank\">Marc21 Language Code</a> (see
+                        <a href=\"https://www.loc.gov/marc/bibliographic/bd041.html\" target=\"_blank\">Marc21 041a</a>).
+                        This language code is used in case a post is assigned to a specific category, see below.
+                        <br>For Example: <code>eng</code> = \"English\"",
+                ),
+                array(
+                    "name" => "language_alternate_category",
+                    "type" => "string",
+                    "section" => "language",
+                    "label" => "Alternate Language<br>Category",
+                    "placeholder" => "category name",
+                    "description" => "The name of the category, which posts are assigned to, in case they are written
+                        in the alternate language.
+                        <br>For Example: <code>English Articles</code>",
+                ),
+
+                // ------------- advanced custom field settings -------------
+
                 array(
                     "name" => "doi_acf",
                     "type" => "string",
@@ -296,6 +218,111 @@ if (!class_exists('VB_Metadata_Export_Setting_Fields')) {
                     "description" => "The ACF field key that contains a funding note for a particular post (see
                         <a href=\"https://www.loc.gov/marc/bibliographic/bd540.html\" target=\"_blank\">Marc21 536a</a>).
                         If a post-specific funding note is provided, the default funding note is overwritten.",
+                ),
+
+                // ------------------ marc21 xml settings -------------------
+
+                array(
+                    "name" => "marc21xml_enabled",
+                    "type" => "boolean",
+                    "section" => "marc21",
+                    "label" => __("Marc21 Export Enabled", "vb-metadata-export"),
+                    "description" => "Whether the Marc21 XML export is active or not.",
+                ),
+                array(
+                    "name" => "marc21_leader",
+                    "type" => "string",
+                    "section" => "marc21",
+                    "label" => __("Marc21 Leader", "vb-metadata-export"),
+                    "placeholder" => __("marc21 leader attribute", "vb-metadata-export"),
+                    "description" => implode("", array(
+                        __("The", "vb-metadata-export"),
+                        " <a href=\"https://www.loc.gov/marc/bibliographic/bdleader.html\" target=\"_blank\">",
+                        __("Marc21 leader attribute", "vb-metadata-export"),
+                        "</a>. ",
+                        __("Use the underscore (_) instead of a space ( ).", "vb-metadata-export"),
+                        "<br>",
+                        __("For example:", "vb-metadata-export"),
+                        "<code>_____nam__22_____uu_4500</code>",
+                    )),
+                ),
+                array(
+                    "name" => "marc21_doi_as_control_number",
+                    "type" => "boolean",
+                    "section" => "marc21",
+                    "label" => __("Use DOI as Control Number", "vb-metadata-export"),
+                    "description" => "Whether to use the DOI (see ACF tab) for the Marc21 Control Number Field (see
+                        <a href=\"https://www.loc.gov/marc/bibliographic/bd001.html\" target=\"_blank\">Marc21 001</a>),
+                        or otherwise the sequential post number (post id). If enabled, posts without a DOI will not output
+                        any metadata.",
+                ),
+                array(
+                    "name" => "marc21_control_number_identifier",
+                    "type" => "string",
+                    "section" => "marc21",
+                    "label" => __("Control Number Identifier", "vb-metadata-export"),
+                    "placeholder" => __("marc21 control number identifier", "vb-metadata-export"),
+                    "description" => "The Marc Code for the organization that provides control numbers (see
+                        <a href=\"https://www.loc.gov/marc/bibliographic/bd003.html\" target=\"_blank\">Marc21 003</a>).
+                        This code is issued by the Library of Congress and other national libraries, for example the
+                        <a href=\"https://sigel.staatsbibliothek-berlin.de/vergabe/marc-orgcode\">
+                        Staatsbibliothek zu Berlin</a>.",
+                ),
+                array(
+                    "name" => "marc21_physical_description",
+                    "type" => "string",
+                    "section" => "marc21",
+                    "label" => __("Physical Description", "vb-metadata-export"),
+                    "placeholder" => __("marc21 physical description code", "vb-metadata-export"),
+                    "description" => "The physical description code (see
+                        <a href=\"https://www.loc.gov/marc/bibliographic/bd007.html\" target=\"_blank\">Marc21 007</a>).
+                        <br>For example: <code>cr|||||</code> = Remote Electronic Resource",
+                ),
+
+                // -------------------- mods settings -----------------------
+
+                array(
+                    "name" => "mods_enabled",
+                    "type" => "boolean",
+                    "section" => "mods",
+                    "label" => __("MODS Export Enabled", "vb-metadata-export"),
+                    "description" => "Whether the MODS export is active or not.",
+                ),
+
+                // ----------------- dublin core settings -------------------
+
+                array(
+                    "name" => "dc_enabled",
+                    "type" => "boolean",
+                    "section" => "dc",
+                    "label" => __("Dublin Core Export Enabled", "vb-metadata-export"),
+                    "description" => "Whether the Dublin Core export is active or not.",
+                ),
+
+                // ------------------- oai-pmh settings ---------------------
+
+                array(
+                    "name" => "oai-pmh_enabled",
+                    "type" => "boolean",
+                    "section" => "oai_pmh",
+                    "label" => __("OAI-PMH 2.0 Enabled", "vb-metadata-export"),
+                    "description" => "Whether the OAI-PMH 2.0 interface is active or not.",
+                ),
+                array(
+                    "name" => "oai-pmh_admin_email",
+                    "type" => "string",
+                    "section" => "oai_pmh",
+                    "label" => __("OAI Admin Email", "vb-metadata-export"),
+                    "placeholder" => __("the OAI admin email address", "vb-metadata-export"),
+                    "description" => "The admin email address that provides support for the OAI PMH interface.",
+                ),
+                array(
+                    "name" => "oai-pmh_list_size",
+                    "type" => "integer",
+                    "section" => "oai_pmh",
+                    "label" => __("OAI List Size", "vb-metadata-export"),
+                    "placeholder" => __("the list size", "vb-metadata-export"),
+                    "description" => "The maximum number of records to show in a response to a OAI-PMH list request.",
                 ),
             );
             // index settings field by their name

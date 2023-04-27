@@ -27,6 +27,7 @@ if (!class_exists('VB_Metadata_Export_Common')) {
                     "issn" => "2366-7044",
                     "publisher" => $blog_title,
                     "require_doi" => true,
+                    "include_excerpt" => true,
                     "ddc_general" => "342",
                     "copyright_general" => "CC BY-SA 4.0",
                     "funding_general" => "funded by the government",
@@ -69,6 +70,7 @@ if (!class_exists('VB_Metadata_Export_Common')) {
                     // general
                     "blog_title" => $blog_title,
                     "require_doi" => false,
+                    "include_excerpt" => false,
 
                     // language
                     "language" => "eng",

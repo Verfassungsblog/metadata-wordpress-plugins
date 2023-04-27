@@ -278,6 +278,20 @@ if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
             </marc21:datafield>";
         }
 
+        public function render_datafield_520($post)
+        {
+            $include_excerpt = $this->common->get_settings_field_value("include_excerpt");
+            if ($include_excerpt) {
+                $excerpt = esc_html(get_the_excerpt($post));
+                if (!empty($excerpt)) {
+                return "<marc21:datafield tag=\"520\" ind1=\" \" ind2=\" \">
+                        <marc21:subfield code=\"a\">${excerpt}</marc21:subfield>
+                    </marc21:datafield>";
+                }
+            }
+            return "";
+        }
+
         public function render_datafield_536($post)
         {
             $funding_general = $this->common->get_settings_field_value("funding_general");
@@ -402,6 +416,7 @@ if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
                     $this->render_datafield_336($post),
                     $this->render_datafield_337($post),
                     $this->render_datafield_338($post),
+                    $this->render_datafield_520($post),
                     $this->render_datafield_536($post),
                     $this->render_datafield_540($post),
                     $this->render_datafield_650($post),
