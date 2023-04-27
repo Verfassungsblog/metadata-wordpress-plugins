@@ -1,0 +1,24 @@
+FROM docker.io/perl:5
+
+RUN apt-get update && apt-get install -y \
+    libcgi-pm-perl \
+    libclass-accessor-perl \
+    libcrypt-ssleay-perl \
+    libdata-uuid-perl \
+    libdate-manip-perl \
+    libhttp-message-perl \
+    libjson-perl \
+    liblwp-protocol-https-perl \
+    libtry-tiny-perl \
+    liburi-perl \
+    libxml-dom-perl \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN cpan HTTP::OAIPMH::Validator
+
+WORKDIR /root/.cpan/build/HTTP-OAIPMH-Validator-1.06-0
+
+# keep container running for development work
+# (e.g. vscode remote development plugin)
+# don't do this other than for development purposes
+ENTRYPOINT ["tail", "-f", "/dev/null"]

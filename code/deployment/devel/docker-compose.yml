@@ -47,3 +47,11 @@ services:
       - PMA_HOST=database
     depends_on:
       - database
+
+  oaipmh-validator:
+    build:
+      context: .
+      dockerfile: Dockerfile.oaipmh-validator
+    network_mode: "host"
+    depends_on:
+      - wordpress

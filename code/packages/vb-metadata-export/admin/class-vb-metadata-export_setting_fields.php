@@ -98,6 +98,14 @@ if (!class_exists('VB_Metadata_Export_Setting_Fields')) {
                         <br>For example: <code>cr|||||</code> = Remote Electronic Resource",
                 ),
                 array(
+                    "name" => "oai-pmh_admin_email",
+                    "type" => "string",
+                    "section" => "oai_pmh",
+                    "label" => __("OAI Admin Email", "vb-metadata-export"),
+                    "placeholder" => __("the OAI admin email address", "vb-metadata-export"),
+                    "description" => "The admin email address that provides support for the OAI PMH interface.",
+                ),
+                array(
                     "name" => "blog_owner",
                     "type" => "string",
                     "section" => "general",

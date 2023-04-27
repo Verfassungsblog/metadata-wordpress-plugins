@@ -21,6 +21,7 @@ if (!class_exists('VB_Metadata_Export_Common')) {
                     "marc21xml_enabled" => true,
                     "mods_enabled" => true,
                     "oai-pmh_enabled" => true,
+                    "oai-pmh_admin_email" => "admin@example.com",
                     "dc_enabled" => true,
                     "marc21_leader" => "_____nam__22_____uu_4500",
                     "marc21_doi_as_control_number" => true,

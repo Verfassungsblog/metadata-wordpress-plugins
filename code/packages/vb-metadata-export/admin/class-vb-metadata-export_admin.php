@@ -425,7 +425,8 @@ if (!class_exists('VB_Metadata_Export_Admin')) {
             $oai_baseurl = $oaipmh->get_base_url();
             $list_sets = $oaipmh->render_list_sets();
             $list_metadata_formats = $oaipmh->render_list_metadata_formats();
-            $get_record = $oaipmh->render_get_record($posts[0]->ID, "oai_dc");
+            $post_identifier = $oaipmh->get_post_identifier($posts[0]);
+            $get_record = $oaipmh->render_get_record($post_identifier, "oai_dc");
             $list_records = $oaipmh->render_list_records();
             $list_identifiers = $oaipmh->render_list_identifiers();
 
@@ -449,7 +450,7 @@ if (!class_exists('VB_Metadata_Export_Admin')) {
             </h2>
             <pre><?php echo esc_html($list_metadata_formats) ?></pre>
             <h2>
-                <a href="<?php echo $oai_baseurl ?>?verb=GetRecord&identifier=<?php echo $posts[0]->ID ?>&metadataPrefix=oai_dc">
+                <a href="<?php echo $oai_baseurl ?>?verb=GetRecord&identifier=<?php echo $post_identifier ?>&metadataPrefix=oai_dc">
                 <?php echo __("Example GetRecord", "vb-metadata-export") ?>
                 </a>
             </h2>
