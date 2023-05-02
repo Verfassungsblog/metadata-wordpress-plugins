@@ -1,0 +1,49 @@
+body.settings_page_vb-doaj div#wpcontent {
+    padding-left: 0;
+}
+
+body.settings_page_vb-doaj pre {
+    padding: 0.5em;
+    background-color: #fff;
+    border: 1px solid #dcdcde;
+    box-sizing: border-box;
+    overflow: auto;
+}
+
+.vb-doaj-admin-header {
+    padding: 20px 0 0 0;
+    background-color: #fff;
+    text-align: center;
+    border-bottom: 1px solid #dcdcde;
+}
+
+.vb-doaj-admin-header h1 {
+    line-height: 1.5em;
+}
+
+.vb-doaj-admin-header-nav {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.vb-doaj-admin-header-tab {
+    display: inline-block;
+    padding: 20px 15px 15px 15px;
+    margin: 0 5px;
+    text-decoration: none;
+    color: rgb(60, 67, 74);
+    border-bottom: 3px solid #fff;
+    box-sizing: border-box;
+
+}
+
+.vb-doaj-admin-header-tab.active {
+    font-weight: 500;
+    border-bottom: 3px solid #2271b1;
+}
+
+
+.vb-doaj-admin-content {
+    margin: 20px 20px 0 20px;
+}
