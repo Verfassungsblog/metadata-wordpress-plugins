@@ -53,7 +53,7 @@ if (!function_exists('vb_metadata_export_render_format')) {
 
         $common = new VB_Metadata_Export_Common("vb-metadata-export");
 
-        if (!$common->is_format_available($format, $post) || !is_single()) {
+        if (!is_post_publicly_viewable() || !$common->is_format_available($format, $post) || !is_single()) {
             return;
         }
 

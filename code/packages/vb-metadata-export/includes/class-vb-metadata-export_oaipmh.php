@@ -136,6 +136,7 @@ if (!class_exists('VB_Metadata_Export_OaiPmh')) {
                         'inclusive' => true,
                     ),
                 ),
+                'post_type' => 'post',
                 'post_status' => 'publish',
                 'posts_per_page' => $this->get_list_size(),
             );
