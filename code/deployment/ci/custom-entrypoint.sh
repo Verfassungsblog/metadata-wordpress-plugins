@@ -48,7 +48,7 @@ EOF
 cp -a /usr/src/wordpress/. /var/www/html/
 
 # copy wordpress plugins
-cp -a /usr/src/wordpress-plugins/. /var/www/html/wp-content/plugins/
+cp -a /usr/src/wordpress-plugins/* /var/www/html/wp-content/plugins/
 
 # reset file permissions
 chown -R www-data:www-data /var/www/html
@@ -82,6 +82,7 @@ wp-cli theme update --all
 # activate plugins
 wp-cli plugin activate advanced-custom-fields co-authors-plus debug-bar query-monitor
 wp-cli plugin activate vb-metadata-export
+wp-cli plugin activate vb-doaj
 
 # flush permalinks
 wp-cli rewrite structure "/%postname%/"

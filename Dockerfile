@@ -20,7 +20,7 @@ RUN apt-get update && apt-get install -y libxslt-dev && rm -rf /var/lib/apt/list
 RUN docker-php-ext-install xsl
 
 # copy plugins
-COPY code/packages/* /usr/src/wordpress-plugins/
+COPY code/packages /usr/src/wordpress-plugins
 
 # copy entrypoint that configures mysql and wordpress
 COPY code/deployment/ci/custom-entrypoint.sh /usr/local/bin/custom-entrypoint.sh
