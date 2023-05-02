@@ -1,6 +1,6 @@
 <?php
 
-require_once plugin_dir_path(__FILE__) . '/class-vb-metadata-export_oaipmh.php';
+require_once plugin_dir_path(__FILE__) . '/class-vb-metadata-export_oai_pmh.php';
 
 if (!class_exists('VB_Metadata_Export_Common')) {
 
@@ -196,7 +196,7 @@ if (!class_exists('VB_Metadata_Export_Common')) {
             }
 
             if ($format == "oai-pmh") {
-                $oaipmh = new VB_Metadata_Export_OaiPmh($this->plugin_name);
+                $oaipmh = new VB_Metadata_Export_OAI_PMH($this->plugin_name);
                 return $oaipmh->get_permalink($post);
             }
 

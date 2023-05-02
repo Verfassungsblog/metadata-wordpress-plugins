@@ -4,9 +4,9 @@ require_once plugin_dir_path(__FILE__) . '/class-vb-metadata-export_common.php';
 require_once plugin_dir_path(__FILE__) . '/class-vb-metadata-export_marc21xml.php';
 require_once plugin_dir_path(__FILE__) . '/class-vb-metadata-export_converter.php';
 
-if (!class_exists('VB_Metadata_Export_OaiPmh')) {
+if (!class_exists('VB_Metadata_Export_OAI_PMH')) {
 
-    class VB_Metadata_Export_OaiPmh
+    class VB_Metadata_Export_OAI_PMH
     {
         protected $common;
 
@@ -398,6 +398,22 @@ if (!class_exists('VB_Metadata_Export_OaiPmh')) {
         public function render_list_identifiers($metadataPrefix, $from = null, $until = null, $set = null, $resumptionToken = null) {
             // example: https://services.dnb.de/oai/repository?verb=ListIdentifiers&metadataPrefix=oai_dc&from=2023-01-01&until=2023-01-02
             return $this->render_list_request("ListIdentifiers", $metadataPrefix, $from, $until, $set, $resumptionToken);
+        }
+
+        public function action_init() {
+            // write rules for OAI-PMH
+            add_rewrite_rule('^oai/repository/?([^/]*)', 'index.php?' . $this->common->plugin_name . '=oai-pmh&$matches[1]', 'top');
+            add_rewrite_tag('%verb%', '([^&]+)');
+            add_rewrite_tag('%identifier%', '([^&]+)');
+            add_rewrite_tag('%metadataPrefix%', '([^&]+)');
+            add_rewrite_tag('%from%', '([^&]+)');
+            add_rewrite_tag('%until%', '([^&]+)');
+            add_rewrite_tag('%resumptionToken%', '([^&]+)');
+            add_rewrite_tag('%set%', '([^&]+)');
+        }
+
+        public function run() {
+            add_action("init", array($this, 'action_init'));
         }
 
     }

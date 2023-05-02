@@ -26,7 +26,7 @@ if (!class_exists('VB_Metadata_Export')) {
             $this->common = new VB_Metadata_Export_Common($plugin_name);
             $this->admin = new VB_Metadata_Export_Admin($plugin_name);
             $this->shortcode = new VB_Metadata_Export_Shortcode($plugin_name);
-            $this->oaipmh = new VB_Metadata_Export_OaiPmh($plugin_name);
+            $this->oaipmh = new VB_Metadata_Export_OAI_PMH($plugin_name);
         }
 
         public function activate()
@@ -42,27 +42,8 @@ if (!class_exists('VB_Metadata_Export')) {
 
         public function action_init()
         {
-            // general format (marc21, mods, dc, oai-pmh)
+            // add rewrite rule to output custom metadata formats instead of html
             add_rewrite_tag('%' . $this->common->plugin_name . '%', '([^&]+)');
-
-            // specific oai-pmh rewrites
-            add_rewrite_rule('^oai/?([^/]*)', 'index.php?' . $this->common->plugin_name . '=oai-pmh&$matches[1]', 'top');
-            add_rewrite_tag('%verb%', '([^&]+)');
-            add_rewrite_tag('%identifier%', '([^&]+)');
-            add_rewrite_tag('%metadataPrefix%', '([^&]+)');
-            add_rewrite_tag('%from%', '([^&]+)');
-            add_rewrite_tag('%until%', '([^&]+)');
-            add_rewrite_tag('%resumptionToken%', '([^&]+)');
-            add_rewrite_tag('%set%', '([^&]+)');
-
-            /*register_block_type("vb-metadata-export/marc21xml-link", array(
-                "api_version" => 2,
-                "title" => "Marc21 XML Link",
-                "description" => "Adds a link to download the post metadata as Marc21 XML document.",
-                "category" => "text",
-                "icon" => "star",
-                "render_callback" => array($this, "shortcode_marc21xml_link")
-            ));*/
 
             load_plugin_textdomain(
                 $this->common->plugin_name,
@@ -97,6 +78,7 @@ if (!class_exists('VB_Metadata_Export')) {
 
             $this->admin->run();
             $this->shortcode->run();
+            $this->oaipmh->run();
         }
 
     }

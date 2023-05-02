@@ -3,7 +3,7 @@
 require_once plugin_dir_path(__FILE__) . '/class-vb-metadata-export_common.php';
 require_once plugin_dir_path(__FILE__) . '/class-vb-metadata-export_marc21xml.php';
 require_once plugin_dir_path(__FILE__) . '/class-vb-metadata-export_converter.php';
-require_once plugin_dir_path(__FILE__) . '/class-vb-metadata-export_oaipmh.php';
+require_once plugin_dir_path(__FILE__) . '/class-vb-metadata-export_oai_pmh.php';
 
 if (!function_exists('get_the_vb_metadata_export_permalink')) {
     function get_the_vb_metadata_export_permalink($format)
@@ -83,5 +83,23 @@ if (!function_exists('vb_metadata_export_render_format')) {
 
         // should not happen
         return "unkown format";
+    }
+}
+
+if (!function_exists('vb_metadata_export_render_oaipmh')) {
+    function vb_metadata_export_render_oaipmh() {
+
+        $common = new VB_Metadata_Export_Common("vb-metadata-export");
+        if ($common->get_settings_field_value("oai-pmh_enabled")) {
+            header('Content-Type: application/xml');
+            $oaipmh = new VB_Metadata_Export_OAI_PMH($common->plugin_name);
+            echo $oaipmh->render();
+        } else {
+            global $wp_query;
+            $wp_query->set_404();
+            status_header(404);
+            get_template_part(404);
+            exit();
+        }
     }
 }

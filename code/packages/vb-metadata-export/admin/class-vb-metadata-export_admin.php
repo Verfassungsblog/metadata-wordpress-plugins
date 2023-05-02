@@ -3,7 +3,7 @@
 require_once plugin_dir_path(__FILE__) . '../includes/class-vb-metadata-export_common.php';
 require_once plugin_dir_path(__FILE__) . '../includes/class-vb-metadata-export_converter.php';
 require_once plugin_dir_path(__FILE__) . '../includes/class-vb-metadata-export_marc21xml.php';
-require_once plugin_dir_path(__FILE__) . '../includes/class-vb-metadata-export_oaipmh.php';
+require_once plugin_dir_path(__FILE__) . '../includes/class-vb-metadata-export_oai_pmh.php';
 require_once plugin_dir_path(__FILE__) . '/class-vb-metadata-export_setting_fields.php';
 
 if (!class_exists('VB_Metadata_Export_Admin')) {
@@ -425,7 +425,7 @@ if (!class_exists('VB_Metadata_Export_Admin')) {
             $oaipmh_enabled = $this->common->get_settings_field_value("oai-pmh_enabled");
             $posts = get_posts(array('numberposts' => 1));
             if ($oaipmh_enabled && count($posts) >= 1) {
-                $oaipmh = new VB_Metadata_Export_OaiPmh($this->common->plugin_name);
+                $oaipmh = new VB_Metadata_Export_OAI_PMH($this->common->plugin_name);
                 $oai_baseurl = $oaipmh->get_base_url();
                 $post_identifier = $oaipmh->get_post_identifier($posts[0]);
                 ?>
