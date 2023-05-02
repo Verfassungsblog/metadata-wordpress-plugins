@@ -379,48 +379,52 @@ if (!class_exists('VB_Metadata_Export_Admin')) {
         public function render_marc21_tab()
         {
             $posts = get_posts(array('numberposts' => 1));
-            $renderer = new VB_Metadata_Export_Marc21Xml($this->common->plugin_name);
-            $marc21xml = $renderer->render($posts[0]);
-            $example_url = $this->common->get_the_permalink("marc21xml", $posts[0]);
-            ?>
-            <h2>
-                <a href="<?php echo $example_url ?>">
-                <?php echo __("Example", "vb-metadata-export") ?>
-                </a>
-            </h2>
+            if (count($posts) >= 1) {
+                $renderer = new VB_Metadata_Export_Marc21Xml($this->common->plugin_name);
+                $marc21xml = $renderer->render($posts[0]);
+                $example_url = $this->common->get_the_permalink("marc21xml", $posts[0]);
+                ?>
+                <h2>
+                    <a href="<?php echo $example_url ?>">
+                    <?php echo __("Example", "vb-metadata-export") ?>
+                    </a>
+                </h2>
 
-            <pre><?php echo esc_html($marc21xml) ?></pre>
+                <pre><?php echo esc_html($marc21xml) ?></pre>
 
-            <?php
+                <?php
+            }
         }
 
         public function render_mods_tab()
         {
             $posts = get_posts(array('numberposts' => 1));
-            $renderer = new VB_Metadata_Export_Marc21Xml($this->common->plugin_name);
-            $converter = new VB_Metadata_Export_Converter();
+            if (count($posts) >= 1) {
+                $renderer = new VB_Metadata_Export_Marc21Xml($this->common->plugin_name);
+                $converter = new VB_Metadata_Export_Converter();
 
-            $marc21xml = $renderer->render($posts[0]);
-            $mods_xml = $converter->convertMarc21ToMods($marc21xml);
-            $example_url = $this->common->get_the_permalink("mods", $posts[0]);
+                $marc21xml = $renderer->render($posts[0]);
+                $mods_xml = $converter->convertMarc21ToMods($marc21xml);
+                $example_url = $this->common->get_the_permalink("mods", $posts[0]);
 
-            ?>
-            <h2>
-                <a href="<?php echo $example_url ?>">
-                <?php echo __("Example", "vb-metadata-export") ?>
-                </a>
-            </h2>
+                ?>
+                <h2>
+                    <a href="<?php echo $example_url ?>">
+                    <?php echo __("Example", "vb-metadata-export") ?>
+                    </a>
+                </h2>
 
-            <pre><?php echo esc_html($mods_xml) ?></pre>
+                <pre><?php echo esc_html($mods_xml) ?></pre>
 
-            <?php
+                <?php
+            }
         }
 
         public function render_oai_pmh_tab()
         {
             $oaipmh_enabled = $this->common->get_settings_field_value("oai-pmh_enabled");
-            if ($oaipmh_enabled) {
-                $posts = get_posts(array('numberposts' => 1));
+            $posts = get_posts(array('numberposts' => 1));
+            if ($oaipmh_enabled && count($posts) >= 1) {
                 $oaipmh = new VB_Metadata_Export_OaiPmh($this->common->plugin_name);
                 $oai_baseurl = $oaipmh->get_base_url();
                 $post_identifier = $oaipmh->get_post_identifier($posts[0]);
@@ -483,22 +487,24 @@ if (!class_exists('VB_Metadata_Export_Admin')) {
         public function render_dc_tab()
         {
             $posts = get_posts(array('numberposts' => 1));
-            $renderer = new VB_Metadata_Export_Marc21Xml($this->common->plugin_name, true);
-            $converter = new VB_Metadata_Export_Converter();
+            if (count($posts) >= 1) {
+                $renderer = new VB_Metadata_Export_Marc21Xml($this->common->plugin_name, true);
+                $converter = new VB_Metadata_Export_Converter();
 
-            $marc21xml = $renderer->render($posts[0]);
-            $rdf_dc = $converter->convertMarc21ToRdfDc($marc21xml);
-            $example_url = $this->common->get_the_permalink("dc", $posts[0]);
+                $marc21xml = $renderer->render($posts[0]);
+                $rdf_dc = $converter->convertMarc21ToRdfDc($marc21xml);
+                $example_url = $this->common->get_the_permalink("dc", $posts[0]);
 
-            ?>
-            <h2>
-                <a href="<?php echo $example_url ?>">
-                <?php echo __("Example", "vb-metadata-export") ?>
-                </a>
-            </h2>
+                ?>
+                <h2>
+                    <a href="<?php echo $example_url ?>">
+                    <?php echo __("Example", "vb-metadata-export") ?>
+                    </a>
+                </h2>
 
-            <pre><?php echo esc_html($rdf_dc) ?></pre>
-            <?php
+                <pre><?php echo esc_html($rdf_dc) ?></pre>
+                <?php
+            }
         }
 
         public function render_acf_tab()
