@@ -318,6 +318,7 @@ if (!class_exists('VB_Metadata_Export_Admin')) {
             }
 
             $current_tab = isset($_GET['tab']) ? $_GET['tab'] : "general";
+            $current_tab = isset($this->get_tab_labels()[$current_tab]) ? $current_tab : "general";
 
             ?>
             <div class="vb-metadata-export-admin-header">
