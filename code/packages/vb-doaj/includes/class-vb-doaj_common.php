@@ -20,7 +20,8 @@ if (!class_exists('VB_DOAJ_Common')) {
                 // default settings for Verfassungsblog
                 $this->setting_field_defaults = array(
                     // general
-                    "interval" => 5,
+                    "auto_update" => true,
+                    "interval" => 1,
                     "issn" => "2366-7044",
                     "issue" => "2366-7044",
                     "require_doi" => true,
@@ -34,7 +35,7 @@ if (!class_exists('VB_DOAJ_Common')) {
                 // default settings for any other blog than Verfassungsblog
                 $this->setting_field_defaults = array(
                     // general
-                    "interval" => 5,
+                    "interval" => 1,
                     "require_doi" => true,
                 );
             }

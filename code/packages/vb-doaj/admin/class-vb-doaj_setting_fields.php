@@ -21,6 +21,7 @@ if (!class_exists('VB_DOAJ_Setting_Fields')) {
             }
             $this->settings_fields = array(
                 // ------------------- general settings ---------------------
+
                 array(
                     "name" => "api_key",
                     "type" => "string",
@@ -28,6 +29,13 @@ if (!class_exists('VB_DOAJ_Setting_Fields')) {
                     "label" => "API Key",
                     "placeholder" => "DOAJ API Key",
                     "description" => "The API Key provided by the DOAJ.",
+                ),
+                array(
+                    "name" => "auto_update",
+                    "type" => "boolean",
+                    "section" => "general",
+                    "label" => "Automatic Update",
+                    "description" => "Whether new posts should be automatically submitted to the DOAJ in regular intervals.",
                 ),
                 array(
                     "name" => "interval",
@@ -69,9 +77,7 @@ if (!class_exists('VB_DOAJ_Setting_Fields')) {
                     "section" => "general",
                     "label" => __("Require DOI", "vb-doaj"),
                     "description" => "Whether to require the DOI to be available for a post to be submitted. If
-                        checked, published posts without a DOI are not submitted to the DOAJ. If a DOI becomes
-                        available for an already published post, the post is submitted without any further actions
-                        from the user.",
+                        checked, published posts without a DOI are not submitted to the DOAJ.",
                 ),
                 array(
                     "name" => "include_excerpt",

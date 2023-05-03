@@ -1,5 +1,8 @@
 <?php
 
+require_once plugin_dir_path(__FILE__) . './class-vb-doaj_common.php';
+require_once plugin_dir_path(__FILE__) . './class-vb-doaj_update.php';
+require_once plugin_dir_path(__FILE__) . './class-vb-doaj_status.php';
 require_once plugin_dir_path(__FILE__) . '../admin/class-vb-doaj_admin.php';
 
 if (!class_exists('VB_DOAJ')) {
@@ -14,12 +17,18 @@ if (!class_exists('VB_DOAJ')) {
 
         protected $admin;
 
+        protected $status;
+
+        protected $update;
+
         public function __construct($base_file, $plugin_name, $plugin_version)
         {
             $this->plugin_version = $plugin_version;
             $this->base_file = $base_file;
             $this->common = new VB_DOAJ_Common($plugin_name);
-            $this->admin = new VB_DOAJ_Admin($plugin_name);
+            $this->status = new VB_DOAJ_Status($this->common);
+            $this->update = new VB_DOAJ_Update($this->common, $this->status);
+            $this->admin = new VB_DOAJ_Admin($this->common, $this->status, $this->update);
         }
 
         public function activate()
@@ -50,6 +59,8 @@ if (!class_exists('VB_DOAJ')) {
             add_action("init", array($this, 'action_init'));
 
             $this->admin->run();
+            $this->status->run();
+            $this->update->run();
         }
 
     }

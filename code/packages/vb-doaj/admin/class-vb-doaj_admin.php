@@ -17,16 +17,22 @@ if (!class_exists('VB_DOAJ_Admin')) {
 
         protected $common;
 
-        public function __construct($plugin_name)
+        protected $status;
+
+        protected $update;
+
+        public function __construct($common, $status, $update)
         {
-            $this->common = new VB_DOAJ_Common($plugin_name);
+            $this->common = $common;
+            $this->status = $status;
+            $this->update = $update;
             $this->setting_fields = new VB_DOAJ_Setting_Fields();
         }
 
         protected function get_tab_labels()
         {
             return array(
-                "general" => "Settings",
+                "settings" => "Settings",
                 "example" => "Example",
                 "status" => "Status",
             );
@@ -44,9 +50,9 @@ if (!class_exists('VB_DOAJ_Admin')) {
         protected function get_tab_by_section_map()
         {
             return array(
-                "general" => "general",
-                "post_acf" => "general",
-                "user_acf" => "general",
+                "general" => "settings",
+                "post_acf" => "settings",
+                "user_acf" => "settings",
             );
         }
 
@@ -235,7 +241,8 @@ if (!class_exists('VB_DOAJ_Admin')) {
                 }
             }
 
-            $current_tab = isset($_GET['tab']) ? $_GET['tab'] : "general";
+            $current_tab = isset($_GET['tab']) ? $_GET['tab'] : "settings";
+            $current_tab = isset($this->get_tab_labels()[$current_tab]) ? $current_tab : "settings";
 
             ?>
             <div class="vb-doaj-admin-header">
@@ -260,17 +267,6 @@ if (!class_exists('VB_DOAJ_Admin')) {
             <hr class="wp-header-end">
             <div class="vb-doaj-admin-content">
                 <?php
-                $settings_page_id = $this->get_setting_page_id_by_tab($current_tab);
-                ?>
-                <form action="options.php" method="post">
-                    <?php
-                    settings_fields($settings_page_id);
-                    do_settings_sections($settings_page_id);
-                    submit_button(__('Save Settings', "vb-doaj"));
-                    ?>
-                </form>
-                <hr />
-                <?php
                 call_user_func_array($this->get_render_function_by_tab($current_tab), array());
                 ?>
             </div>
@@ -278,9 +274,20 @@ if (!class_exists('VB_DOAJ_Admin')) {
             <?php
         }
 
-        public function render_general_tab()
+        public function render_settings_tab()
         {
             ?>
+            <?php
+            $settings_page_id = $this->get_setting_page_id_by_tab("settings");
+            ?>
+            <form action="options.php" method="post">
+                <?php
+                settings_fields($settings_page_id);
+                do_settings_sections($settings_page_id);
+                submit_button(__('Save Settings', "vb-doaj"));
+                ?>
+            </form>
+            <hr />
             <form method="post" onsubmit="return confirm('Are you sure?');">
                 <input type="hidden" name="reset" value="true" />
                 <p>
@@ -302,6 +309,13 @@ if (!class_exists('VB_DOAJ_Admin')) {
         public function render_status_tab()
         {
             // empty
+            ?>
+            <ul>
+                <li>Automatic Update: <?php echo $this->common->get_settings_field_value("auto_update") ? "enabled" : "disabled" ?></li>
+                <li>Update Interval: <?php echo $this->update->get_update_interval_in_minutes() ?> min</li>
+                <li>Last Update: <?php echo $this->status->get_last_update() ?? "never" ?></li>
+            </ul>
+            <?php
         }
 
         public function run()
