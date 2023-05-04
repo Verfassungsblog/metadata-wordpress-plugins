@@ -34,7 +34,7 @@ if (!class_exists('VB_Metadata_Export_Admin')) {
                 "marc21" => "Marc21 XML",
                 "mods" => "MODS",
                 "dc" => "Dublin Core",
-                "oai_pmh" => "OAI-PMH 2.0",
+                "oai_pmh" => "OAI-PMH",
             );
         }
 
@@ -47,7 +47,7 @@ if (!class_exists('VB_Metadata_Export_Admin')) {
                 "user_acf" => "Advanced Custom Fields for Users",
                 "marc21" => "Marc21 XML Settings",
                 "mods" => "MODS Settings",
-                "oai_pmh" => "OAI-PMH 2.0 Settings",
+                "oai_pmh" => "OAI-PMH Settings",
                 "dc" => "Dublin Core Settings",
             );
         }
@@ -221,7 +221,7 @@ if (!class_exists('VB_Metadata_Export_Admin')) {
             ?>
             <p id="<?php echo esc_attr($args['id']); ?>">
                 <?php echo __(
-                    "The following settings influence how metadata is provided via the OAI-PMH 2.0 interface.",
+                    "The following settings influence how metadata is provided via the OAI-PMH interface.",
                     "vb-metadata-export"
                 );
                 ?>
@@ -489,11 +489,8 @@ if (!class_exists('VB_Metadata_Export_Admin')) {
         {
             $posts = get_posts(array('numberposts' => 1));
             if (count($posts) >= 1) {
-                $renderer = new VB_Metadata_Export_Marc21Xml($this->common->plugin_name, true);
-                $converter = new VB_Metadata_Export_Converter();
-
-                $marc21xml = $renderer->render($posts[0]);
-                $rdf_dc = $converter->convertMarc21ToRdfDc($marc21xml);
+                $dc_renderer = new VB_Metadata_Export_DC($this->common->plugin_name);
+                $dc = $dc_renderer->render($posts[0]);
                 $example_url = $this->common->get_the_permalink("dc", $posts[0]);
 
                 ?>
@@ -503,7 +500,7 @@ if (!class_exists('VB_Metadata_Export_Admin')) {
                     </a>
                 </h2>
 
-                <pre><?php echo esc_html($rdf_dc) ?></pre>
+                <pre><?php echo esc_html($dc) ?></pre>
                 <?php
             }
         }

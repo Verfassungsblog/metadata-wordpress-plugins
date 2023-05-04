@@ -305,8 +305,9 @@ if (!class_exists('VB_Metadata_Export_Setting_Fields')) {
                     "name" => "oai-pmh_enabled",
                     "type" => "boolean",
                     "section" => "oai_pmh",
-                    "label" => __("OAI-PMH 2.0 Enabled", "vb-metadata-export"),
-                    "description" => "Whether the OAI-PMH 2.0 interface is active or not.",
+                    "label" => __("OAI-PMH Enabled", "vb-metadata-export"),
+                    "description" => "Whether the OAI-PMH interface is active or not.
+                        <br>(OAI-PMH requires Dublic Core to be enabled)",
                 ),
                 array(
                     "name" => "oai-pmh_admin_email",

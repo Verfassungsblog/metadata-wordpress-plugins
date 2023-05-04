@@ -3,6 +3,7 @@
 require_once plugin_dir_path(__FILE__) . '/class-vb-metadata-export_common.php';
 require_once plugin_dir_path(__FILE__) . '/class-vb-metadata-export_marc21xml.php';
 require_once plugin_dir_path(__FILE__) . '/class-vb-metadata-export_converter.php';
+require_once plugin_dir_path(__FILE__) . '/class-vb-metadata-export_dc.php';
 
 if (!class_exists('VB_Metadata_Export_OAI_PMH')) {
 
@@ -28,8 +29,10 @@ if (!class_exists('VB_Metadata_Export_OAI_PMH')) {
         }
 
         protected function get_post_id_from_identifier($identifier) {
-            $permalink = str_replace("oai:", "http://", $identifier);
-            return url_to_postid($permalink);
+            $url = parse_url(site_url());
+            $path = isset($url["path"]) ? $url["path"] : "";
+            $host = $url["host"];
+            return (int)str_replace("oai:" . $host . "/" . $path, "", $identifier) ?? false;
         }
 
         protected function post_date_to_iso8601($post_date) {
@@ -40,14 +43,23 @@ if (!class_exists('VB_Metadata_Export_OAI_PMH')) {
         protected function get_earliest_post_date() {
             $oldest_posts = get_posts(array("numberposts" => 1, "order" => "ASC"));
             if (count($oldest_posts) == 1) {
-                return $this->post_date_to_iso8601($oldest_posts[0]->post_date);
+                return $this->post_date_to_iso8601($oldest_posts[0]->post_date_gmt);
             }
             // no posts yet, return current date
             return $this->date_to_iso8601(new DateTime());
         }
 
+        protected function metadataPrefix_to_common_format($metadataPrefix) {
+            return array(
+                "oai_dc" => "dc",
+                "mods-xml" => "mods",
+                "MARC21-xml" => "marc21xml",
+            )[$metadataPrefix];
+        }
+
         protected function is_valid_metadata_prefix($metadataPrefix) {
-            return in_array($metadataPrefix, array("oai_dc", "mods-xml", "MARC21-xml"));
+            return in_array($metadataPrefix, array("oai_dc", "mods-xml", "MARC21-xml")) &&
+                $this->common->is_format_enabled($this->metadataPrefix_to_common_format($metadataPrefix));
         }
 
         protected function get_list_arguments_error($verb, $metadataPrefix, $from, $until, $resumptionToken) {
@@ -112,7 +124,8 @@ if (!class_exists('VB_Metadata_Export_OAI_PMH')) {
                 $metadata = $marc21xml;
             }
             if ($metadataPrefix == "oai_dc") {
-                $metadata = $converter->convertMarc21ToOaiDc($marc21xml);
+                $oaidc = new VB_Metadata_Export_DC($this->common->plugin_name);
+                $metadata = $oaidc->render($post);
             }
             if ($metadataPrefix == "mods-xml") {
                 $metadata = $converter->convertMarc21ToMods($marc21xml);
@@ -122,10 +135,21 @@ if (!class_exists('VB_Metadata_Export_OAI_PMH')) {
             return "<metadata>" . $metadata . "</metadata>";
         }
 
+        protected function local_to_utc_iso8601($utc_iso) {
+            $local = new Datetime("now", wp_timezone());
+            $date = new Datetime("now", new DateTimeZone("UTC"));
+            $date->setTimestamp($this->iso8601_to_date($utc_iso)->getTimestamp() - wp_timezone()->getOffset($local));
+            return $this->date_to_iso8601($date);
+        }
+
         protected function query_for_posts($offset, $from, $until) {
             $after = empty($from) ? $this->get_earliest_post_date() : $from;
-            $before = empty($until) ? $this->date_to_iso8601(new DateTime()) : $until;
+            $before = empty($until) ? $this->date_to_iso8601(new DateTime("now", new DateTimeZone("UTC"))) : $until;
             $require_doi = $this->common->get_settings_field_value("require_doi");
+
+            // convert after/before to UTC (even though they are UTC) because date_query will always convert to local
+            $after = $this->local_to_utc_iso8601($after);
+            $before = $this->local_to_utc_iso8601($before);
 
             $query_args = array(
                 'offset' => $offset,
@@ -242,7 +266,10 @@ if (!class_exists('VB_Metadata_Export_OAI_PMH')) {
         }
 
         public function get_post_identifier($post) {
-            return "oai:" . str_replace(array("http://", "https://"), "", get_the_permalink($post));
+            $url = parse_url(site_url());
+            $path = isset($url["path"]) ? $url["path"] : "";
+            $host = $url["host"];
+            return "oai:" . $host . "/" . $path . $post->ID;
         }
 
         public function get_permalink($post) {
@@ -339,21 +366,21 @@ if (!class_exists('VB_Metadata_Export_OAI_PMH')) {
             // example: https://services.dnb.de/oai/repository?verb=ListMetadataFormats
             $xml = implode("", array(
                 "<ListMetadataFormats>",
-                "<metadataFormat>",
-                "<metadataPrefix>oai_dc</metadataPrefix>",
-                "<schema>http://www.openarchives.org/OAI/2.0/oai_dc.xsd</schema>",
-                "<metadataNamespace>http://www.openarchives.org/OAI/2.0/oai_dc</metadataNamespace>",
-                "</metadataFormat>",
-                "<metadataFormat>",
-                "<metadataPrefix>mods-xml</metadataPrefix>",
-                "<schema>http://www.loc.gov/standards/mods/v3/mods-3-7.xsd</schema>",
-                "<metadataNamespace>http://www.loc.gov/mods/v3</metadataNamespace>",
-                "</metadataFormat>",
-                "<metadataFormat>",
-                "<metadataPrefix>MARC21-xml</metadataPrefix>",
-                "<schema>http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd</schema>",
-                "<metadataNamespace>http://www.loc.gov/MARC21/slim</metadataNamespace>",
-                "</metadataFormat>",
+                $this->common->is_format_enabled("dc") ? "<metadataFormat>
+                <metadataPrefix>oai_dc</metadataPrefix>
+                <schema>http://www.openarchives.org/OAI/2.0/oai_dc.xsd</schema>
+                <metadataNamespace>http://www.openarchives.org/OAI/2.0/oai_dc</metadataNamespace>
+                </metadataFormat>" : "",
+                $this->common->is_format_enabled("mods") ? "<metadataFormat>
+                <metadataPrefix>mods-xml</metadataPrefix>
+                <schema>http://www.loc.gov/standards/mods/v3/mods-3-7.xsd</schema>
+                <metadataNamespace>http://www.loc.gov/mods/v3</metadataNamespace>
+                </metadataFormat>" : "",
+                $this->common->is_format_enabled("marc21xml") ? "<metadataFormat>
+                <metadataPrefix>MARC21-xml</metadataPrefix>
+                <schema>http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd</schema>
+                <metadataNamespace>http://www.loc.gov/MARC21/slim</metadataNamespace>
+                </metadataFormat>" : "",
                 "</ListMetadataFormats>",
             ));
             return $this->render_response(array("verb" => "ListMetadataFormats"), $xml);
@@ -376,6 +403,10 @@ if (!class_exists('VB_Metadata_Export_OAI_PMH')) {
             }
 
             $post = get_post($post_id);
+
+            if (!is_post_publicly_viewable($post)) {
+                return $this->render_error("GetRecord", "idDoesNotExist", "invalid identifier");
+            }
 
             $xml = implode("", array(
                 "<GetRecord>",

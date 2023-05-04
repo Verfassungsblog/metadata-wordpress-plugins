@@ -130,7 +130,7 @@ if (!class_exists('VB_Metadata_Export_Common')) {
             return false;
         }
 
-        public function is_format_available($format, $post)
+        public function is_metadata_available($format, $post)
         {
             if (!$this->is_format_enabled($format)) {
                 return false;
@@ -140,6 +140,9 @@ if (!class_exists('VB_Metadata_Export_Common')) {
                 if (empty($doi)) {
                     return false;
                 }
+            }
+            if (!is_post_publicly_viewable($post)) {
+                return false;
             }
             return true;
         }
@@ -184,7 +187,7 @@ if (!class_exists('VB_Metadata_Export_Common')) {
         public function get_the_permalink($format, $post)
         {
             // check settings
-            if (!$this->is_format_available($format, $post)) {
+            if (!$this->is_metadata_available($format, $post)) {
                 // format must be valid and enabled
                 return;
             }

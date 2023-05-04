@@ -4,6 +4,7 @@ require_once plugin_dir_path(__FILE__) . '/class-vb-metadata-export_common.php';
 require_once plugin_dir_path(__FILE__) . '/class-vb-metadata-export_marc21xml.php';
 require_once plugin_dir_path(__FILE__) . '/class-vb-metadata-export_converter.php';
 require_once plugin_dir_path(__FILE__) . '/class-vb-metadata-export_oai_pmh.php';
+require_once plugin_dir_path(__FILE__) . '/class-vb-metadata-export_dc.php';
 
 if (!function_exists('get_the_vb_metadata_export_permalink')) {
     function get_the_vb_metadata_export_permalink($format)
@@ -53,7 +54,7 @@ if (!function_exists('vb_metadata_export_render_format')) {
 
         $common = new VB_Metadata_Export_Common("vb-metadata-export");
 
-        if (!is_post_publicly_viewable() || !$common->is_format_available($format, $post) || !is_single()) {
+        if (!$common->is_metadata_available($format, $post) || !is_single()) {
             return;
         }
 
@@ -74,10 +75,8 @@ if (!function_exists('vb_metadata_export_render_format')) {
         }
 
         if ($format == "dc") {
-            $converter = new VB_Metadata_Export_Converter();
-            $marc21xml = new VB_Metadata_Export_Marc21Xml($common->plugin_name, true);
-            $dc = $converter->convertMarc21ToRdfDc($marc21xml->render($post));
-            echo $dc;
+            $dc = new VB_Metadata_Export_DC($common->plugin_name);
+            echo $dc->render($post);
             return;
         }
 
