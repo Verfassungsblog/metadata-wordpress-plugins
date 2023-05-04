@@ -75,14 +75,13 @@ EOF
 
 # run wp-cli to setup account
 wp-cli core install --url=${WORDPRESS_URL} --title=\"${WORDPRESS_TITLE}\" --admin_user=${WORDPRESS_USER} --admin_password=${WORDPRESS_PASSWORD} --admin_email=${WORDPRESS_EMAIL} --skip-email
-wp-cli plugin install advanced-custom-fields co-authors-plus debug-bar query-monitor
+wp-cli plugin install advanced-custom-fields co-authors-plus classic-editor debug-bar query-monitor
 wp-cli plugin update --all
 wp-cli theme update --all
 
 # activate plugins
-wp-cli plugin activate advanced-custom-fields co-authors-plus debug-bar query-monitor
-wp-cli plugin activate vb-metadata-export
-wp-cli plugin activate vb-doaj
+wp-cli plugin activate advanced-custom-fields classic-editor co-authors-plus debug-bar query-monitor
+wp-cli plugin activate vb-metadata-export vb-doaj
 
 # flush permalinks
 wp-cli rewrite structure "/%postname%/"
