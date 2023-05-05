@@ -102,12 +102,14 @@ if (!class_exists('VB_Metadata_Export_OAI_PMH')) {
 
         protected function get_post_header($post) {
             return implode("", array(
-                "<header>",
+                "<header",
+                $post->post_status == "trash" ? " status=\"deleted\"" : "",
+                ">",
                 "<identifier>",
                 $this->get_post_identifier($post),
                 "</identifier>",
                 "<datestamp>",
-                $this->post_date_to_iso8601($post->post_date),
+                $this->post_date_to_iso8601($post->post_modified_gmt),
                 "</datestamp>",
                 "<setSpec>posts</setSpec>",
                 "</header>",
@@ -115,7 +117,10 @@ if (!class_exists('VB_Metadata_Export_OAI_PMH')) {
         }
 
         protected function get_post_metadata($post, $metadataPrefix) {
-
+            if ($post->post_status == "trash") {
+                // do not show metadata of deleted posts
+                return "";
+            }
             $renderer = new VB_Metadata_Export_Marc21Xml($this->common->plugin_name);
             $converter = new VB_Metadata_Export_Converter();
             $marc21xml = $renderer->render($post);
@@ -154,6 +159,7 @@ if (!class_exists('VB_Metadata_Export_OAI_PMH')) {
             $query_args = array(
                 'offset' => $offset,
                 'date_query' => array(
+                    'column' => 'post_modified',
                     array(
                         'after'     => $after,
                         'before'    => $before,
@@ -161,8 +167,9 @@ if (!class_exists('VB_Metadata_Export_OAI_PMH')) {
                     ),
                 ),
                 'post_type' => 'post',
-                'post_status' => 'publish',
+                'post_status' => array('publish', 'trash'),
                 'posts_per_page' => $this->get_list_size(),
+                'order_by' => 'modified'
             );
 
             if ($require_doi) {
@@ -342,7 +349,7 @@ if (!class_exists('VB_Metadata_Export_OAI_PMH')) {
                 "<protocolVersion>2.0</protocolVersion>",
                 "<adminEmail>{$admin_email}</adminEmail>",
                 "<earliestDatestamp>{$earliest_date}</earliestDatestamp>",
-                "<deletedRecord>no</deletedRecord>",
+                "<deletedRecord>transient</deletedRecord>",
                 "<granularity>YYYY-MM-DDThh:mm:ssZ</granularity>",
                 "</Identify>",
             ));
@@ -404,7 +411,7 @@ if (!class_exists('VB_Metadata_Export_OAI_PMH')) {
 
             $post = get_post($post_id);
 
-            if (!is_post_publicly_viewable($post)) {
+            if (!is_post_publicly_viewable($post) && !$post->post_status == "trash") {
                 return $this->render_error("GetRecord", "idDoesNotExist", "invalid identifier");
             }
 
