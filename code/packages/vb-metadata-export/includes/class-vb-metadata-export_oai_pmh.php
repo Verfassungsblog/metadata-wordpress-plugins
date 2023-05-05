@@ -159,7 +159,7 @@ if (!class_exists('VB_Metadata_Export_OAI_PMH')) {
             $query_args = array(
                 'offset' => $offset,
                 'date_query' => array(
-                    'column' => 'post_modified',
+                    'column' => 'post_modified_gmt',
                     array(
                         'after'     => $after,
                         'before'    => $before,
@@ -173,10 +173,11 @@ if (!class_exists('VB_Metadata_Export_OAI_PMH')) {
             );
 
             if ($require_doi) {
+                $doi_acf_key = $this->common->get_settings_field_value("doi_acf");
                 $query_args['meta_query'] = array(
                     'relation' => 'OR',
                     array(
-                        'key' => "doi",
+                        'key' => $doi_acf_key,
                         'value' => "",
                         'compare' => "!=",
                     ),

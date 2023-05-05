@@ -31,6 +31,14 @@ if (!class_exists('VB_DOAJ_Submit_Setting_Fields')) {
                     "description" => "The API Key provided by the DOAJ.",
                 ),
                 array(
+                    "name" => "api_baseurl",
+                    "type" => "string",
+                    "section" => "general",
+                    "label" => "API Base URL",
+                    "placeholder" => "URL to DOAJ API",
+                    "description" => "The URL to the DOAJ API.",
+                ),
+                array(
                     "name" => "auto_update",
                     "type" => "boolean",
                     "section" => "general",
@@ -47,12 +55,21 @@ if (!class_exists('VB_DOAJ_Submit_Setting_Fields')) {
                     and new posts are submitted to the DOAJ.",
                 ),
                 array(
-                    "name" => "issn",
+                    "name" => "eissn",
                     "type" => "string",
                     "section" => "general",
-                    "label" => "ISSN",
-                    "placeholder" => "ISSN",
-                    "description" => "The <a href=\"https://en.wikipedia.org/wiki/International_Standard_Serial_Number\" target=\"_blank\">
+                    "label" => "eISSN",
+                    "placeholder" => "eISSN",
+                    "description" => "The electronic <a href=\"https://en.wikipedia.org/wiki/International_Standard_Serial_Number\" target=\"_blank\">
+                            International Standard Serial Number</a> (ISSN) of this journal (or blog).",
+                ),
+                array(
+                    "name" => "pissn",
+                    "type" => "string",
+                    "section" => "general",
+                    "label" => "pISSN",
+                    "placeholder" => "pISSN",
+                    "description" => "The print <a href=\"https://en.wikipedia.org/wiki/International_Standard_Serial_Number\" target=\"_blank\">
                             International Standard Serial Number</a> (ISSN) of this journal (or blog).",
                 ),
                 array(
@@ -126,7 +143,7 @@ if (!class_exists('VB_DOAJ_Submit_Setting_Fields')) {
                     "section" => "post_acf",
                     "label" => "Sub-Headline<br>(ACF key)",
                     "placeholder" => "ACF field key for a sub-headline",
-                    "description" => "The ACF field key that contains the sub-headline for a post.",
+                    "description" => "The ACF field key that contains the sub-headline for a post. If a subheadline is available, it is appended to the title with a minus symbol as separator.",
                 ),
                 array(
                     "name" => "orcid_acf",

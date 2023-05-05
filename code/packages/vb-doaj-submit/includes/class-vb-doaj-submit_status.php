@@ -17,15 +17,21 @@ if (!class_exists('VB_DOAJ_Submit_Status')) {
             return update_option($this->common->plugin_name . "_status_last_update", time());
         }
 
-        public function get_last_update() {
+        public function get_last_update_date() {
             $timestamp = get_option($this->common->plugin_name . "_status_last_update", false);
             if (empty($timestamp)) {
                 return false;
             }
-            $datetime = (new DateTime())->setTimestamp($timestamp)->setTimezone(wp_timezone());
-            $time_format = get_option('time_format');
-            $date_format = get_option('date_format');
-            return date_i18n("d-m-Y H:i:s e", $datetime->getTimestamp() + $datetime->getOffset());
+            return (new DateTime())->setTimestamp($timestamp)->setTimezone(wp_timezone());
+        }
+
+        public function get_last_update_text() {
+            $date = $this->get_last_update_date();
+            if (empty($date)) {
+                return "never";
+            }
+            return human_time_diff($date->getTimestamp() + $date->getOffset()) . " ago";
+            # date_i18n("d-m-Y H:i:s e", $date->getTimestamp() + $date->getOffset());
         }
 
         public function action_init() {

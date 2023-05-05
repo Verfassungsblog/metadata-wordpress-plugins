@@ -1,6 +1,7 @@
 <?php
 
 require_once plugin_dir_path(__FILE__) . '../includes/class-vb-doaj-submit_common.php';
+require_once plugin_dir_path(__FILE__) . '../includes/class-vb-doaj-submit_render.php';
 require_once plugin_dir_path(__FILE__) . '/class-vb-doaj-submit_setting_fields.php';
 
 if (!class_exists('VB_DOAJ_Submit_Admin')) {
@@ -303,7 +304,19 @@ if (!class_exists('VB_DOAJ_Submit_Admin')) {
 
         public function render_example_tab()
         {
-            // empty
+            $posts = get_posts(array('numberposts' => 1));
+            if (count($posts) >= 1) {
+                $renderer = new VB_DOAJ_Submit_Render($this->common);
+                $doaj_data = $renderer->render($posts[0]);
+                ?>
+                <h2>
+                    <?php echo __("Example", "vb-doaj-submit") ?>
+                </h2>
+
+                <pre><?php echo htmlspecialchars($doaj_data) ?></pre>
+
+                <?php
+            }
         }
 
         public function render_status_tab()
@@ -313,7 +326,7 @@ if (!class_exists('VB_DOAJ_Submit_Admin')) {
             <ul>
                 <li>Automatic Update: <?php echo $this->common->get_settings_field_value("auto_update") ? "enabled" : "disabled" ?></li>
                 <li>Update Interval: <?php echo $this->update->get_update_interval_in_minutes() ?> min</li>
-                <li>Last Update: <?php echo $this->status->get_last_update() ?? "never" ?></li>
+                <li>Last Update: <?php echo $this->status->get_last_update_text() ?></li>
             </ul>
             <?php
         }

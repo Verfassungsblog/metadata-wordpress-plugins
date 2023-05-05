@@ -20,9 +20,10 @@ if (!class_exists('VB_DOAJ_Submit_Common')) {
                 // default settings for Verfassungsblog
                 $this->setting_field_defaults = array(
                     // general
+                    "api_baseurl" => "https://doaj.org/api/",
                     "auto_update" => true,
                     "interval" => 1,
-                    "issn" => "2366-7044",
+                    "eissn" => "2366-7044",
                     "issue" => "2366-7044",
                     "require_doi" => true,
                     "include_excerpt" => true,
@@ -35,6 +36,7 @@ if (!class_exists('VB_DOAJ_Submit_Common')) {
                 // default settings for any other blog than Verfassungsblog
                 $this->setting_field_defaults = array(
                     // general
+                    "api_baseurl" => "https://doaj.org/api/",
                     "interval" => 1,
                     "require_doi" => true,
                 );

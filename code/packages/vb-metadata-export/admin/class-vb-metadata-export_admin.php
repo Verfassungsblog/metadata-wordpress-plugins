@@ -391,7 +391,7 @@ if (!class_exists('VB_Metadata_Export_Admin')) {
                     </a>
                 </h2>
 
-                <pre><?php echo esc_html($marc21xml) ?></pre>
+                <pre><?php echo htmlspecialchars($marc21xml) ?></pre>
 
                 <?php
             }
@@ -415,7 +415,7 @@ if (!class_exists('VB_Metadata_Export_Admin')) {
                     </a>
                 </h2>
 
-                <pre><?php echo esc_html($mods_xml) ?></pre>
+                <pre><?php echo htmlspecialchars($mods_xml) ?></pre>
 
                 <?php
             }
@@ -500,7 +500,7 @@ if (!class_exists('VB_Metadata_Export_Admin')) {
                     </a>
                 </h2>
 
-                <pre><?php echo esc_html($dc) ?></pre>
+                <pre><?php echo htmlspecialchars($dc) ?></pre>
                 <?php
             }
         }
