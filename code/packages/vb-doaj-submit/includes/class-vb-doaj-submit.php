@@ -1,13 +1,13 @@
 <?php
 
-require_once plugin_dir_path(__FILE__) . './class-vb-doaj_common.php';
-require_once plugin_dir_path(__FILE__) . './class-vb-doaj_update.php';
-require_once plugin_dir_path(__FILE__) . './class-vb-doaj_status.php';
-require_once plugin_dir_path(__FILE__) . '../admin/class-vb-doaj_admin.php';
+require_once plugin_dir_path(__FILE__) . './class-vb-doaj-submit_common.php';
+require_once plugin_dir_path(__FILE__) . './class-vb-doaj-submit_update.php';
+require_once plugin_dir_path(__FILE__) . './class-vb-doaj-submit_status.php';
+require_once plugin_dir_path(__FILE__) . '../admin/class-vb-doaj-submit_admin.php';
 
-if (!class_exists('VB_DOAJ')) {
+if (!class_exists('VB_DOAJ_Submit')) {
 
-    class VB_DOAJ
+    class VB_DOAJ_Submit
     {
         protected $common;
 
@@ -25,10 +25,10 @@ if (!class_exists('VB_DOAJ')) {
         {
             $this->plugin_version = $plugin_version;
             $this->base_file = $base_file;
-            $this->common = new VB_DOAJ_Common($plugin_name);
-            $this->status = new VB_DOAJ_Status($this->common);
-            $this->update = new VB_DOAJ_Update($this->common, $this->status);
-            $this->admin = new VB_DOAJ_Admin($this->common, $this->status, $this->update);
+            $this->common = new VB_DOAJ_Submit_Common($plugin_name);
+            $this->status = new VB_DOAJ_Submit_Status($this->common);
+            $this->update = new VB_DOAJ_Submit_Update($this->common, $this->status);
+            $this->admin = new VB_DOAJ_Submit_Admin($this->common, $this->status, $this->update);
         }
 
         public function activate()
@@ -54,7 +54,7 @@ if (!class_exists('VB_DOAJ')) {
         {
             register_activation_hook($this->base_file, array($this, 'activate'));
             register_deactivation_hook($this->base_file, array($this, 'deactivate'));
-            register_uninstall_hook($this->base_file, 'vb_doaj_uninstall');
+            register_uninstall_hook($this->base_file, 'vb_doaj_submit_uninstall');
 
             add_action("init", array($this, 'action_init'));
 

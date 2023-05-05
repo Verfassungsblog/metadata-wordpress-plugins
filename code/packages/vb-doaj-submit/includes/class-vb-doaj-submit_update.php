@@ -1,10 +1,10 @@
 <?php
 
-require_once plugin_dir_path(__FILE__) . './class-vb-doaj_common.php';
+require_once plugin_dir_path(__FILE__) . './class-vb-doaj-submit_common.php';
 
-if (!class_exists('VB_DOAJ_Update')) {
+if (!class_exists('VB_DOAJ_Submit_Update')) {
 
-    class VB_DOAJ_Update
+    class VB_DOAJ_Submit_Update
     {
         protected $common;
         protected $status;

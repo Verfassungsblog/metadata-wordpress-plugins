@@ -1,8 +1,8 @@
 <?php
 
-if (!class_exists('VB_DOAJ_Common')) {
+if (!class_exists('VB_DOAJ_Submit_Common')) {
 
-    class VB_DOAJ_Common
+    class VB_DOAJ_Submit_Common
     {
         public $plugin_name;
 

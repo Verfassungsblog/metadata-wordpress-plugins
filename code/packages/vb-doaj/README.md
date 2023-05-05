@@ -1,3 +1,0 @@
-# Verfassungsblog DOAJ Plugin
-
-

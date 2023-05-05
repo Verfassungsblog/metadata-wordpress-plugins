@@ -1,11 +1,11 @@
 <?php
 
-require_once plugin_dir_path(__FILE__) . '../includes/class-vb-doaj_common.php';
-require_once plugin_dir_path(__FILE__) . '/class-vb-doaj_setting_fields.php';
+require_once plugin_dir_path(__FILE__) . '../includes/class-vb-doaj-submit_common.php';
+require_once plugin_dir_path(__FILE__) . '/class-vb-doaj-submit_setting_fields.php';
 
-if (!class_exists('VB_DOAJ_Admin')) {
+if (!class_exists('VB_DOAJ_Submit_Admin')) {
 
-    class VB_DOAJ_Admin
+    class VB_DOAJ_Submit_Admin
     {
         protected $setting_fields;
 
@@ -26,7 +26,7 @@ if (!class_exists('VB_DOAJ_Admin')) {
             $this->common = $common;
             $this->status = $status;
             $this->update = $update;
-            $this->setting_fields = new VB_DOAJ_Setting_Fields();
+            $this->setting_fields = new VB_DOAJ_Submit_Setting_Fields();
         }
 
         protected function get_tab_labels()
@@ -200,8 +200,8 @@ if (!class_exists('VB_DOAJ_Admin')) {
 
             $admin_page_hook = add_submenu_page(
                 'options-general.php',
-                'Verfassungsblog DOAJ',
-                'VB DOAJ',
+                'Verfassungsblog DOAJ Submit',
+                'VB DOAJ Submit',
                 'manage_options',
                 $this->common->plugin_name,
                 array($this, 'render')
@@ -223,7 +223,7 @@ if (!class_exists('VB_DOAJ_Admin')) {
                 array(
                     "id" => $this->common->plugin_name . "_help_tab",
                     "title" => __("Help"),
-                    "content" => "<h2>Verfassungsblog DOAJ</h2>",
+                    "content" => "<h2>Verfassungsblog DOAJ Submit</h2>",
                 )
             );
         }
@@ -245,17 +245,17 @@ if (!class_exists('VB_DOAJ_Admin')) {
             $current_tab = isset($this->get_tab_labels()[$current_tab]) ? $current_tab : "settings";
 
             ?>
-            <div class="vb-doaj-admin-header">
-                <div class="vb-doaj-title-section">
+            <div class="vb-doaj-submit-admin-header">
+                <div class="vb-doaj-submit-title-section">
                     <h1>
                         <?php echo esc_html(get_admin_page_title()); ?>
                     </h1>
                 </div>
-                <nav class="vb-doaj-admin-header-nav">
+                <nav class="vb-doaj-submit-admin-header-nav">
                     <?php
                     foreach ($this->get_tab_labels() as $tab_name => $tab_label) {
                         ?>
-                        <a class="vb-doaj-admin-header-tab <?php echo $current_tab == $tab_name ? "active" : "" ?>"
+                        <a class="vb-doaj-submit-admin-header-tab <?php echo $current_tab == $tab_name ? "active" : "" ?>"
                             href="?page=<?php echo $this->common->plugin_name ?>&tab=<?php echo $tab_name ?>">
                             <?php echo $tab_label ?>
                         </a>
@@ -265,7 +265,7 @@ if (!class_exists('VB_DOAJ_Admin')) {
                 </nav>
             </div>
             <hr class="wp-header-end">
-            <div class="vb-doaj-admin-content">
+            <div class="vb-doaj-submit-admin-content">
                 <?php
                 call_user_func_array($this->get_render_function_by_tab($current_tab), array());
                 ?>

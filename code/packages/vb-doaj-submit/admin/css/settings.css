@@ -1,8 +1,8 @@
-body.settings_page_vb-doaj div#wpcontent {
+body.settings_page_vb-doaj-submit div#wpcontent {
     padding-left: 0;
 }
 
-body.settings_page_vb-doaj pre {
+body.settings_page_vb-doaj-submit pre {
     padding: 0.5em;
     background-color: #fff;
     border: 1px solid #dcdcde;
@@ -10,24 +10,24 @@ body.settings_page_vb-doaj pre {
     overflow: auto;
 }
 
-.vb-doaj-admin-header {
+.vb-doaj-submit-admin-header {
     padding: 20px 0 0 0;
     background-color: #fff;
     text-align: center;
     border-bottom: 1px solid #dcdcde;
 }
 
-.vb-doaj-admin-header h1 {
+.vb-doaj-submit-admin-header h1 {
     line-height: 1.5em;
 }
 
-.vb-doaj-admin-header-nav {
+.vb-doaj-submit-admin-header-nav {
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
 }
 
-.vb-doaj-admin-header-tab {
+.vb-doaj-submit-admin-header-tab {
     display: inline-block;
     padding: 20px 15px 15px 15px;
     margin: 0 5px;
@@ -38,12 +38,12 @@ body.settings_page_vb-doaj pre {
 
 }
 
-.vb-doaj-admin-header-tab.active {
+.vb-doaj-submit-admin-header-tab.active {
     font-weight: 500;
     border-bottom: 3px solid #2271b1;
 }
 
 
-.vb-doaj-admin-content {
+.vb-doaj-submit-admin-content {
     margin: 20px 20px 0 20px;
 }

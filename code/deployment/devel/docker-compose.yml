@@ -33,7 +33,7 @@ services:
     volumes:
       - ${DATA_DIR}/wordpress:/var/www/html:Z
       - ${WORKSPACE_DIR}/code/packages/vb-crossref:/var/www/html/wp-content/plugins/vb-crossref:Z
-      - ${WORKSPACE_DIR}/code/packages/vb-doaj:/var/www/html/wp-content/plugins/vb-doaj:Z
+      - ${WORKSPACE_DIR}/code/packages/vb-doaj-submit:/var/www/html/wp-content/plugins/vb-doaj-submit:Z
       - ${WORKSPACE_DIR}/code/packages/vb-gnd-taxonomy:/var/www/html/wp-content/plugins/vb-gnd-taxonomy:Z
       - ${WORKSPACE_DIR}/code/packages/vb-metadata-export:/var/www/html/wp-content/plugins/vb-metadata-export:Z
     depends_on:
