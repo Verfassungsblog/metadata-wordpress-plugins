@@ -55,6 +55,15 @@ if (!class_exists('VB_DOAJ_Submit_Setting_Fields')) {
                     and new posts are submitted to the DOAJ.",
                 ),
                 array(
+                    "name" => "batch",
+                    "type" => "string",
+                    "section" => "general",
+                    "label" => "Batch Size",
+                    "placeholder" => "batch size",
+                    "description" => "The number of posts that are processed in one batch. High values (>1) might
+                        trigger the DOAJ to block your IP for a while.",
+                ),
+                array(
                     "name" => "eissn",
                     "type" => "string",
                     "section" => "general",
@@ -113,6 +122,14 @@ if (!class_exists('VB_DOAJ_Submit_Setting_Fields')) {
 
                 // ------------- advanced custom field settings -------------
 
+                array(
+                    "name" => "article_id_acf",
+                    "type" => "string",
+                    "section" => "post_acf",
+                    "label" => "Article ID<br>(ACF key)",
+                    "placeholder" => "ACF field key for DOAJ article id",
+                    "description" => "The ACF field key that contains the DOAH article id for a post.",
+                ),
                 array(
                     "name" => "issue_acf",
                     "type" => "string",

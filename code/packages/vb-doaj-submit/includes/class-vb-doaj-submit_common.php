@@ -23,11 +23,13 @@ if (!class_exists('VB_DOAJ_Submit_Common')) {
                     "api_baseurl" => "https://doaj.org/api/",
                     "auto_update" => true,
                     "interval" => 1,
+                    "batch" => 1,
                     "eissn" => "2366-7044",
                     "issue" => "2366-7044",
                     "require_doi" => true,
                     "include_excerpt" => true,
                     "include_tags" => true,
+                    "article_id_acf" => "doaj_article_id",
                     "doi_acf" => "doi",
                     "subheadline_acf" => "subheadline",
                     "orcid_acf" => "orcid",
@@ -38,7 +40,9 @@ if (!class_exists('VB_DOAJ_Submit_Common')) {
                     // general
                     "api_baseurl" => "https://doaj.org/api/",
                     "interval" => 1,
+                    "batch" => 1,
                     "require_doi" => true,
+                    "article_id_acf" => "doaj_article_id",
                 );
             }
         }
@@ -78,6 +82,33 @@ if (!class_exists('VB_DOAJ_Submit_Common')) {
                 return $this->setting_field_defaults[$field_name];
             }
             return false;
+        }
+
+        public function get_doaj_article_id_key() {
+            $acf_key = $this->get_settings_field_value("article_id_acf");
+            if (empty($acf_key)) {
+                return $this->plugin_name . "_doaj_article_id";
+            }
+            return $acf_key;
+        }
+
+        public function date_to_iso8601($date) {
+            return $date->format("Y-m-d\TH:i:s\Z");
+        }
+
+        public function iso8601_to_date($iso) {
+            $date = date_create_immutable_from_format('Y-m-d\\TH:i:s\\Z', $iso, new DateTimeZone('UTC'));
+            if (!$date) {
+                $date = date_create_immutable_from_format('Y-m-d', $iso, new DateTimeZone('UTC'));
+            }
+            return $date;
+        }
+
+        public function local_to_utc_iso8601($utc_iso) {
+            $local = new Datetime("now", wp_timezone());
+            $date = new Datetime("now", new DateTimeZone("UTC"));
+            $date->setTimestamp($this->iso8601_to_date($utc_iso)->getTimestamp() - wp_timezone()->getOffset($local));
+            return $this->date_to_iso8601($date);
         }
 
     }

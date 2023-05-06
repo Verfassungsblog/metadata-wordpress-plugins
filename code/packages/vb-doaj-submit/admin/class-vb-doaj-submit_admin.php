@@ -235,11 +235,23 @@ if (!class_exists('VB_DOAJ_Submit_Admin')) {
                 return;
             }
 
-            if (!empty($_POST["reset"])) {
+            if (!empty($_POST["reset_settings"])) {
                 foreach ($this->setting_fields->get_list() as $field) {
                     $field_id = $this->common->get_settings_field_id($field["name"]);
                     delete_option($field_id);
                 }
+            }
+
+            if (!empty($_POST["reset_all_posts"])) {
+                $this->update->reset_all_posts();
+            }
+
+            if (!empty($_POST["manual_update"])) {
+                $this->update->do_update();
+            }
+
+            if (!empty($_POST["manual_identify"])) {
+                $this->update->do_identify();
             }
 
             $current_tab = isset($_GET['tab']) ? $_GET['tab'] : "settings";
@@ -290,13 +302,12 @@ if (!class_exists('VB_DOAJ_Submit_Admin')) {
             </form>
             <hr />
             <form method="post" onsubmit="return confirm('Are you sure?');">
-                <input type="hidden" name="reset" value="true" />
                 <p>
                     The following action will reset all options of this plugin to their default value
                     (including options in other tabs). Use with care only.
                 </p>
                 <?php
-                submit_button(__('Reset Settings to Default', "vb-doaj"), "secondary", "reset");
+                submit_button(__('Reset Settings to Default', "vb-doaj"), "secondary", "reset_settings");
                 ?>
             </form>
             <?php
@@ -306,12 +317,24 @@ if (!class_exists('VB_DOAJ_Submit_Admin')) {
         {
             $posts = get_posts(array('numberposts' => 1));
             if (count($posts) >= 1) {
+                $doaj_article_id = get_post_meta($posts[0]->ID, $this->common->get_doaj_article_id_key(), true);
+                $doaj_baseurl = $this->common->get_settings_field_value("api_baseurl");
                 $renderer = new VB_DOAJ_Submit_Render($this->common);
                 $doaj_data = $renderer->render($posts[0]);
+
+                if (empty($doaj_article_id)) {
+                    ?>
+                    <h2>Example</h2>
+                    <?php
+                } else {
+                    ?>
+                    <h2>
+                        <a href="https://doaj.org/article/<?php echo $doaj_article_id ?>">Example</a>
+                        (<a href="<?php echo $doaj_baseurl . "articles/" . $doaj_article_id ?>">JSON</a>)
+                    </h2>
+                    <?php
+                }
                 ?>
-                <h2>
-                    <?php echo __("Example", "vb-doaj-submit") ?>
-                </h2>
 
                 <pre><?php echo htmlspecialchars($doaj_data) ?></pre>
 
@@ -323,11 +346,45 @@ if (!class_exists('VB_DOAJ_Submit_Admin')) {
         {
             // empty
             ?>
+            <h2>Status</h2>
             <ul>
                 <li>Automatic Update: <?php echo $this->common->get_settings_field_value("auto_update") ? "enabled" : "disabled" ?></li>
                 <li>Update Interval: <?php echo $this->update->get_update_interval_in_minutes() ?> min</li>
                 <li>Last Update: <?php echo $this->status->get_last_update_text() ?></li>
+                <li>Last Submitted Post Date: <?php echo $this->status->get_last_updated_post_modified_text() ?></li>
             </ul>
+            <form method="post" onsubmit="return;">
+            <p>
+                <?php
+                submit_button(__('Manually Update Now', "vb-doaj"), "primary", "manual_update", false);
+                echo " ";
+                submit_button(__('Manually Identify Now', "vb-doaj"), "primary", "manual_identify", false);
+                ?>
+            </p>
+            </form>
+            <hr />
+            <h2>Statistics</h2>
+            <?php
+            $need_identifying = $this->status->get_number_of_posts_that_need_identifying();
+            $have_article_id = $this->status->get_number_of_posts_that_have_article_id();
+            $were_identified = $this->status->get_number_of_posts_that_were_identified();
+            $need_submitting_modified = $this->status->get_number_of_posts_that_need_submitting();
+            $were_submitted = $this->status->get_number_of_posts_that_are_submitted();
+            ?>
+            <ul>
+                <li>Posts that need identifying (unknown DOAJ article id): <?php echo $need_identifying; ?></li>
+                <li>Posts that were successfully identified (known DOAJ article id): <?php echo $have_article_id; ?></li>
+                <li>Posts that were not identified (no DOAJ article id found): <?php echo ($were_identified - $have_article_id) ?></li>
+                <li>Posts that need submitting: <?php echo $need_submitting_modified; ?></li>
+                <li>Posts that were submitted: <?php echo $were_submitted; ?></li>
+            </ul>
+            <form method="post" onsubmit="return confirm('Are you sure?');;">
+            <p>
+                <?php
+                submit_button(__('Reset Status of all Posts', "vb-doaj-submit"), "secondary", "reset_all_posts", false);
+                ?>
+            </p>
+            </form>
             <?php
         }
 
