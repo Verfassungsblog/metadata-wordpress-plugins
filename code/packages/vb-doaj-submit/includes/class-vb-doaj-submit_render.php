@@ -60,7 +60,7 @@ if (!class_exists('VB_DOAJ_Submit_Render')) {
             if (!$include_excerpt) {
                 return false;
             }
-            return esc_html(get_the_excerpt($post));
+            return esc_html(strip_tags(get_the_excerpt($post)));
         }
 
         protected function render_author($name, $orcid, $affiliation)

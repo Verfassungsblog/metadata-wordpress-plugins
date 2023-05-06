@@ -282,7 +282,7 @@ if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
         {
             $include_excerpt = $this->common->get_settings_field_value("include_excerpt");
             if ($include_excerpt) {
-                $excerpt = esc_html(get_the_excerpt($post));
+                $excerpt = esc_html(strip_tags(get_the_excerpt($post)));
                 if (!empty($excerpt)) {
                 return "<marc21:datafield tag=\"520\" ind1=\" \" ind2=\" \">
                         <marc21:subfield code=\"a\">${excerpt}</marc21:subfield>

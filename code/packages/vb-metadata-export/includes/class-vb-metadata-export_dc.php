@@ -173,7 +173,7 @@ if (!class_exists('VB_Metadata_Export_DC')) {
         {
             $include_excerpt = $this->common->get_settings_field_value("include_excerpt");
             if ($include_excerpt) {
-                $excerpt = esc_html(get_the_excerpt($post));
+                $excerpt = esc_html(strip_tags(get_the_excerpt($post)));
                 if (!empty($excerpt)) {
                     return "<dc:description>{$excerpt}</dc:description>";
                 }
