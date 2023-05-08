@@ -21,7 +21,6 @@ if (!class_exists('VB_DOAJ_Submit_Update')) {
             $this->status->set_last_update();
             $batch = (int)$this->common->get_settings_field_value("batch");
             $batch = $batch < 1 ? 1 : $batch;
-
             $rest = new VB_DOAJ_Submit_REST($this->common, $this->status);
 
             // iterate over all posts that require update because they were modified recently
@@ -65,59 +64,18 @@ if (!class_exists('VB_DOAJ_Submit_Update')) {
             $this->status->clear_last_error();
             $batch = (int)$this->common->get_settings_field_value("batch");
             $batch = $batch < 1 ? 1 : $batch;
+            $rest = new VB_DOAJ_Submit_REST($this->common, $this->status);
 
             // iterate over all posts that require identifying
             $identify_query = $this->status->query_posts_that_need_identifying($batch);
             if ($identify_query->post_count > 0) {
                 foreach($identify_query->posts as $post) {
-                    $this->identify_post($post);
+                    $success = $rest->identify_post($post);
+                    if (!$success) {
+                        return;
+                    }
                 }
             }
-        }
-
-        public function identify_post($post)
-        {
-            $title = rawurlencode(get_the_title($post));
-            if (empty($title)) {
-                $this->status->set_last_error("[ Post id=" . $post->ID . "] post has no title?!");
-                return;
-            }
-
-            $issn = rawurlencode($this->common->get_settings_field_value("eissn"));
-            if (empty($issn)) {
-                $issn = rawurlencode($this->common->get_settings_field_value("pissn"));
-            }
-
-            if (empty($issn)) {
-                $this->status->set_last_error("Either eISSN or pISSN needs to be provided!");
-                return;
-            }
-
-            $baseurl = $this->common->get_settings_field_value("api_baseurl");
-            $url = $baseurl . "search/articles/bibjson.title.exact:%22{$title}%22%20AND%20issn:%22{$issn}%22";
-            $response = wp_remote_get($url);
-            if (is_wp_error($response)) {
-                $this->status->set_last_error("[Request Error] " . $response->get_error_message());
-                return;
-            }
-            $status_code = wp_remote_retrieve_response_code($response);
-            if ($status_code !== 200) {
-                $this->status->set_last_error("search request has invalid status code '" . $status_code . "'");
-                return;
-            }
-            $json_data = json_decode(wp_remote_retrieve_body($response));
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                $this->status->set_last_error("response is invalid json");
-                return;
-            }
-
-            if ($json_data->total == 1 && count($json_data->results) == 1) {
-                // exact match found
-                $article_id = $json_data->results[0]->id;
-                $this->status->set_post_article_id($post, $article_id);
-            }
-
-            $this->status->set_post_identify_timestamp($post);
         }
 
         public function action_init() {

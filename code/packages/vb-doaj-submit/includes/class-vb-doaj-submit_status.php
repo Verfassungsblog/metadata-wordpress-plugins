@@ -150,10 +150,10 @@ if (!class_exists('VB_DOAJ_Submit_Status')) {
 
             $require_doi = $this->common->get_settings_field_value("require_doi");
             if ($require_doi) {
-                $doi_acf_key = $this->common->get_settings_field_value("doi_acf");
+                $doi_meta_key = $this->common->get_settings_field_value("doi_meta_key");
                 $query_args['meta_query'] = array_merge($query_args['meta_query'], array(
                     array(
-                        'key' => $doi_acf_key,
+                        'key' => $doi_meta_key,
                         'value' => "",
                         'compare' => "!=",
                     ),
@@ -192,10 +192,10 @@ if (!class_exists('VB_DOAJ_Submit_Status')) {
             }
 
             if ($require_doi) {
-                $doi_acf_key = $this->common->get_settings_field_value("doi_acf");
+                $doi_meta_key = $this->common->get_settings_field_value("doi_meta_key");
                 $query_args['meta_query'] = array_merge($query_args['meta_query'], array(
                     array(
-                        'key' => $doi_acf_key,
+                        'key' => $doi_meta_key,
                         'value' => "",
                         'compare' => "!=",
                     ),

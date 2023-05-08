@@ -34,6 +34,7 @@ if (!class_exists('VB_DOAJ_Submit_Admin')) {
         {
             return array(
                 "settings" => "Settings",
+                "fields" => "Custom Fields",
                 "example" => "Example",
                 "status" => "Status",
             );
@@ -43,8 +44,8 @@ if (!class_exists('VB_DOAJ_Submit_Admin')) {
         {
             return array(
                 "general" => "General",
-                "post_acf" => "Advanced Custom Fields for Posts",
-                "user_acf" => "Advanced Custom Fields for Users",
+                "post_meta" => "Custom Fields for Posts",
+                "user_meta" => "Custom Fields for Users",
             );
         }
 
@@ -52,8 +53,8 @@ if (!class_exists('VB_DOAJ_Submit_Admin')) {
         {
             return array(
                 "general" => "settings",
-                "post_acf" => "settings",
-                "user_acf" => "settings",
+                "post_meta" => "fields",
+                "user_meta" => "fields",
             );
         }
 
@@ -157,13 +158,14 @@ if (!class_exists('VB_DOAJ_Submit_Admin')) {
             <?php
         }
 
-        public function render_post_acf_section($args)
+        public function render_post_meta_section($args)
         {
             ?>
             <p id="<?php echo esc_attr($args['id']); ?>">
                 <?php echo __(
-                    "The following settings add or overwrite meta data for each individual post via the Advanced Custom
-                    Fields (ACF) plugin. Each option may specify the ACF field key that contains the relevant information.",
+                    "The following settings add or overwrite meta data for each individual post. Each option may
+                    specify a meta key that is used to store the relevant information for each post. You may use, for
+                    example, the Advanced Custom Fields (ACF) plugin to view or edit this meta data.",
                     "vb-doaj"
                 );
                 ?>
@@ -171,15 +173,17 @@ if (!class_exists('VB_DOAJ_Submit_Admin')) {
             <?php
         }
 
-        public function render_user_acf_section($args)
+        public function render_user_meta_section($args)
         {
             ?>
             <p id="<?php echo esc_attr($args['id']); ?>">
                 <?php echo __(
-                    "The following settings add or overwrite meta data for each author (or user) via the Advanced Custom
-                    Fields (ACF) plugin. Each option may specify the ACF field key that contains the relevant information.
-                    The corresponding ACF field needs to be assigned to users instead of posts. This can be achieved by
-                    an ACF \"location rule\" for the field group: <code>User Role : is equal to : All</code>.",
+                    "The following settings add or overwrite meta data for each author (or user). Each option may
+                    specify a meta key that is used to store the relevant information for each user.
+                    You may use, for example, the Advanced Custom Fields (ACF) plugin to view or edit this meta data.
+                    For user meta data, the corresponding ACF field group needs to be assigned to users instead of posts.
+                    This can be achieved by specifying the ACF \"location rule\" for the corresponding field group as:
+                    <code>User Role : is equal to : All</code>.",
                     "vb-doaj-export"
                 );
                 ?>
@@ -331,7 +335,23 @@ if (!class_exists('VB_DOAJ_Submit_Admin')) {
                     (including options in other tabs). Use with care only.
                 </p>
                 <?php
-                submit_button(__('Reset Settings to Default', "vb-doaj"), "secondary", "reset_settings");
+                submit_button(__('Reset Settings to Default', "vb-doaj-submit"), "secondary", "reset_settings");
+                ?>
+            </form>
+            <?php
+        }
+
+        public function render_fields_tab()
+        {
+            ?>
+            <?php
+            $settings_page_id = $this->get_setting_page_id_by_tab("fields");
+            ?>
+            <form action="options.php" method="post">
+                <?php
+                settings_fields($settings_page_id);
+                do_settings_sections($settings_page_id);
+                submit_button(__('Save Settings', "vb-doaj-submit"));
                 ?>
             </form>
             <?php
@@ -397,8 +417,6 @@ if (!class_exists('VB_DOAJ_Submit_Admin')) {
                 submit_button(__('Manually Update Now', "vb-doaj-submit"), "primary", "manual_update", false);
                 echo " ";
                 submit_button(__('Manually Identify Now', "vb-doaj-submit"), "secondary", "manual_identify", false);
-                echo " ";
-                submit_button(__('Reset Last Error', "vb-doaj-submit"), "secondary", "reset_last_error", false);
                 ?>
             </p>
             </form>
@@ -418,10 +436,13 @@ if (!class_exists('VB_DOAJ_Submit_Admin')) {
                 <li>Posts that need submitting: <?php echo $need_submitting_modified; ?></li>
                 <li>Posts that were submitted: <?php echo $were_submitted; ?></li>
             </ul>
+            <hr />
             <form method="post" onsubmit="return confirm('Are you sure?');;">
             <p>
                 <?php
                 submit_button(__('Reset Status of all Posts', "vb-doaj-submit"), "secondary", "reset_status", false);
+                echo " ";
+                submit_button(__('Reset Last Error', "vb-doaj-submit"), "secondary", "reset_last_error", false);
                 ?>
             </p>
             </form>

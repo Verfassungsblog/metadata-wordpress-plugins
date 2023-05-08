@@ -10,6 +10,7 @@
  */
 
 require_once plugin_dir_path(__FILE__) . './class-vb-doaj-submit_common.php';
+require_once plugin_dir_path(__FILE__) . './class-vb-doaj-submit_affiliation.php';
 
 if (!class_exists('VB_DOAJ_Submit_Render')) {
 
@@ -56,7 +57,7 @@ if (!class_exists('VB_DOAJ_Submit_Render')) {
 
         protected function get_orcid($user_id)
         {
-            return $this->common->get_acf_settings_user_field_value("orcid_acf", $user_id);
+            return $this->common->get_user_meta_field_value("orcid_meta_key", $user_id);
         }
 
         protected function get_post_coauthors($post)
@@ -83,7 +84,7 @@ if (!class_exists('VB_DOAJ_Submit_Render')) {
             }
             return array_filter(array(
                 "name" => $name,
-                "orcid_id" => "https://orcid.org/" . $orcid,
+                "orcid_id" => !empty($orcid) ? "https://orcid.org/{$orcid}" : false,
                 "affiliation" => $affiliation,
             ));
         }
@@ -92,7 +93,9 @@ if (!class_exists('VB_DOAJ_Submit_Render')) {
         {
             $post_author_name = $this->get_author_name($post->post_author);
             $post_author_orcid = $this->get_orcid($post->post_author);
-            return $this->render_author($post_author_name, $post_author_orcid, null);
+            $finder = new VB_DOAJ_Submit_Affiliation($this->common);
+            $post_author_affiliation = $finder->find_author_affiliation($post->post_author);
+            return $this->render_author($post_author_name, $post_author_orcid, $post_author_affiliation);
         }
 
         protected function render_post_coauthors($post)
@@ -153,7 +156,7 @@ if (!class_exists('VB_DOAJ_Submit_Render')) {
         }
 
         protected function render_doi($post) {
-            $doi = esc_html($this->common->get_acf_settings_post_field_value("doi_acf", $post));
+            $doi = esc_html($this->common->get_post_meta_field_value("doi_meta_key", $post));
             if (empty($doi)) {
                 return false;
             }
@@ -175,16 +178,16 @@ if (!class_exists('VB_DOAJ_Submit_Render')) {
         protected function render_issue_number($post)
         {
             $issue_general = esc_html($this->common->get_settings_field_value("issue"));
-            $issue_acf = esc_html($this->common->get_acf_settings_post_field_value("issue_acf", $post));
-            $issue = !empty($issue_acf) ? $issue_acf : $issue_general;
+            $issue_custom = esc_html($this->common->get_post_meta_field_value("issue_meta_key", $post));
+            $issue = !empty($issue_custom) ? $issue_custom : $issue_general;
             return empty($issue) ? false : $issue;
         }
 
         protected function render_volume($post)
         {
             $volume_general = esc_html($this->common->get_settings_field_value("volume"));
-            $volume_acf = esc_html($this->common->get_acf_settings_post_field_value("volume_acf", $post));
-            $volume = !empty($volume_acf) ? $volume_acf : $volume_general;
+            $volume_custom = esc_html($this->common->get_post_meta_field_value("volume_meta_key", $post));
+            $volume = !empty($volume_custom) ? $volume_custom : $volume_general;
             return empty($volume) ? false : $volume;
         }
 

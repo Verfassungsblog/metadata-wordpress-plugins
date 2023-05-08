@@ -18,12 +18,6 @@ if (!class_exists('VB_DOAJ_Submit_REST')) {
 
         public function identify_post($post)
         {
-            $title = rawurlencode(get_the_title($post));
-            if (empty($title)) {
-                $this->status->set_last_error("[ Post id=" . $post->ID . "] post has no title?!");
-                return false;
-            }
-
             $issn = rawurlencode($this->common->get_settings_field_value("eissn"));
             if (empty($issn)) {
                 $issn = rawurlencode($this->common->get_settings_field_value("pissn"));
@@ -39,7 +33,27 @@ if (!class_exists('VB_DOAJ_Submit_REST')) {
                 $this->status->set_last_error("DOAJ api base URL can not be empty!");
                 return false;
             }
-            $url = $baseurl . "search/articles/bibjson.title.exact:%22{$title}%22%20AND%20issn:%22{$issn}%22";
+
+            $identify_by_permalink = $this->common->get_settings_field_value("identify_by_permalink");
+            if ($identify_by_permalink) {
+                // identify by permalink
+                $permalink = rawurlencode(get_the_permalink($post));
+                if (empty($permalink)) {
+                    $this->status->set_last_error("[ Post id=" . $post->ID . "] has no permalink?!");
+                    return false;
+                }
+                $url = $baseurl . "search/articles/bibjson.link.url.exact:%22{$permalink}%22%20AND%20issn:%22{$issn}%22";
+            } else {
+                // identify by title
+                $title = rawurlencode(get_the_title($post));
+                if (empty($title)) {
+                    $this->status->set_last_error("[ Post id=" . $post->ID . "] post has no title?!");
+                    return false;
+                }
+                $url = $baseurl . "search/articles/bibjson.title.exact:%22{$title}%22%20AND%20issn:%22{$issn}%22";
+            }
+
+            // do http request
             $response = wp_remote_get($url);
             if (is_wp_error($response)) {
                 $this->status->set_last_error("[Request Error] " . $response->get_error_message());

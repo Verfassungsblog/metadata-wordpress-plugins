@@ -29,9 +29,13 @@ if (!class_exists('VB_DOAJ_Submit_Common')) {
                     "require_doi" => true,
                     "include_excerpt" => true,
                     "include_tags" => true,
-                    "article_id_acf" => "doaj_article_id",
-                    "doi_acf" => "doi",
-                    "orcid_acf" => "orcid",
+                    "identify_by_permalink" => true,
+                    "article_id_meta_key" => "doaj_article_id",
+                    "doi_meta_key" => "doi",
+                    "post_affiliations_meta_key" => "stored_affiliations",
+                    "orcid_meta_key" => "orcid",
+                    "affiliation_meta_key" => "affiliation",
+                    "rorid_meta_key" => "rorid",
                 );
             } else {
                 // default settings for any other blog than Verfassungsblog
@@ -42,7 +46,15 @@ if (!class_exists('VB_DOAJ_Submit_Common')) {
                     "interval" => 1,
                     "batch" => 1,
                     "require_doi" => true,
-                    "article_id_acf" => "doaj_article_id",
+                    "include_excerpt" => true,
+                    "include_tags" => true,
+                    "identify_by_permalink" => true,
+                    "article_id_meta_key" => "doaj_article_id",
+                    "doi_meta_key" => "doi",
+                    "post_affiliations_meta_key" => "stored_affiliations",
+                    "orcid_meta_key" => "orcid",
+                    "affiliation_meta_key" => "affiliation",
+                    "rorid_meta_key" => "rorid",
                 );
             }
         }
@@ -53,22 +65,22 @@ if (!class_exists('VB_DOAJ_Submit_Common')) {
             return get_option($this->get_settings_field_id($field_name), $default);
         }
 
-        public function get_acf_settings_post_field_value($field_name, $post)
+        public function get_post_meta_field_value($field_name, $post)
         {
-            if (!function_exists("get_field")) {
-                return;
+            $meta_key = $this->get_settings_field_value($field_name);
+            if (empty($meta_key)) {
+                return false;
             }
-            $acf_key = $this->get_settings_field_value($field_name);
-            return get_field($acf_key, $post->ID);
+            return get_post_meta($post->ID, $meta_key, true);
         }
 
-        public function get_acf_settings_user_field_value($field_name, $user_id)
+        public function get_user_meta_field_value($field_name, $user_id)
         {
-            if (!function_exists("get_field")) {
-                return;
+            $meta_key = $this->get_settings_field_value($field_name);
+            if (empty($meta_key)) {
+                return false;
             }
-            $acf_key = $this->get_settings_field_value($field_name);
-            return get_field($acf_key, 'user_' . $user_id);
+            return get_user_meta($user_id, $meta_key, true);
         }
 
         public function get_settings_field_id($field_name)
@@ -85,11 +97,7 @@ if (!class_exists('VB_DOAJ_Submit_Common')) {
         }
 
         public function get_doaj_article_id_key() {
-            $acf_key = $this->get_settings_field_value("article_id_acf");
-            if (empty($acf_key)) {
-                return $this->plugin_name . "_doaj_article_id";
-            }
-            return $acf_key;
+            return $this->get_settings_field_value("article_id_meta_key");
         }
 
         public function date_to_iso8601($date) {
