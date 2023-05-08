@@ -119,11 +119,8 @@ if (!class_exists('VB_DOAJ_Submit_Status')) {
                 'meta_query' => array(
                     'relation' => 'AND',
                     array(
-                        'relation' => 'AND',
-                        array(
-                            'key' => $this->common->plugin_name . "_doaj_identify_timestamp",
-                            'compare' => "EXIST",
-                        ),
+                        'key' => $this->common->plugin_name . "_doaj_identify_timestamp",
+                        'compare' => "EXIST",
                     ),
                 )
             );
