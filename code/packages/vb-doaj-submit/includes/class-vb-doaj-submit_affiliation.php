@@ -98,7 +98,7 @@ if (!class_exists('VB_DOAJ_Submit_Affiliation')) {
             return $name_array[0]->__toString() . ", " .$country_array[0]->__toString();
         }
 
-        public function find_author_affiliation($user_id)
+        protected function find_author_affiliation($user_id)
         {
             $affiliation = $this->get_textual_author_affiliation($user_id);
             if (empty($affiliation)) {
@@ -110,11 +110,48 @@ if (!class_exists('VB_DOAJ_Submit_Affiliation')) {
             return $affiliation;
         }
 
+        protected function get_post_coauthors($post)
+        {
+            if (!function_exists("get_coauthors")) {
+                return array();
+            }
+            return array_slice(get_coauthors($post->ID), 1);
+        }
 
+        public function save_author_affiliations_for_post($post)
+        {
+            $affiliations = array();
 
+            // add post author
+            $post_author_login = get_the_author_meta("user_login", $post->post_author);
+            $affiliations[$post_author_login] = $this->find_author_affiliation($post->post_author);
 
+            // add post coauthors
+            foreach ($this->get_post_coauthors($post) as $coauthor) {
+                $coauthor_login = get_the_author_meta("user_login", $coauthor->ID);
+                $affiliations[$coauthor_login] = $this->find_author_affiliation($coauthor->ID);
+            }
+            $affiliations = array_filter($affiliations);
+            $author_affiliations_meta_key = $this->common->get_settings_field_value("author_affiliations_meta_key");
 
+            // encode json
+            update_post_meta($post->ID, $author_affiliations_meta_key, json_encode($affiliations));
+        }
 
+        public function get_author_affiliation_for_post($post, $user_id)
+        {
+            $author_affiliations_meta_key = $this->common->get_settings_field_value("author_affiliations_meta_key");
+            $author_login = get_the_author_meta("user_login", $user_id);
+
+            // decode json
+            $json = get_post_meta($post->ID, $author_affiliations_meta_key, true);
+            $affiliations = json_decode($json, true);
+
+            if (isset($affiliations[$author_login])) {
+                return $affiliations[$author_login];
+            }
+            return false;
+        }
 
     }
 

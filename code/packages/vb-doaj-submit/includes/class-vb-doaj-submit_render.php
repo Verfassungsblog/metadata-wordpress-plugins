@@ -18,6 +18,8 @@ if (!class_exists('VB_DOAJ_Submit_Render')) {
     {
         protected $common;
 
+        protected $affiliation;
+
         protected $last_error;
 
         protected $last_post;
@@ -25,6 +27,7 @@ if (!class_exists('VB_DOAJ_Submit_Render')) {
         public function __construct($common)
         {
             $this->common = $common;
+            $this->affiliation = new VB_DOAJ_Submit_Affiliation($this->common);
         }
 
         protected function get_author_name($author)
@@ -93,8 +96,7 @@ if (!class_exists('VB_DOAJ_Submit_Render')) {
         {
             $post_author_name = $this->get_author_name($post->post_author);
             $post_author_orcid = $this->get_orcid($post->post_author);
-            $finder = new VB_DOAJ_Submit_Affiliation($this->common);
-            $post_author_affiliation = $finder->find_author_affiliation($post->post_author);
+            $post_author_affiliation = $this->affiliation->get_author_affiliation_for_post($post, $post->post_author);
             return $this->render_author($post_author_name, $post_author_orcid, $post_author_affiliation);
         }
 
@@ -105,7 +107,8 @@ if (!class_exists('VB_DOAJ_Submit_Render')) {
             foreach ($coauthors as $coauthor) {
                 $coauthor_name = $this->get_coauthor_name($coauthor);
                 $coauthor_orcid = $this->get_orcid($coauthor->ID);
-                $result = array_merge($result, array($this->render_author($coauthor_name, $coauthor_orcid, null)));
+                $coauthor_affiliation = $this->affiliation->get_author_affiliation_for_post($post, $coauthor->ID);
+                $result = array_merge($result, array($this->render_author($coauthor_name, $coauthor_orcid, $coauthor_affiliation)));
             }
             return $result;
         }

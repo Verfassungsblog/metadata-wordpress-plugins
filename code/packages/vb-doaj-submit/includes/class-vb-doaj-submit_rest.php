@@ -2,6 +2,7 @@
 
 require_once plugin_dir_path(__FILE__) . './class-vb-doaj-submit_common.php';
 require_once plugin_dir_path(__FILE__) . './class-vb-doaj-submit_status.php';
+require_once plugin_dir_path(__FILE__) . './class-vb-doaj-submit_affiliation.php';
 
 if (!class_exists('VB_DOAJ_Submit_REST')) {
 
@@ -74,6 +75,10 @@ if (!class_exists('VB_DOAJ_Submit_REST')) {
                 // exact match found
                 $article_id = $json_data->results[0]->id;
                 $this->status->set_post_article_id($post, $article_id);
+            } else {
+                // no match found (article is new)
+                $affiliation = new VB_DOAJ_Submit_Affiliation($this->common);
+                $affiliation->save_author_affiliations_for_post($post);
             }
 
             $this->status->set_post_identify_timestamp($post);
