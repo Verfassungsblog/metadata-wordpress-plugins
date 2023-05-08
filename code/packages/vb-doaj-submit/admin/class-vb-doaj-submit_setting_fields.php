@@ -36,7 +36,8 @@ if (!class_exists('VB_DOAJ_Submit_Setting_Fields')) {
                     "section" => "general",
                     "label" => "API Base URL",
                     "placeholder" => "URL to DOAJ API",
-                    "description" => "The URL to the DOAJ API.",
+                    "description" => "The URL to the DOAJ API.<br>
+                        Usually <code>https://doaj.org/api/</code>, for testing: <code>https://testdoaj.cottagelabs.com/api/</code>",
                 ),
                 array(
                     "name" => "auto_update",
@@ -126,9 +127,12 @@ if (!class_exists('VB_DOAJ_Submit_Setting_Fields')) {
                     "name" => "article_id_acf",
                     "type" => "string",
                     "section" => "post_acf",
-                    "label" => "Article ID<br>(ACF key)",
+                    "label" => "DOAJ Article ID<br>(ACF key)",
                     "placeholder" => "ACF field key for DOAJ article id",
-                    "description" => "The ACF field key that contains the DOAH article id for a post.",
+                    "description" => "The ACF field key that contains the DOAJ article id for a post.<br/>
+                        (Any changes to this field will not copy data to the new field automatically. You can trigger
+                        that article ids are retrieved from the DOAJ again via the \"Reset Status of all Posts\" button
+                        in the status tab.)",
                 ),
                 array(
                     "name" => "issue_acf",
@@ -153,14 +157,6 @@ if (!class_exists('VB_DOAJ_Submit_Setting_Fields')) {
                     "label" => "DOI<br>(ACF key)",
                     "placeholder" => "ACF field key for DOI",
                     "description" => "The ACF field key that contains the DOI for a post.",
-                ),
-                array(
-                    "name" => "subheadline_acf",
-                    "type" => "string",
-                    "section" => "post_acf",
-                    "label" => "Sub-Headline<br>(ACF key)",
-                    "placeholder" => "ACF field key for a sub-headline",
-                    "description" => "The ACF field key that contains the sub-headline for a post. If a subheadline is available, it is appended to the title with a minus symbol as separator.",
                 ),
                 array(
                     "name" => "orcid_acf",

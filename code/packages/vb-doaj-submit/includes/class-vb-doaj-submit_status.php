@@ -13,6 +13,18 @@ if (!class_exists('VB_DOAJ_Submit_Status')) {
             $this->common = $common;
         }
 
+        public function set_last_error($error) {
+            return update_option($this->common->plugin_name . "_status_last_error", $error);
+        }
+
+        public function get_last_error() {
+            return get_option($this->common->plugin_name . "_status_last_error", false);
+        }
+
+        public function clear_last_error() {
+            delete_option($this->common->plugin_name . "_status_last_error");
+        }
+
         public function set_last_update() {
             return update_option($this->common->plugin_name . "_status_last_update", time());
         }
@@ -60,6 +72,35 @@ if (!class_exists('VB_DOAJ_Submit_Status')) {
             $date->setTimezone(wp_timezone());
             $timestamp = $date->getTimestamp() + $date->getOffset();
             return date_i18n(get_option('date_format'), $timestamp) . " at " . date_i18n(get_option('time_format'), $timestamp);
+        }
+
+        public function set_post_submit_timestamp($post) {
+            update_post_meta(
+                $post->ID,
+                $this->common->plugin_name . "_doaj_submit_timestamp",
+                (new DateTime("now", new DateTimeZone("UTC")))->getTimestamp()
+            );
+        }
+
+        public function set_post_article_id($post, $article_id) {
+            update_post_meta(
+                $post->ID,
+                $this->common->get_doaj_article_id_key(),
+                $article_id,
+            );
+        }
+
+        public function clear_post_article_id($post) {
+            delete_post_meta($post->ID, $this->common->get_doaj_article_id_key());
+        }
+
+        public function set_post_identify_timestamp($post)
+        {
+            update_post_meta(
+                $post->ID,
+                $this->common->plugin_name . "_doaj_identify_timestamp",
+                (new DateTime("now", new DateTimeZone("UTC")))->getTimestamp()
+            );
         }
 
         public function get_number_of_posts_that_need_submitting()
@@ -174,6 +215,7 @@ if (!class_exists('VB_DOAJ_Submit_Status')) {
         {
             $query_args = array(
                 'post_type' => 'post',
+                'post_status' => array('publish', 'trash'),
                 'meta_query' => array(
                     'relation' => 'OR',
                     array(
@@ -206,6 +248,7 @@ if (!class_exists('VB_DOAJ_Submit_Status')) {
         {
             $query_args = array(
                 'post_type' => 'post',
+                'post_status' => array('publish', 'trash'),
                 'meta_query' => array(
                     'relation' => 'OR',
                     array(
@@ -234,6 +277,7 @@ if (!class_exists('VB_DOAJ_Submit_Status')) {
         {
             $query_args = array(
                 'post_type' => 'post',
+                'post_status' => array('publish', 'trash'),
                 'meta_query' => array(
                     'relation' => 'AND',
                     array(
@@ -260,6 +304,19 @@ if (!class_exists('VB_DOAJ_Submit_Status')) {
         {
             $query = $this->query_posts_that_are_submitted(false);
             return $query->post_count;
+        }
+
+        public function reset_status()
+        {
+            $this->clear_last_updated_post_modified_date();
+            $identified_query = $this->query_posts_that_were_identified(false);
+            foreach($identified_query->posts as $post)
+            {
+                delete_post_meta($post->ID, $this->common->plugin_name . "_doaj_identify_timestamp");
+                delete_post_meta($post->ID, $this->common->plugin_name . "_doaj_submit_timestamp");
+                delete_post_meta($post->ID, $this->common->get_doaj_article_id_key());
+            }
+            $this->clear_last_error();
         }
 
         public function action_init() {

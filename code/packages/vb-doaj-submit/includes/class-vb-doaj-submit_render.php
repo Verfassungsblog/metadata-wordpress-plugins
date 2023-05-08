@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * Renders DOAJ article json. See:
+ * - Api Documentation: https://doaj.org/api/v3/docs
+ * - Json Data Format: https://doaj.github.io/doaj-docs/master/data_models/IncomingAPIArticle
+ * - DOAJ Validation Code: https://github.com/DOAJ/doaj/blob/bc9187c6dfaf4c4ad552baac1c874cd257ca1468/portality/api/current/data_objects/article.py#L195
+ * - DOAJ Article Creation Test: https://github.com/DOAJ/doaj/blob/752f8fe34d2a09846aa4af6a0900fb7db285cce7/doajtest/unit/test_create_article.py
+ * - DOAJ Journal Metadata Code: https://github.com/DOAJ/doaj/blob/bc9187c6dfaf4c4ad552baac1c874cd257ca1468/portality/models/article.py#L247
+ */
+
 require_once plugin_dir_path(__FILE__) . './class-vb-doaj-submit_common.php';
 
 if (!class_exists('VB_DOAJ_Submit_Render')) {
@@ -7,6 +16,10 @@ if (!class_exists('VB_DOAJ_Submit_Render')) {
     class VB_DOAJ_Submit_Render
     {
         protected $common;
+
+        protected $last_error;
+
+        protected $last_post;
 
         public function __construct($common)
         {
@@ -70,7 +83,7 @@ if (!class_exists('VB_DOAJ_Submit_Render')) {
             }
             return array_filter(array(
                 "name" => $name,
-                "orcid_id" => $orcid,
+                "orcid_id" => "https://orcid.org/" . $orcid,
                 "affiliation" => $affiliation,
             ));
         }
@@ -180,23 +193,31 @@ if (!class_exists('VB_DOAJ_Submit_Render')) {
             return array_filter(array(
                 'number' => $this->render_issue_number($post),
                 'volume' => $this->render_volume($post),
+                // title is overwritten by DOAJ
+                // publisher is overwritten by DOAJ
+                // country is overwritten by DOAJ
+                // language list is overwritten by DOAJ
             ));
         }
 
         protected function render_title($post)
         {
             $title = esc_html(get_the_title($post));
-            $subheadline = esc_html($this->common->get_acf_settings_post_field_value("subheadline_acf", $post));
-            if (!empty($subheadline)) {
-                $title = $title . " - " . $subheadline;
-            }
             return empty($title) ? false : $title;
+        }
+
+        public function get_last_error()
+        {
+            return "[Post id=" . $this->last_post->ID . "] " .  $this->last_error;
         }
 
         public function render($post)
         {
-            // example Random: https://doaj.org/api/articles/831bac8cf73e4f2f855189504d29f54d
+            // random example: https://doaj.org/api/articles/831bac8cf73e4f2f855189504d29f54d
             // verfassungsblog example: https://doaj.org/api/articles/19f5e959bca74eb29f303e6bf4078640
+            $this->last_error = null;
+            $this->last_post = $post;
+
             $json_data = array(
                 'bibjson' => array_filter(array(
                     'title' => $this->render_title($post),
@@ -212,22 +233,27 @@ if (!class_exists('VB_DOAJ_Submit_Render')) {
                     )),
                     'month' => get_the_time('m', $post),
                     'year' => get_the_time('Y', $post),
+                    // subject list is overwritten by DOAJ
                 )),
             );
 
             // check mandatory fields
-            if (empty($json_data["bibjson"]["title"])) {
-                // article has no title
+            if (!isset($json_data["bibjson"]["title"]) || empty($json_data["bibjson"]["title"])) {
+                $this->last_error = "article has no title";
                 return false;
             }
 
-            if (count($json_data["bibjson"]["author"]) < 1 || empty($json_data["bibjson"]["author"][0]["name"])) {
-                // article has no author or author name is empty
+            if (!isset($json_data["bibjson"]["author"])
+                    || count($json_data["bibjson"]["author"]) < 1
+                    || empty($json_data["bibjson"]["author"][0]["name"])) {
+                $this->last_error = "article has no author or author name is empty";
                 return false;
             }
 
-            if (count($json_data["bibjson"]["identifier"]) < 1 || empty($json_data["bibjson"]["identifier"][0]["id"])) {
-                // article has no identifier or identifier is empty
+            if (!isset($json_data["bibjson"]["identifier"])
+                    || count($json_data["bibjson"]["identifier"]) < 1
+                    || empty($json_data["bibjson"]["identifier"][0]["id"])) {
+                $this->last_error = "article has no identifier or identifier is empty";
                 return false;
             }
             return json_encode($json_data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);

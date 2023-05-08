@@ -74,6 +74,11 @@ if (!class_exists('VB_DOAJ_Submit_Admin')) {
 
         public function action_init()
         {
+            if (!current_user_can('manage_options')) {
+                // settings are not allowed for non-admin users
+                return;
+            }
+
             // create sections
             $section_labels = $this->get_settings_section_labels();
             $tab_by_section = $this->get_tab_by_section_map();
@@ -122,6 +127,21 @@ if (!class_exists('VB_DOAJ_Submit_Admin')) {
                 filemtime(realpath(plugin_dir_path(__FILE__) . "css/settings.css")),
                 "screen"
             );
+
+            // add error notice
+            add_action('admin_notices', array($this, 'admin_notices'));
+        }
+
+        public function admin_notices()
+        {
+            $error = $this->status->get_last_error();
+            if (!empty($error)) {
+                ?>
+                <div class="error notice">
+                    <p><?php echo "Error in " . $this->common->plugin_name . ": " . $error ?></p>
+                </div>
+                <?php
+            }
         }
 
         public function render_general_section($args)
@@ -242,8 +262,8 @@ if (!class_exists('VB_DOAJ_Submit_Admin')) {
                 }
             }
 
-            if (!empty($_POST["reset_all_posts"])) {
-                $this->update->reset_all_posts();
+            if (!empty($_POST["reset_status"])) {
+                $this->status->reset_status();
             }
 
             if (!empty($_POST["manual_update"])) {
@@ -252,6 +272,10 @@ if (!class_exists('VB_DOAJ_Submit_Admin')) {
 
             if (!empty($_POST["manual_identify"])) {
                 $this->update->do_identify();
+            }
+
+            if (!empty($_POST["reset_last_error"])) {
+                $this->status->clear_last_error();
             }
 
             $current_tab = isset($_GET['tab']) ? $_GET['tab'] : "settings";
@@ -315,12 +339,21 @@ if (!class_exists('VB_DOAJ_Submit_Admin')) {
 
         public function render_example_tab()
         {
-            $posts = get_posts(array('numberposts' => 1));
+            // get next post that needs identifying or submitting; or last published post
+            $submit_query = $this->status->query_posts_that_need_submitting(1);
+            $posts = $submit_query->posts;
+            if (count($posts) < 1) {
+                $identify_query = $this->status->query_posts_that_need_identifying(1);
+                $posts = $identify_query->posts;
+            }
+            if (count($posts) < 1) {
+                $posts = get_posts(array('numberposts' => 1));
+            }
             if (count($posts) >= 1) {
                 $doaj_article_id = get_post_meta($posts[0]->ID, $this->common->get_doaj_article_id_key(), true);
                 $doaj_baseurl = $this->common->get_settings_field_value("api_baseurl");
                 $renderer = new VB_DOAJ_Submit_Render($this->common);
-                $doaj_data = $renderer->render($posts[0]);
+                $json_text = $renderer->render($posts[0]);
 
                 if (empty($doaj_article_id)) {
                     ?>
@@ -334,17 +367,21 @@ if (!class_exists('VB_DOAJ_Submit_Admin')) {
                     </h2>
                     <?php
                 }
-                ?>
-
-                <pre><?php echo htmlspecialchars($doaj_data) ?></pre>
-
-                <?php
+                if (!empty($json_text)) {
+                    ?>
+                    <pre><?php echo htmlspecialchars($json_text) ?></pre>
+                    <?php
+                } else {
+                    $error = $renderer->get_last_error();
+                    echo "<p>Error: {$error}</p>";
+                }
             }
         }
 
         public function render_status_tab()
         {
             // empty
+            $last_error = $this->status->get_last_error();
             ?>
             <h2>Status</h2>
             <ul>
@@ -352,13 +389,16 @@ if (!class_exists('VB_DOAJ_Submit_Admin')) {
                 <li>Update Interval: <?php echo $this->update->get_update_interval_in_minutes() ?> min</li>
                 <li>Last Update: <?php echo $this->status->get_last_update_text() ?></li>
                 <li>Last Submitted Post Date: <?php echo $this->status->get_last_updated_post_modified_text() ?></li>
+                <li>Last Error: <?php echo $last_error ? $last_error : "none" ?></li>
             </ul>
             <form method="post" onsubmit="return;">
             <p>
                 <?php
-                submit_button(__('Manually Update Now', "vb-doaj"), "primary", "manual_update", false);
+                submit_button(__('Manually Update Now', "vb-doaj-submit"), "primary", "manual_update", false);
                 echo " ";
-                submit_button(__('Manually Identify Now', "vb-doaj"), "primary", "manual_identify", false);
+                submit_button(__('Manually Identify Now', "vb-doaj-submit"), "secondary", "manual_identify", false);
+                echo " ";
+                submit_button(__('Reset Last Error', "vb-doaj-submit"), "secondary", "reset_last_error", false);
                 ?>
             </p>
             </form>
@@ -381,7 +421,7 @@ if (!class_exists('VB_DOAJ_Submit_Admin')) {
             <form method="post" onsubmit="return confirm('Are you sure?');;">
             <p>
                 <?php
-                submit_button(__('Reset Status of all Posts', "vb-doaj-submit"), "secondary", "reset_all_posts", false);
+                submit_button(__('Reset Status of all Posts', "vb-doaj-submit"), "secondary", "reset_status", false);
                 ?>
             </p>
             </form>

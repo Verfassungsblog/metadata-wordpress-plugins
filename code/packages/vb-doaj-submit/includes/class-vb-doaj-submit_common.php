@@ -21,7 +21,7 @@ if (!class_exists('VB_DOAJ_Submit_Common')) {
                 $this->setting_field_defaults = array(
                     // general
                     "api_baseurl" => "https://doaj.org/api/",
-                    "auto_update" => true,
+                    "auto_update" => false,
                     "interval" => 1,
                     "batch" => 1,
                     "eissn" => "2366-7044",
@@ -31,7 +31,6 @@ if (!class_exists('VB_DOAJ_Submit_Common')) {
                     "include_tags" => true,
                     "article_id_acf" => "doaj_article_id",
                     "doi_acf" => "doi",
-                    "subheadline_acf" => "subheadline",
                     "orcid_acf" => "orcid",
                 );
             } else {
@@ -39,6 +38,7 @@ if (!class_exists('VB_DOAJ_Submit_Common')) {
                 $this->setting_field_defaults = array(
                     // general
                     "api_baseurl" => "https://doaj.org/api/",
+                    "auto_update" => false,
                     "interval" => 1,
                     "batch" => 1,
                     "require_doi" => true,
