@@ -26,7 +26,7 @@ function vb_doaj_submit_uninstall() {
 
 function run_vb_doaj_submit()
 {
-    $vb_doaj_submit = new VB_DOAJ_SUBMIT(__FILE__, "vb-doaj-submit", "0.0.1");
+    $vb_doaj_submit = new VB_DOAJ_Submit(__FILE__, "vb-doaj-submit", "0.0.1");
     $vb_doaj_submit->run();
 }
 
