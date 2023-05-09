@@ -380,7 +380,7 @@ if (!class_exists('VB_DOAJ_Submit_Status')) {
         }
 
         public function action_init() {
-            add_option($this->common->plugin_name . "_status_last_update", "never");
+            add_option($this->common->plugin_name . "_status_last_update", 0);
         }
 
         public function run() {

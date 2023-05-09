@@ -81,7 +81,7 @@ wp-cli theme update --all
 
 # activate plugins
 wp-cli plugin activate advanced-custom-fields classic-editor co-authors-plus debug-bar query-monitor
-wp-cli plugin activate vb-metadata-export vb-doaj-submit
+wp-cli plugin activate vb-metadata-export vb-doaj-submit vb-gnd-taxonomy
 
 # flush permalinks
 wp-cli rewrite structure "/%postname%/"
