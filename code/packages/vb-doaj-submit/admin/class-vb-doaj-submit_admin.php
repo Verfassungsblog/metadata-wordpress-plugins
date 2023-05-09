@@ -434,7 +434,7 @@ if (!class_exists('VB_DOAJ_Submit_Admin')) {
                 <li>Posts that were successfully identified (known DOAJ article id): <?php echo $have_article_id; ?></li>
                 <li>Posts that were not identified (no DOAJ article id found): <?php echo ($were_identified - $have_article_id) ?></li>
                 <li>Posts that need submitting: <?php echo $need_submitting_modified; ?></li>
-                <li>Posts that were submitted: <?php echo $were_submitted; ?></li>
+                <li>Posts that were successfully submitted: <?php echo $were_submitted; ?></li>
             </ul>
             <hr />
             <form method="post" onsubmit="return confirm('Are you sure?');;">

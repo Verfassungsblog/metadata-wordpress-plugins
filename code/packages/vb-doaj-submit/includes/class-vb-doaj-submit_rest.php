@@ -173,12 +173,6 @@ if (!class_exists('VB_DOAJ_Submit_REST')) {
 
         public function submit_trashed_post($post)
         {
-            $apikey = $this->common->get_settings_field_value("api_key");
-            if (empty($apikey)) {
-                $this->status->set_last_error("DOAJ api key required for deleting articles");
-                return false;
-            }
-
             $article_id = get_post_meta($post->ID, $this->common->get_doaj_article_id_key(), true);
 
             if (!empty($article_id)) {
@@ -189,6 +183,12 @@ if (!class_exists('VB_DOAJ_Submit_REST')) {
                     $this->status->clear_post_article_id($post);
                     $this->status->set_post_submit_timestamp($post);
                     return true;
+                }
+
+                $apikey = $this->common->get_settings_field_value("api_key");
+                if (empty($apikey)) {
+                    $this->status->set_last_error("DOAJ api key required for deleting articles");
+                    return false;
                 }
 
                 // build request url

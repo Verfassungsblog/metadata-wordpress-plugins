@@ -233,7 +233,7 @@ if (!class_exists('VB_DOAJ_Submit_Status')) {
         {
             $query_args = array(
                 'post_type' => 'post',
-                'post_status' => array('publish', 'trash'),
+                'post_status' => array('publish'),
                 'meta_query' => array(
                     'relation' => 'OR',
                     array(
@@ -274,7 +274,7 @@ if (!class_exists('VB_DOAJ_Submit_Status')) {
 
         public function get_number_of_posts_that_have_article_id()
         {
-            $query = $this->query_posts_that_have_article_id(1);
+            $query = $this->query_posts_that_have_article_id(false);
             return $query->post_count;
         }
 
@@ -282,7 +282,7 @@ if (!class_exists('VB_DOAJ_Submit_Status')) {
         {
             $query_args = array(
                 'post_type' => 'post',
-                'post_status' => array('publish', 'trash'),
+                'post_status' => array('publish'),
                 'meta_query' => array(
                     'relation' => 'AND',
                     array(
@@ -316,7 +316,7 @@ if (!class_exists('VB_DOAJ_Submit_Status')) {
         {
             $query_args = array(
                 'post_type' => 'post',
-                'post_status' => array('publish', 'trash'),
+                'post_status' => array('publish'),
                 'meta_query' => array(
                     'relation' => 'AND',
                     array(
@@ -358,8 +358,19 @@ if (!class_exists('VB_DOAJ_Submit_Status')) {
         public function reset_status()
         {
             $this->clear_last_updated_post_modified_date();
-            $identified_query = $this->query_posts_that_were_identified(false);
-            foreach($identified_query->posts as $post)
+
+            $query = new WP_Query(array(
+                'post_type' => 'post',
+                'post_status' => array('publish', 'trash'),
+                'meta_query' => array(
+                    'relation' => 'OR',
+                    array(
+                        'key' => $this->common->plugin_name . "_doaj_identify_timestamp",
+                        'compare' => "EXISTS",
+                    ),
+                ),
+            ));
+            foreach($query->posts as $post)
             {
                 delete_post_meta($post->ID, $this->common->plugin_name . "_doaj_identify_timestamp");
                 delete_post_meta($post->ID, $this->common->plugin_name . "_doaj_submit_timestamp");
