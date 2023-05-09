@@ -40,14 +40,14 @@ if (!class_exists('VB_Metadata_Export_Common')) {
                     // content types
                     "podcast_category" => "Podcast",
 
-                    // acf
-                    "doi_acf" => "doi",
-                    "subheadline_acf" => "subheadline",
-                    "orcid_acf" => "orcid",
-                    "gndid_acf" => "gndid",
-                    "ddc_acf" => "ddc",
-                    "copyright_acf" => "copyright",
-                    "funding_acf" => "funding",
+                    // custom fields
+                    "doi_meta_key" => "doi",
+                    "subheadline_meta_key" => "subheadline",
+                    "orcid_meta_key" => "orcid",
+                    "gndid_meta_key" => "gndid",
+                    "ddc_meta_key" => "ddc",
+                    "copyright_meta_key" => "copyright",
+                    "funding_meta_key" => "funding",
 
                     // marc21xml
                     "marc21xml_enabled" => true,
@@ -147,7 +147,7 @@ if (!class_exists('VB_Metadata_Export_Common')) {
                 return false;
             }
             if ($this->is_format_requiring_doi($format)) {
-                $doi = $this->get_acf_settings_post_field_value("doi_acf", $post);
+                $doi = $this->get_post_meta_field_value("doi_meta_key", $post);
                 if (empty($doi)) {
                     return false;
                 }
@@ -164,22 +164,22 @@ if (!class_exists('VB_Metadata_Export_Common')) {
             return get_option($this->get_settings_field_id($field_name), $default);
         }
 
-        public function get_acf_settings_post_field_value($field_name, $post)
+        public function get_post_meta_field_value($field_name, $post)
         {
-            if (!function_exists("get_field")) {
-                return;
+            $meta_key = $this->get_settings_field_value($field_name);
+            if (empty($meta_key)) {
+                return false;
             }
-            $acf_key = $this->get_settings_field_value($field_name);
-            return get_field($acf_key, $post->ID);
+            return get_post_meta($post->ID, $meta_key, true);
         }
 
-        public function get_acf_settings_user_field_value($field_name, $user_id)
+        public function get_user_meta_field_value($field_name, $user_id)
         {
-            if (!function_exists("get_field")) {
-                return;
+            $meta_key = $this->get_settings_field_value($field_name);
+            if (empty($meta_key)) {
+                return false;
             }
-            $acf_key = $this->get_settings_field_value($field_name);
-            return get_field($acf_key, 'user_' . $user_id);
+            return get_user_meta($user_id, $meta_key, true);
         }
 
         public function get_settings_field_id($field_name)
@@ -221,7 +221,7 @@ if (!class_exists('VB_Metadata_Export_Common')) {
             return $permalink . "?" . $this->plugin_name . "={$format}";
         }
 
-        public function formatXml($xml_str)
+        public function format_xml($xml_str)
         {
             $dom = new DOMDocument("1.0");
             $dom->preserveWhiteSpace = false;

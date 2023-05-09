@@ -27,9 +27,8 @@ if (!class_exists('VB_Metadata_Export_Setting_Fields')) {
                     "section" => "general",
                     "label" => __("Blog Owner", "vb-metadata-export"),
                     "placeholder" => __("blog owner", "vb-metadata-export"),
-                    "description" => "The main entry heading (see <a href=\"https://www.loc.gov/marc/bibliographic/bd773.html\"
-                    target=\"_blank\">Marc21 773a</a>) of the host item entry, for example the
-                        blog owner.",
+                    "description" => "The blog owner (used in
+                        <a href=\"https://www.loc.gov/marc/bibliographic/bd773.html\" target=\"_blank\">Marc21 773a</a>).",
                 ),
                 array(
                     "name" => "blog_title",
@@ -37,8 +36,8 @@ if (!class_exists('VB_Metadata_Export_Setting_Fields')) {
                     "section" => "general",
                     "label" => __("Blog Title", "vb-metadata-export"),
                     "placeholder" => __("blog title", "vb-metadata-export"),
-                    "description" => "The title (see <a href=\"https://www.loc.gov/marc/bibliographic/bd773.html\"
-                    target=\"_blank\">Marc21 773t</a>) of the host item entry, for example the blog title.",
+                    "description" => "The blog title (used in
+                        <a href=\"https://www.loc.gov/marc/bibliographic/bd773.html\" target=\"_blank\">Marc21 773t</a>).",
                 ),
                 array(
                     "name" => "issn",
@@ -47,7 +46,7 @@ if (!class_exists('VB_Metadata_Export_Setting_Fields')) {
                     "label" => "ISSN",
                     "placeholder" => "ISSN",
                     "description" => "The <a href=\"https://en.wikipedia.org/wiki/International_Standard_Serial_Number\" target=\"_blank\">
-                            International Standard Serial Number</a> (ISSN) of the host item entry (see
+                            International Standard Serial Number</a> (ISSN) of this journal (used in
                         <a href=\"https://www.loc.gov/marc/bibliographic/bd773.html\" target=\"_blank\">Marc21 773x</a>).
                         <br>For example: <code>2366-7044</code> = ISSN of the Verfassungsblog",
                 ),
@@ -57,8 +56,8 @@ if (!class_exists('VB_Metadata_Export_Setting_Fields')) {
                     "section" => "general",
                     "label" => __("Publisher", "vb-metadata-export"),
                     "placeholder" => __("name of publisher", "vb-metadata-export"),
-                    "description" => "The publisher (see <a href=\"https://www.loc.gov/marc/bibliographic/bd264.html\"
-                    target=\"_blank\">Marc21 264b</a>), for example the blog title.",
+                    "description" => "The publisher (used in <a href=\"https://www.loc.gov/marc/bibliographic/bd264.html\"
+                    target=\"_blank\">Marc21 264b</a>).",
                 ),
                 array(
                     "name" => "require_doi",
@@ -74,7 +73,7 @@ if (!class_exists('VB_Metadata_Export_Setting_Fields')) {
                     "type" => "boolean",
                     "section" => "general",
                     "label" => __("Include Excerpt", "vb-metadata-export"),
-                    "description" => "Whether to include the article excerpt when exporting metadata (see
+                    "description" => "Whether to include the article excerpt when exporting metadata (used in
                         <a href=\"https://www.loc.gov/marc/bibliographic/bd520.html\" target=\"_blank\">Marc21 520a</a>).",
                 ),
                 array(
@@ -85,9 +84,9 @@ if (!class_exists('VB_Metadata_Export_Setting_Fields')) {
                     "placeholder" => "DDC as comma seperated codes",
                     "description" => "The comma-separated list of
                         <a href=\"https://deweysearchde.pansoft.de/webdeweysearch/mainClasses.html\"
-                        target=\"_blank\">Dewey Decimal Classification</a> codes that are applicable to every post (see
+                        target=\"_blank\">Dewey Decimal Classification</a> codes that are applicable to every post (used in
                         <a href=\"https://www.loc.gov/marc/bibliographic/bd084.html\" target=\"_blank\">Marc21 084a</a>).
-                        Additional codes can be provided via ACF, see below.
+                        Additional codes can be provided via a custom field, see tab \"Custom Fields\".
                         <br>For Example: <code>342</code> = \"Verfassungs- und Verwaltungsrecht\"",
                 ),
                 array(
@@ -96,10 +95,10 @@ if (!class_exists('VB_Metadata_Export_Setting_Fields')) {
                     "section" => "general",
                     "label" => "Copyright / Licence <br>for all posts",
                     "placeholder" => "a copyright / license note",
-                    "description" => "The default copyright or licence note for all posts (see
+                    "description" => "The default copyright or licence note for all posts (used in
                         <a href=\"https://www.loc.gov/marc/bibliographic/bd540.html\" target=\"_blank\">Marc21 540a</a>).
-                        This note can be overwritten with a post-specific copyright note if it is provided via an ACF
-                        field. <br>For example: <code>CC BY-SA 4.0</code>
+                        This note can be overwritten with a post-specific copyright note if it is provided via via a
+                        custom field, see tab \"Custom Fields\". <br>For example: <code>CC BY-SA 4.0</code>
                          = Creative Commons Attribution-ShareAlike 4.0 International",
                 ),
                 array(
@@ -108,9 +107,10 @@ if (!class_exists('VB_Metadata_Export_Setting_Fields')) {
                     "section" => "general",
                     "label" => "Funding<br/>for all posts",
                     "placeholder" => "a funding note",
-                    "description" => "The default funding note for all posts (see
+                    "description" => "The default funding note for all posts (used in
                         <a href=\"https://www.loc.gov/marc/bibliographic/bd540.html\" target=\"_blank\">Marc21 536a</a>).
-                        This note can be overwritten with a post-specific funding note if it is provided via an ACF field.",
+                        This note can be overwritten with a post-specific funding note if it is provided via via a
+                        custom field, see tab \"Custom Fields\".",
                 ),
 
                 // ------------------ language settings ---------------------
@@ -122,7 +122,7 @@ if (!class_exists('VB_Metadata_Export_Setting_Fields')) {
                     "label" => "Language<br>Code",
                     "placeholder" => "language code",
                     "description" => "The default <a href=\"https://www.loc.gov/marc/languages/language_code.html\"
-                        target=\"_blank\">Marc21 Language Code</a> (see
+                        target=\"_blank\">Marc21 Language Code</a> (used in
                         <a href=\"https://www.loc.gov/marc/bibliographic/bd041.html\" target=\"_blank\">Marc21 041a</a>).
                         The language can be overwritten by assigning posts to a category, see below.
                         <br>For Example: <code>ger</code> = \"German\"",
@@ -134,7 +134,7 @@ if (!class_exists('VB_Metadata_Export_Setting_Fields')) {
                     "label" => "Alternate Language<br>Code",
                     "placeholder" => "language code",
                     "description" => "The alternate <a href=\"https://www.loc.gov/marc/languages/language_code.html\"
-                        target=\"_blank\">Marc21 Language Code</a> (see
+                        target=\"_blank\">Marc21 Language Code</a> (used in
                         <a href=\"https://www.loc.gov/marc/bibliographic/bd041.html\" target=\"_blank\">Marc21 041a</a>).
                         This language code is used in case a post is assigned to a specific category, see below.
                         <br>For Example: <code>eng</code> = \"English\"",
@@ -162,74 +162,81 @@ if (!class_exists('VB_Metadata_Export_Setting_Fields')) {
                         <br>For Example: <code>Podcast</code>",
                 ),
 
-                // ------------- advanced custom field settings -------------
+                // ----------------  custom field settings -----------------
 
                 array(
-                    "name" => "doi_acf",
+                    "name" => "doi_meta_key",
                     "type" => "string",
-                    "section" => "post_acf",
-                    "label" => "DOI<br>(ACF key)",
-                    "placeholder" => "ACF field key for DOI",
-                    "description" => "The ACF field key that contains the DOI for a specific post (see
-                        <a href=\"https://www.loc.gov/marc/bibliographic/bd024.html\" target=\"_blank\">Marc21 024a</a>).",
+                    "section" => "post_meta",
+                    "label" => "DOI<br>(custom field / meta key)",
+                    "placeholder" => "meta key for the DOI",
+                    "description" => "The meta key for the custom field that contains the DOI for a post (used in
+                        <a href=\"https://www.loc.gov/marc/bibliographic/bd024.html\" target=\"_blank\">Marc21 024a</a>).
+                        <br>The DOI should be provided as code (not as URI), e.g. <code>10.1214/aos/1176345451</code>.",
                 ),
                 array(
-                    "name" => "subheadline_acf",
+                    "name" => "subheadline_meta_key",
                     "type" => "string",
-                    "section" => "post_acf",
-                    "label" => "Sub-Headline<br>(ACF key)",
-                    "placeholder" => "ACF field key for a sub-headline",
-                    "description" => "The ACF field key that contains the sub-headline for a particular post (see
+                    "section" => "post_meta",
+                    "label" => "Sub-Headline<br>(custom field / meta key)",
+                    "placeholder" => "meta key for a sub-headline",
+                    "description" => "The meta key for the custom field that contains the sub-headline for a particular
+                        post (used in
                         <a href=\"https://www.loc.gov/marc/bibliographic/bd245.html\" target=\"_blank\">Marc21 245b</a>).",
                 ),
                 array(
-                    "name" => "orcid_acf",
+                    "name" => "ddc_meta_key",
                     "type" => "string",
-                    "section" => "user_acf",
-                    "label" => "ORCID<br>(ACF key)",
-                    "placeholder" => "ACF field key for the ORCID of the author",
-                    "description" => "The ACF field key that contains the ORCID of the post author (see
-                        <a href=\"https://www.loc.gov/marc/bibliographic/bd100.html\" target=\"_blank\">Marc21 100 0</a>).",
-                ),
-                array(
-                    "name" => "gndid_acf",
-                    "type" => "string",
-                    "section" => "user_acf",
-                    "label" => "GND-ID<br>(ACF key)",
-                    "placeholder" => "ACF field key for the GND-ID of the author",
-                    "description" => "The ACF field key that contains the GND-ID of the post author (see
-                        <a href=\"https://www.loc.gov/marc/bibliographic/bd100.html\" target=\"_blank\">Marc21 100 0</a>).",
-                ),
-                array(
-                    "name" => "ddc_acf",
-                    "type" => "string",
-                    "section" => "post_acf",
-                    "label" => "DDC<br>(ACF key)",
-                    "placeholder" => "ACF field key for comma separated DDC codes",
-                    "description" => "The ACF field key that contains the list of
+                    "section" => "post_meta",
+                    "label" => "DDC<br>(custom field / meta key)",
+                    "placeholder" => "meta key for comma separated DDC codes",
+                    "description" => "The meta key for the custom field that contains the list of
                         <a href=\"https://deweysearchde.pansoft.de/webdeweysearch/mainClasses.html\"
                         target=\"_blank\">Dewey Decimal Classification</a> codes that is applicable for a particular
-                        post (see <a href=\"https://www.loc.gov/marc/bibliographic/bd084.html\" target=\"_blank\">Marc21 084a</a>).",
+                        post (used in
+                        <a href=\"https://www.loc.gov/marc/bibliographic/bd084.html\" target=\"_blank\">Marc21 084a</a>).",
                 ),
                 array(
-                    "name" => "copyright_acf",
+                    "name" => "copyright_meta_key",
                     "type" => "string",
-                    "section" => "post_acf",
-                    "label" => "Copyright / Licence<br>(ACF key)",
-                    "placeholder" => "ACF field key for a copyright / licence note",
-                    "description" => "The ACF field key that contains the copyright or licence note for a specific post
-                        (see <a href=\"https://www.loc.gov/marc/bibliographic/bd540.html\" target=\"_blank\">Marc21 540a</a>).
+                    "section" => "post_meta",
+                    "label" => "Copyright / Licence<br>(custom field / meta key)",
+                    "placeholder" => "meta key for a copyright / licence note",
+                    "description" => "The meta key for the custom field that contains the copyright or licence note for
+                        a specific post (used in
+                        <a href=\"https://www.loc.gov/marc/bibliographic/bd540.html\" target=\"_blank\">Marc21 540a</a>).
                         If a post-specific copyright note is provided, the default copyright note is overwritten.",
                 ),
                 array(
-                    "name" => "funding_acf",
+                    "name" => "funding_meta_key",
                     "type" => "string",
-                    "section" => "post_acf",
-                    "label" => "Funding<br>(ACF key)",
-                    "placeholder" => "ACF field key for a funding note",
-                    "description" => "The ACF field key that contains a funding note for a particular post (see
+                    "section" => "post_meta",
+                    "label" => "Funding<br>(custom field / meta key)",
+                    "placeholder" => "meta key for a funding note",
+                    "description" => "The meta key for the custom field that contains a funding note for a particular
+                        post (used in
                         <a href=\"https://www.loc.gov/marc/bibliographic/bd540.html\" target=\"_blank\">Marc21 536a</a>).
                         If a post-specific funding note is provided, the default funding note is overwritten.",
+                ),
+                array(
+                    "name" => "orcid_meta_key",
+                    "type" => "string",
+                    "section" => "user_meta",
+                    "label" => "ORCID<br>(custom field / meta key)",
+                    "placeholder" => "meta key for the ORCID of the author",
+                    "description" => "The meta key for the custom field that contains the ORCID of the post author
+                        (used in
+                        <a href=\"https://www.loc.gov/marc/bibliographic/bd100.html\" target=\"_blank\">Marc21 100 0</a>).",
+                ),
+                array(
+                    "name" => "gndid_meta_key",
+                    "type" => "string",
+                    "section" => "user_meta",
+                    "label" => "GND-ID<br>(custom field / meta key)",
+                    "placeholder" => "meta key for the GND-ID of the author",
+                    "description" => "The meta key for the custom field that contains the GND-ID of the post author
+                        (used in
+                        <a href=\"https://www.loc.gov/marc/bibliographic/bd100.html\" target=\"_blank\">Marc21 100 0</a>).",
                 ),
 
                 // ------------------ marc21 xml settings -------------------

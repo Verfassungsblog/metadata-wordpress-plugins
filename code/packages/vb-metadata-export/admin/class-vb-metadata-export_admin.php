@@ -30,7 +30,7 @@ if (!class_exists('VB_Metadata_Export_Admin')) {
         {
             return array(
                 "general" => "General",
-                "acf" => "ACF",
+                "fields" => "Custom Fields",
                 "marc21" => "Marc21 XML",
                 "mods" => "MODS",
                 "dc" => "Dublin Core",
@@ -44,8 +44,8 @@ if (!class_exists('VB_Metadata_Export_Admin')) {
                 "general" => "General",
                 "language" => "Language",
                 "content_type" => "Content Types",
-                "post_acf" => "Advanced Custom Fields for Posts",
-                "user_acf" => "Advanced Custom Fields for Users",
+                "post_meta" => "Custom Fields for Posts",
+                "user_meta" => "Custom Fields for Users",
                 "marc21" => "Marc21 XML Settings",
                 "mods" => "MODS Settings",
                 "oai_pmh" => "OAI-PMH Settings",
@@ -59,8 +59,8 @@ if (!class_exists('VB_Metadata_Export_Admin')) {
                 "general" => "general",
                 "language" => "general",
                 "content_type" => "general",
-                "post_acf" => "acf",
-                "user_acf" => "acf",
+                "post_meta" => "fields",
+                "user_meta" => "fields",
                 "marc21" => "marc21",
                 "mods" => "mods",
                 "oai_pmh" => "oai_pmh",
@@ -176,7 +176,7 @@ if (!class_exists('VB_Metadata_Export_Admin')) {
             <?php
         }
 
-        public function render_post_acf_section($args)
+        public function render_post_meta_section($args)
         {
             ?>
             <p id="<?php echo esc_attr($args['id']); ?>">
@@ -190,7 +190,7 @@ if (!class_exists('VB_Metadata_Export_Admin')) {
             <?php
         }
 
-        public function render_user_acf_section($args)
+        public function render_user_meta_section($args)
         {
             ?>
             <p id="<?php echo esc_attr($args['id']); ?>">
@@ -521,7 +521,7 @@ if (!class_exists('VB_Metadata_Export_Admin')) {
             }
         }
 
-        public function render_acf_tab()
+        public function render_fields_tab()
         {
             // empty
         }

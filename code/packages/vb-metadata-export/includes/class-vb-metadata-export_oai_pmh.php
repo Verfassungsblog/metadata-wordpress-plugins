@@ -173,11 +173,11 @@ if (!class_exists('VB_Metadata_Export_OAI_PMH')) {
             );
 
             if ($require_doi) {
-                $doi_acf_key = $this->common->get_settings_field_value("doi_acf");
+                $doi_meta_key = $this->common->get_settings_field_value("doi_meta_key");
                 $query_args['meta_query'] = array(
                     'relation' => 'OR',
                     array(
-                        'key' => $doi_acf_key,
+                        'key' => $doi_meta_key,
                         'value' => "",
                         'compare' => "!=",
                     ),
@@ -328,7 +328,7 @@ if (!class_exists('VB_Metadata_Export_OAI_PMH')) {
                 "<request {$request_arguments}>{$base_url}</request>",
                 $content,
             "</OAI-PMH>"));
-            return $this->common->formatXml($xml);
+            return $this->common->format_xml($xml);
         }
 
         public function render_error($verb, $code, $text) {

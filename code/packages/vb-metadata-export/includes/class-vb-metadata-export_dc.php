@@ -69,7 +69,7 @@ if (!class_exists('VB_Metadata_Export_DC')) {
 
         public function render_identifier($post)
         {
-            $doi = esc_html($this->common->get_acf_settings_post_field_value("doi_acf", $post));
+            $doi = esc_html($this->common->get_post_meta_field_value("doi_meta_key", $post));
             $post_url = get_the_permalink($post);
 
             $xml = implode("", array(
@@ -106,7 +106,7 @@ if (!class_exists('VB_Metadata_Export_DC')) {
         public function render_ddc_subjects($post)
         {
             $global_ddc = $this->common->get_settings_field_value("ddc_general");
-            $post_ddc = $this->common->get_acf_settings_post_field_value("ddc_acf", $post);
+            $post_ddc = $this->common->get_post_meta_field_value("ddc_meta_key", $post);
             $combined_ddc = array_merge(explode(",", $global_ddc), explode(",", $post_ddc));
             $trimmed_ddc = array_filter(array_map('trim', $combined_ddc));
 
@@ -158,7 +158,7 @@ if (!class_exists('VB_Metadata_Export_DC')) {
         public function render_title($post)
         {
             $title = esc_html(get_the_title($post));
-            $subheadline = esc_html($this->common->get_acf_settings_post_field_value("subheadline_acf", $post));
+            $subheadline = esc_html($this->common->get_post_meta_field_value("subheadline_meta_key", $post));
             if (!empty($subheadline)) {
                 $title = $title . " - " . $subheadline;
             }
@@ -193,8 +193,8 @@ if (!class_exists('VB_Metadata_Export_DC')) {
         public function render_copyright($post)
         {
             $copyright_general = $this->common->get_settings_field_value("copyright_general");
-            $copyright_acf = $this->common->get_acf_settings_post_field_value("copyright_acf", $post);
-            $copyright = !empty($copyright_acf) ? $copyright_acf : $copyright_general;
+            $copyright_custom = $this->common->get_post_meta_field_value("copyright_meta_key", $post);
+            $copyright = !empty($copyright_custom) ? $copyright_custom : $copyright_general;
             if (!empty($copyright)) {
                 return "<dc:rights>{$copyright}</dc:rights>";
             }
@@ -245,7 +245,7 @@ if (!class_exists('VB_Metadata_Export_DC')) {
                     "</dc>"
                 )
             );
-            return $this->common->formatXml($xml_str);
+            return $this->common->format_xml($xml_str);
         }
 
     }
