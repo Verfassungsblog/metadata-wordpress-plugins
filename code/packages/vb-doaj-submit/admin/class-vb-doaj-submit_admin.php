@@ -427,7 +427,7 @@ if (!class_exists('VB_DOAJ_Submit_Admin')) {
             $have_article_id = $this->status->get_number_of_posts_that_have_article_id();
             $were_identified = $this->status->get_number_of_posts_that_were_identified();
             $need_submitting_modified = $this->status->get_number_of_posts_that_need_submitting();
-            $were_submitted = $this->status->get_number_of_posts_that_are_submitted();
+            $were_submitted = $this->status->get_number_of_posts_that_were_submitted();
             ?>
             <ul>
                 <li>Posts that need identifying (unknown DOAJ article id): <?php echo $need_identifying; ?></li>

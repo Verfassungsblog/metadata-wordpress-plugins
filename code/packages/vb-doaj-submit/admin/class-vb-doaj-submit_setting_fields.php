@@ -134,6 +134,13 @@ if (!class_exists('VB_DOAJ_Submit_Setting_Fields')) {
                         permalink (recommended). If not checked, the post title is used instead. Using the post title
                         would be problematic if there are multiple articles with the same title.",
                 ),
+                array(
+                    "name" => "test_without_api_key",
+                    "type" => "boolean",
+                    "section" => "general",
+                    "label" => __("Test without API Key", "vb-doaj-submit"),
+                    "description" => "If checked, articles are not submitted to the DOAJ for testing purposes.",
+                ),
 
                 // ------------- custom post fields -------------
 

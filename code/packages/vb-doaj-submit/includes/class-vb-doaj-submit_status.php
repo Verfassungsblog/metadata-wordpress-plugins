@@ -114,13 +114,18 @@ if (!class_exists('VB_DOAJ_Submit_Status')) {
             $query_args = array(
                 'post_type' => 'post',
                 'post_status' => array('publish', 'trash'),
-                'order_by' => 'modified',
+                'orderby' => 'modified',
                 'order' => 'ASC',
                 'meta_query' => array(
                     'relation' => 'AND',
                     array(
                         'key' => $this->common->plugin_name . "_doaj_identify_timestamp",
                         'compare' => "EXIST",
+                    ),
+                    array(
+                        'key' => $this->common->plugin_name . "_doaj_identify_timestamp",
+                        'value' => "",
+                        'compare' => "!=",
                     ),
                 )
             );
@@ -167,19 +172,35 @@ if (!class_exists('VB_DOAJ_Submit_Status')) {
             $query_args = array(
                 'post_type' => 'post',
                 'post_status' => array('publish'),
-                'order_by' => 'modified',
+                'orderby' => 'modified',
                 'order' => 'ASC',
                 'meta_query' => array(
                     'relation' => 'AND',
                     array(
-                        'key' => $this->common->plugin_name . "_doaj_identify_timestamp",
-                        'compare' => "NOT EXISTS",
+                        'relation' => 'OR',
+                        array(
+                            'key' => $this->common->plugin_name . "_doaj_identify_timestamp",
+                            'compare' => "NOT EXISTS",
+                        ),
+                        array(
+                            'key' => $this->common->plugin_name . "_doaj_identify_timestamp",
+                            'value' => "",
+                            'compare' => "==",
+                        ),
                     ),
                     array(
-                        'key' => $this->common->get_doaj_article_id_key(),
-                        'compare' => "NOT EXISTS",
-                    )
-                )
+                        'relation' => 'OR',
+                        array(
+                            'key' => $this->common->get_doaj_article_id_key(),
+                            'compare' => "NOT EXISTS",
+                        ),
+                        array(
+                            'key' => $this->common->get_doaj_article_id_key(),
+                            'value' => "",
+                            'compare' => "==",
+                        ),
+                    ),
+                ),
             );
 
             if ($batch) {
@@ -216,13 +237,29 @@ if (!class_exists('VB_DOAJ_Submit_Status')) {
                 'meta_query' => array(
                     'relation' => 'OR',
                     array(
-                        'key' => $this->common->plugin_name . "_doaj_identify_timestamp",
-                        'compare' => "EXISTS",
+                        'relation' => 'AND',
+                        array(
+                            'key' => $this->common->plugin_name . "_doaj_identify_timestamp",
+                            'compare' => "EXISTS",
+                        ),
+                        array(
+                            'key' => $this->common->plugin_name . "_doaj_identify_timestamp",
+                            'value' => "",
+                            'compare' => "!=",
+                        ),
                     ),
                     array(
-                        'key' => $this->common->get_doaj_article_id_key(),
-                        'compare' => "EXISTS",
-                    ),
+                        'relation' => 'AND',
+                        array(
+                            'key' => $this->common->get_doaj_article_id_key(),
+                            'compare' => "EXISTS",
+                        ),
+                        array(
+                            'key' => $this->common->get_doaj_article_id_key(),
+                            'value' => "",
+                            'compare' => "!=",
+                        ),
+                    )
                 )
             );
 
@@ -237,7 +274,7 @@ if (!class_exists('VB_DOAJ_Submit_Status')) {
 
         public function get_number_of_posts_that_have_article_id()
         {
-            $query = $this->query_posts_that_have_article_id(false);
+            $query = $this->query_posts_that_have_article_id(1);
             return $query->post_count;
         }
 
@@ -247,10 +284,15 @@ if (!class_exists('VB_DOAJ_Submit_Status')) {
                 'post_type' => 'post',
                 'post_status' => array('publish', 'trash'),
                 'meta_query' => array(
-                    'relation' => 'OR',
+                    'relation' => 'AND',
                     array(
                         'key' => $this->common->get_doaj_article_id_key(),
                         'compare' => "EXISTS",
+                    ),
+                    array(
+                        'key' => $this->common->get_doaj_article_id_key(),
+                        'value' => "",
+                        'compare' => "!=",
                     ),
                 )
             );
@@ -270,7 +312,7 @@ if (!class_exists('VB_DOAJ_Submit_Status')) {
             return $query->post_count;
         }
 
-        public function query_posts_that_are_submitted($batch)
+        public function query_posts_that_were_submitted($batch)
         {
             $query_args = array(
                 'post_type' => 'post',
@@ -282,9 +324,19 @@ if (!class_exists('VB_DOAJ_Submit_Status')) {
                         'compare' => "EXISTS",
                     ),
                     array(
+                        'key' => $this->common->plugin_name . "_doaj_submit_timestamp",
+                        'value' => "",
+                        'compare' => "!=",
+                    ),
+                    array(
                         'key' => $this->common->get_doaj_article_id_key(),
                         'compare' => "EXISTS",
-                    )
+                    ),
+                    array(
+                        'key' => $this->common->get_doaj_article_id_key(),
+                        'value' => "",
+                        'compare' => "!=",
+                    ),
                 )
             );
 
@@ -297,9 +349,9 @@ if (!class_exists('VB_DOAJ_Submit_Status')) {
             return new WP_Query( $query_args );
         }
 
-        public function get_number_of_posts_that_are_submitted()
+        public function get_number_of_posts_that_were_submitted()
         {
-            $query = $this->query_posts_that_are_submitted(false);
+            $query = $this->query_posts_that_were_submitted(false);
             return $query->post_count;
         }
 

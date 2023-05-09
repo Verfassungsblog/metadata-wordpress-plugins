@@ -94,13 +94,28 @@ if (!class_exists('VB_DOAJ_Submit_REST')) {
                 return false;
             }
 
+            $article_id = get_post_meta($post->ID, $this->common->get_doaj_article_id_key(), true);
+
+            $test_without_api_key = $this->common->get_settings_field_value("test_without_api_key");
+            if ($test_without_api_key) {
+                if (empty($article_id)) {
+                    // generate random article id for testing purposes
+                    $article_id = uniqid();
+                }
+
+                // update post status
+                $this->status->set_post_article_id($post, $article_id);
+                $this->status->set_post_submit_timestamp($post);
+                $this->status->set_post_identify_timestamp($post);
+
+                return true;
+            }
+
             $apikey = $this->common->get_settings_field_value("api_key");
             if (empty($apikey)) {
                 $this->status->set_last_error("DOAJ api key required for submitting new posts");
                 return false;
             }
-
-            $article_id = get_post_meta($post->ID, $this->common->get_doaj_article_id_key(), true);
 
             // build request url
             $baseurl = $this->common->get_settings_field_value("api_baseurl");
@@ -167,6 +182,14 @@ if (!class_exists('VB_DOAJ_Submit_REST')) {
             $article_id = get_post_meta($post->ID, $this->common->get_doaj_article_id_key(), true);
 
             if (!empty($article_id)) {
+
+                $test_without_api_key = $this->common->get_settings_field_value("test_without_api_key");
+                if ($test_without_api_key) {
+                    // update post status
+                    $this->status->clear_post_article_id($post);
+                    $this->status->set_post_submit_timestamp($post);
+                    return true;
+                }
 
                 // build request url
                 $baseurl = $this->common->get_settings_field_value("api_baseurl");
