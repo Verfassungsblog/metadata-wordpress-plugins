@@ -100,12 +100,7 @@ if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
             $use_doi = $this->common->get_settings_field_value("marc21_doi_as_control_number");
             if ($use_doi) {
                 $doi = $this->common->get_acf_settings_post_field_value("doi_acf", $post);
-                $doi_splitted = explode("/", $doi);
-                if (count($doi_splitted) == 2) {
-                    $control_number = esc_html($doi_splitted[1]);
-                } else {
-                    $control_number = "invalid-doi";
-                }
+                $control_number = esc_html($doi);
             } else {
                 $control_number = $post->ID;
             }
