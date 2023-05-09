@@ -71,15 +71,22 @@ if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
             return array_slice(get_coauthors($post->ID), 1);
         }
 
+        protected function is_post_in_category($post, $category) {
+            if (!empty($category)) {
+                $categories = array_map(function($category) { return $category->name; }, get_the_category($post->ID));
+                if (in_array($category, $categories)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         protected function get_post_language($post) {
             $language = esc_html($this->common->get_settings_field_value("language"));
             $language_alternate_category = esc_html($this->common->get_settings_field_value("language_alternate_category"));
-            if (!empty($language_alternate_category)) {
-                $categories = array_map(function($category) { return $category->name; }, get_the_category($post->ID));
-                if (in_array($language_alternate_category, $categories)) {
-                    $language_alternate = esc_html($this->common->get_settings_field_value("language_alternate"));
-                    $language = $language_alternate;
-                }
+            if ($this->is_post_in_category($post, $language_alternate_category)) {
+                $language_alternate = esc_html($this->common->get_settings_field_value("language_alternate"));
+                $language = $language_alternate;
             }
             return $language;
         }
@@ -87,7 +94,9 @@ if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
         public function render_leader($post)
         {
             // leader definition see: https://www.loc.gov/marc/bibliographic/bdleader.html
-            $leader = esc_html(str_replace("_", " ", $this->common->get_settings_field_value("marc21_leader")));
+            $podcast_category = $this->common->get_settings_field_value("podcast_category");
+            $leader_field = $this->is_post_in_category($post, $podcast_category) ? "marc21_podcast_leader" : "marc21_leader";
+            $leader = esc_html(str_replace("_", " ", $this->common->get_settings_field_value($leader_field)));
             if (!empty($leader)) {
                 return "<marc21:leader>{$leader}</marc21:leader>";
             }
@@ -105,7 +114,11 @@ if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
                 $control_number = $post->ID;
             }
             $identifier = $this->common->get_settings_field_value("marc21_control_number_identifier");
-            $physical_description = $this->common->get_settings_field_value("marc21_physical_description");
+
+            $podcast_category = $this->common->get_settings_field_value("podcast_category");
+            $physical_description_field = $this->is_post_in_category($post, $podcast_category) ?
+                 "marc21_podcast_physical_description" : "marc21_physical_description";
+            $physical_description = $this->common->get_settings_field_value($physical_description_field);
 
             $date = get_the_date("ymd", $post);
             $date = empty($date) ? "||||||" : $date;
@@ -248,11 +261,21 @@ if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
 
         public function render_datafield_336($post)
         {
-            return "<marc21:datafield tag=\"336\" ind1=\" \" ind2=\" \">
-                <marc21:subfield code=\"a\">Text</marc21:subfield>
-                <marc21:subfield code=\"b\">txt</marc21:subfield>
-                <marc21:subfield code=\"2\">rdacontent</marc21:subfield>
-            </marc21:datafield>";
+            $podcast_category = $this->common->get_settings_field_value("podcast_category");
+            $content_type_field = $this->is_post_in_category($post, $podcast_category) ?
+                 "marc21_podcast_content_type" : "marc21_content_type";
+            $content_type = $this->common->get_settings_field_value($content_type_field);
+            $content_type_array = explode(",", $content_type);
+            if (!empty($content_type) && count($content_type_array) == 3) {
+                return implode("", array(
+                    "<marc21:datafield tag=\"336\" ind1=\" \" ind2=\" \">
+                    <marc21:subfield code=\"a\">{$content_type_array[0]}</marc21:subfield>
+                    <marc21:subfield code=\"b\">{$content_type_array[1]}</marc21:subfield>
+                    <marc21:subfield code=\"2\">{$content_type_array[2]}</marc21:subfield>
+                    </marc21:datafield>"
+                ));
+            }
+            return "";
         }
 
         public function render_datafield_337($post)

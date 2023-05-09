@@ -43,6 +43,7 @@ if (!class_exists('VB_Metadata_Export_Admin')) {
             return array(
                 "general" => "General",
                 "language" => "Language",
+                "content_type" => "Content Types",
                 "post_acf" => "Advanced Custom Fields for Posts",
                 "user_acf" => "Advanced Custom Fields for Users",
                 "marc21" => "Marc21 XML Settings",
@@ -57,6 +58,7 @@ if (!class_exists('VB_Metadata_Export_Admin')) {
             return array(
                 "general" => "general",
                 "language" => "general",
+                "content_type" => "general",
                 "post_acf" => "acf",
                 "user_acf" => "acf",
                 "marc21" => "marc21",
@@ -153,6 +155,20 @@ if (!class_exists('VB_Metadata_Export_Admin')) {
                 <?php echo __(
                     'All posts are assumed to be written in a default language unless they are assigned to a special
                     category indicating that those post were written in an alternative language.',
+                    "vb-metadata-export"
+                );
+                ?>
+            </p>
+            <?php
+        }
+
+        public function render_content_type_section($args)
+        {
+            ?>
+            <p id="<?php echo esc_attr($args['id']); ?>">
+                <?php echo __(
+                    'By default all posts are assumed to be classic textual articles. By assigning posts to the
+                    following categories, they can be assigned to a different content type.',
                     "vb-metadata-export"
                 );
                 ?>

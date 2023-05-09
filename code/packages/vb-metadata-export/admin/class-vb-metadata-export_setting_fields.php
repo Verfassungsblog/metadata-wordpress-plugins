@@ -150,6 +150,18 @@ if (!class_exists('VB_Metadata_Export_Setting_Fields')) {
                         <br>For Example: <code>English Articles</code>",
                 ),
 
+                // ------------------ content type category -----------------
+
+                array(
+                    "name" => "podcast_category",
+                    "type" => "string",
+                    "section" => "content_type",
+                    "label" => "Podcast Category",
+                    "placeholder" => "category name",
+                    "description" => "The name of the category, which posts are assigned to, in case they are podcasts.
+                        <br>For Example: <code>Podcast</code>",
+                ),
+
                 // ------------- advanced custom field settings -------------
 
                 array(
@@ -230,23 +242,6 @@ if (!class_exists('VB_Metadata_Export_Setting_Fields')) {
                     "description" => "Whether the Marc21 XML export is active or not.",
                 ),
                 array(
-                    "name" => "marc21_leader",
-                    "type" => "string",
-                    "section" => "marc21",
-                    "label" => __("Marc21 Leader", "vb-metadata-export"),
-                    "placeholder" => __("marc21 leader attribute", "vb-metadata-export"),
-                    "description" => implode("", array(
-                        __("The", "vb-metadata-export"),
-                        " <a href=\"https://www.loc.gov/marc/bibliographic/bdleader.html\" target=\"_blank\">",
-                        __("Marc21 leader attribute", "vb-metadata-export"),
-                        "</a>. ",
-                        __("Use the underscore (_) instead of a space ( ).", "vb-metadata-export"),
-                        "<br>",
-                        __("For example:", "vb-metadata-export"),
-                        "<code>_____nam__22_____uu_4500</code>",
-                    )),
-                ),
-                array(
                     "name" => "marc21_doi_as_control_number",
                     "type" => "boolean",
                     "section" => "marc21",
@@ -269,14 +264,85 @@ if (!class_exists('VB_Metadata_Export_Setting_Fields')) {
                         Staatsbibliothek zu Berlin</a>.",
                 ),
                 array(
+                    "name" => "marc21_leader",
+                    "type" => "string",
+                    "section" => "marc21",
+                    "label" => __("Default Marc21 Leader", "vb-metadata-export"),
+                    "placeholder" => __("marc21 leader attribute", "vb-metadata-export"),
+                    "description" => implode("", array(
+                        __("The", "vb-metadata-export"),
+                        " <a href=\"https://www.loc.gov/marc/bibliographic/bdleader.html\" target=\"_blank\">",
+                        __("Marc21 leader attribute", "vb-metadata-export"),
+                        "</a>. ",
+                        __("Use the underscore (_) instead of a space ( ).", "vb-metadata-export"),
+                        "<br>",
+                        __("For example:", "vb-metadata-export"),
+                        "<code>_____nam__22_____uu_4500</code>",
+                    )),
+                ),
+                array(
                     "name" => "marc21_physical_description",
                     "type" => "string",
                     "section" => "marc21",
-                    "label" => __("Physical Description", "vb-metadata-export"),
+                    "label" => __("Default Physical Description", "vb-metadata-export"),
                     "placeholder" => __("marc21 physical description code", "vb-metadata-export"),
                     "description" => "The physical description code (see
                         <a href=\"https://www.loc.gov/marc/bibliographic/bd007.html\" target=\"_blank\">Marc21 007</a>).
                         <br>For example: <code>cr|||||</code> = Remote Electronic Resource",
+                ),
+                array(
+                    "name" => "marc21_content_type",
+                    "type" => "string",
+                    "section" => "marc21",
+                    "label" => __("Default Content Type", "vb-metadata-export"),
+                    "placeholder" => __("marc21 content type", "vb-metadata-export"),
+                    "description" => "The content type (see
+                        <a href=\"https://www.loc.gov/marc/bibliographic/bd336.html\" target=\"_blank\">Marc21 336</a>)
+                        in the format of comma separated subfield values (336a,336b,336-2), see
+                        <a href=\"https://www.loc.gov/standards/sourcelist/genre-form.html\">LoC Codes</a> for possible
+                        values.
+                        <br>For example: <code>Text,txt,rdacontent</code> = Text Content Type",
+                ),
+                array(
+                    "name" => "marc21_podcast_leader",
+                    "type" => "string",
+                    "section" => "marc21",
+                    "label" => __("Podcast Marc21 Leader", "vb-metadata-export"),
+                    "placeholder" => __("marc21 leader attribute", "vb-metadata-export"),
+                    "description" => implode("", array(
+                        __("The", "vb-metadata-export"),
+                        " <a href=\"https://www.loc.gov/marc/bibliographic/bdleader.html\" target=\"_blank\">",
+                        __("Marc21 leader attribute", "vb-metadata-export"),
+                        "</a> for podcast posts. ",
+                        __("Use the underscore (_) instead of a space ( ).", "vb-metadata-export"),
+                        "<br>",
+                        __("For example:", "vb-metadata-export"),
+                        "<code>_____nim__22_____uu_4500</code>",
+                    )),
+                ),
+                array(
+                    "name" => "marc21_podcast_physical_description",
+                    "type" => "string",
+                    "section" => "marc21",
+                    "label" => __("Podcast Physical Description", "vb-metadata-export"),
+                    "placeholder" => __("marc21 physical description code", "vb-metadata-export"),
+                    "description" => "The physical description code (see
+                        <a href=\"https://www.loc.gov/marc/bibliographic/bd007.html\" target=\"_blank\">Marc21 007</a>)
+                        for podcast posts.
+                        <br>For example: <code>sr|||||</code> = Remote Sound Recording",
+                ),
+                array(
+                    "name" => "marc21_podcast_content_type",
+                    "type" => "string",
+                    "section" => "marc21",
+                    "label" => __("Podcast Content Type", "vb-metadata-export"),
+                    "placeholder" => __("marc21 content type", "vb-metadata-export"),
+                    "description" => "The content type (see
+                        <a href=\"https://www.loc.gov/marc/bibliographic/bd336.html\" target=\"_blank\">Marc21 336</a>)
+                        of podcast posts in the format of comma separated subfield values (336a,336b,336-2), see
+                        <a href=\"https://www.loc.gov/standards/sourcelist/genre-form.html\">LoC Codes</a> for possible
+                        values.
+                        <br>For example: <code>Spoken Word,spw,rdacontent</code> = Spoken Word Content Type",
                 ),
 
                 // -------------------- mods settings -----------------------
