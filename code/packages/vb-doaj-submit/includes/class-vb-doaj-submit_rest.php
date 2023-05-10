@@ -11,10 +11,13 @@ if (!class_exists('VB_DOAJ_Submit_REST')) {
         protected $common;
         protected $status;
 
-        public function __construct($common, $status)
+        protected $affiliation;
+
+        public function __construct($plugin_name)
         {
-            $this->common = $common;
-            $this->status = $status;
+            $this->common = new VB_DOAJ_Submit_Common($plugin_name);
+            $this->status = new VB_DOAJ_Submit_Status($plugin_name);
+            $this->affiliation = new VB_DOAJ_Submit_Affiliation($this->common->plugin_name);
         }
 
         public function identify_post($post)
@@ -77,8 +80,7 @@ if (!class_exists('VB_DOAJ_Submit_REST')) {
                 $this->status->set_post_article_id($post, $article_id);
             } else {
                 // no match found (article is new)
-                $affiliation = new VB_DOAJ_Submit_Affiliation($this->common);
-                $affiliation->save_author_affiliations_for_post($post);
+                $this->affiliation->save_author_affiliations_for_post($post);
             }
 
             $this->status->set_post_identify_timestamp($post);
@@ -87,14 +89,14 @@ if (!class_exists('VB_DOAJ_Submit_REST')) {
 
         public function submit_new_or_existing_post($post)
         {
-            $renderer = new VB_DOAJ_Submit_Render($this->common);
+            $renderer = new VB_DOAJ_Submit_Render($this->common->plugin_name);
             $json = $renderer->render($post);
             if (!$json) {
                 $this->status->set_last_error($renderer->get_last_error());
                 return false;
             }
 
-            $article_id = get_post_meta($post->ID, $this->common->get_doaj_article_id_key(), true);
+            $article_id = get_post_meta($post->ID, $this->common->get_article_id_meta_key(), true);
 
             $test_without_api_key = $this->common->get_settings_field_value("test_without_api_key");
             if ($test_without_api_key) {
@@ -173,7 +175,7 @@ if (!class_exists('VB_DOAJ_Submit_REST')) {
 
         public function submit_trashed_post($post)
         {
-            $article_id = get_post_meta($post->ID, $this->common->get_doaj_article_id_key(), true);
+            $article_id = get_post_meta($post->ID, $this->common->get_article_id_meta_key(), true);
 
             if (!empty($article_id)) {
 
@@ -223,6 +225,7 @@ if (!class_exists('VB_DOAJ_Submit_REST')) {
 
                 // update post status
                 $this->status->clear_post_article_id($post);
+                $this->status->clear_post_submit_timestamp($post);
                 $this->status->set_post_submit_timestamp($post);
             } else {
                 // do nothing for un-identified trashed article

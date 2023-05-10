@@ -98,8 +98,16 @@ if (!class_exists('VB_DOAJ_Submit_Common')) {
             return false;
         }
 
-        public function get_doaj_article_id_key() {
+        public function get_article_id_meta_key() {
             return $this->get_settings_field_value("article_id_meta_key");
+        }
+
+        public function get_identify_timestamp_meta_key() {
+            return $this->plugin_name . "_doaj_identify_timestamp";
+        }
+
+        public function get_submit_timestamp_meta_key() {
+            return $this->plugin_name . "_doaj_submit_timestamp";
         }
 
         public function date_to_iso8601($date) {

@@ -1,5 +1,7 @@
 <?php
 
+require_once plugin_dir_path(__FILE__) . './class-vb-doaj-submit_common.php';
+
 if (!class_exists('VB_DOAJ_Submit_Affiliation')) {
 
     class VB_DOAJ_Submit_Affiliation
@@ -7,9 +9,9 @@ if (!class_exists('VB_DOAJ_Submit_Affiliation')) {
 
         protected $common;
 
-        public function __construct($common)
+        public function __construct($plugin_name)
         {
-            $this->common = $common;
+            $this->common = new VB_DOAJ_Submit_Common($plugin_name);
         }
 
         protected function get_textual_author_affiliation($user_id)

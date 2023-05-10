@@ -24,10 +24,10 @@ if (!class_exists('VB_DOAJ_Submit_Render')) {
 
         protected $last_post;
 
-        public function __construct($common)
+        public function __construct($plugin_name)
         {
-            $this->common = $common;
-            $this->affiliation = new VB_DOAJ_Submit_Affiliation($this->common);
+            $this->common = new VB_DOAJ_Submit_Common($plugin_name);
+            $this->affiliation = new VB_DOAJ_Submit_Affiliation($plugin_name);
         }
 
         protected function get_author_name($author)

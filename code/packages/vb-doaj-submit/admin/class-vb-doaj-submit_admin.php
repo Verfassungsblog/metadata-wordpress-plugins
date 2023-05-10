@@ -1,8 +1,12 @@
 <?php
 
+require_once plugin_dir_path(__FILE__) . '/class-vb-doaj-submit_setting_fields.php';
+
 require_once plugin_dir_path(__FILE__) . '../includes/class-vb-doaj-submit_common.php';
 require_once plugin_dir_path(__FILE__) . '../includes/class-vb-doaj-submit_render.php';
-require_once plugin_dir_path(__FILE__) . '/class-vb-doaj-submit_setting_fields.php';
+require_once plugin_dir_path(__FILE__) . '../includes/class-vb-doaj-submit_status.php';
+require_once plugin_dir_path(__FILE__) . '../includes/class-vb-doaj-submit_queries.php';
+require_once plugin_dir_path(__FILE__) . '../includes/class-vb-doaj-submit_update.php';
 
 if (!class_exists('VB_DOAJ_Submit_Admin')) {
 
@@ -20,13 +24,16 @@ if (!class_exists('VB_DOAJ_Submit_Admin')) {
 
         protected $status;
 
+        protected $queries;
+
         protected $update;
 
-        public function __construct($common, $status, $update)
+        public function __construct($plugin_name)
         {
-            $this->common = $common;
-            $this->status = $status;
-            $this->update = $update;
+            $this->common = new VB_DOAJ_Submit_Common($plugin_name);
+            $this->status = new VB_DOAJ_Submit_Status($plugin_name);
+            $this->queries = new VB_DOAJ_Submit_Queries($plugin_name);
+            $this->update = new VB_DOAJ_Submit_Update($plugin_name);
             $this->setting_fields = new VB_DOAJ_Submit_Setting_Fields();
         }
 
@@ -357,23 +364,36 @@ if (!class_exists('VB_DOAJ_Submit_Admin')) {
             <?php
         }
 
+        protected function find_example_post()
+        {
+            $never_submitted_query = $this->queries->query_posts_that_were_not_submitted_yet(1);
+            if (count($never_submitted_query->posts) > 0) {
+                return $never_submitted_query->posts[0];
+            }
+            $modified_query = $this->queries->query_posts_that_need_submitting_because_modified(1);
+            if (count($modified_query->posts) > 0) {
+                return $modified_query->posts[0];
+            }
+            $identify_query = $this->queries->query_posts_that_need_identifying(1);
+            if (count($identify_query->posts) > 0) {
+                return $identify_query->posts[0];
+            }
+            $posts = get_posts(array('numberposts' => 1));
+            if (count($posts) > 0) {
+                return $posts[0];
+            }
+            return false;
+        }
+
         public function render_example_tab()
         {
             // get next post that needs identifying or submitting; or last published post
-            $submit_query = $this->status->query_posts_that_need_submitting(1);
-            $posts = $submit_query->posts;
-            if (count($posts) < 1) {
-                $identify_query = $this->status->query_posts_that_need_identifying(1);
-                $posts = $identify_query->posts;
-            }
-            if (count($posts) < 1) {
-                $posts = get_posts(array('numberposts' => 1));
-            }
-            if (count($posts) >= 1) {
-                $doaj_article_id = get_post_meta($posts[0]->ID, $this->common->get_doaj_article_id_key(), true);
+            $post = $this->find_example_post();
+            if ($post) {
+                $doaj_article_id = get_post_meta($post->ID, $this->common->get_article_id_meta_key(), true);
                 $doaj_baseurl = $this->common->get_settings_field_value("api_baseurl");
-                $renderer = new VB_DOAJ_Submit_Render($this->common);
-                $json_text = $renderer->render($posts[0]);
+                $renderer = new VB_DOAJ_Submit_Render($this->common->plugin_name);
+                $json_text = $renderer->render($post);
 
                 if (empty($doaj_article_id)) {
                     ?>
@@ -417,23 +437,27 @@ if (!class_exists('VB_DOAJ_Submit_Admin')) {
                 submit_button(__('Manually Update Now', "vb-doaj-submit"), "primary", "manual_update", false);
                 echo " ";
                 submit_button(__('Manually Identify Now', "vb-doaj-submit"), "secondary", "manual_identify", false);
+                echo " ";
+                submit_button(__('Reset Last Error', "vb-doaj-submit"), "secondary", "reset_last_error", false);
                 ?>
             </p>
             </form>
             <hr />
             <h2>Statistics</h2>
             <?php
-            $need_identifying = $this->status->get_number_of_posts_that_need_identifying();
-            $have_article_id = $this->status->get_number_of_posts_that_have_article_id();
-            $were_identified = $this->status->get_number_of_posts_that_were_identified();
-            $need_submitting_modified = $this->status->get_number_of_posts_that_need_submitting();
-            $were_submitted = $this->status->get_number_of_posts_that_were_submitted();
+            $need_identifying = $this->queries->get_number_of_posts_that_need_identifying();
+            $have_article_id = $this->queries->get_number_of_posts_that_have_article_id();
+            $were_identified = $this->queries->get_number_of_posts_that_were_identified();
+            $need_submitting_never = $this->queries->get_number_of_posts_that_were_not_submitted_yet();
+            $need_submitting_modified = $this->queries->get_number_of_posts_that_need_submitting_because_modified();
+            $were_submitted = $this->queries->get_number_of_posts_that_were_submitted();
             ?>
             <ul>
                 <li>Posts that need identifying (unknown DOAJ article id): <?php echo $need_identifying; ?></li>
                 <li>Posts that were successfully identified (known DOAJ article id): <?php echo $have_article_id; ?></li>
                 <li>Posts that were not identified (no DOAJ article id found): <?php echo ($were_identified - $have_article_id) ?></li>
-                <li>Posts that need submitting: <?php echo $need_submitting_modified; ?></li>
+                <li>Posts that need submitting because not yet submitted: <?php echo $need_submitting_never; ?></li>
+                <li>Posts that need submitting because modified: <?php echo $need_submitting_modified; ?></li>
                 <li>Posts that were successfully submitted: <?php echo $were_submitted; ?></li>
             </ul>
             <hr />
@@ -441,8 +465,6 @@ if (!class_exists('VB_DOAJ_Submit_Admin')) {
             <p>
                 <?php
                 submit_button(__('Reset Status of all Posts', "vb-doaj-submit"), "secondary", "reset_status", false);
-                echo " ";
-                submit_button(__('Reset Last Error', "vb-doaj-submit"), "secondary", "reset_last_error", false);
                 ?>
             </p>
             </form>

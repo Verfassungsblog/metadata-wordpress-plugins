@@ -11,8 +11,6 @@ if (!class_exists('VB_DOAJ_Submit')) {
     {
         protected $common;
 
-        protected $plugin_version;
-
         protected $base_file;
 
         protected $admin;
@@ -21,14 +19,13 @@ if (!class_exists('VB_DOAJ_Submit')) {
 
         protected $update;
 
-        public function __construct($base_file, $plugin_name, $plugin_version)
+        public function __construct($base_file, $plugin_name)
         {
-            $this->plugin_version = $plugin_version;
             $this->base_file = $base_file;
             $this->common = new VB_DOAJ_Submit_Common($plugin_name);
-            $this->status = new VB_DOAJ_Submit_Status($this->common);
-            $this->update = new VB_DOAJ_Submit_Update($this->common, $this->status);
-            $this->admin = new VB_DOAJ_Submit_Admin($this->common, $this->status, $this->update);
+            $this->status = new VB_DOAJ_Submit_Status($plugin_name);
+            $this->update = new VB_DOAJ_Submit_Update($plugin_name);
+            $this->admin = new VB_DOAJ_Submit_Admin($plugin_name);
         }
 
         public function activate()
