@@ -140,6 +140,7 @@ if (!class_exists('VB_DOAJ_Submit_REST')) {
                     "Content-Type" => "application/json",
                     "Accept" =>  "application/json",
                 ),
+                "timeout" => 30,
                 "body" => $json,
             ));
 
@@ -207,6 +208,7 @@ if (!class_exists('VB_DOAJ_Submit_REST')) {
                     "headers" => array(
                         "Accept" =>  "application/json",
                     ),
+                    "timeout" => 30,
                 ));
 
                 // validate response

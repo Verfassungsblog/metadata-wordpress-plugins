@@ -8,10 +8,12 @@ if (!class_exists('VB_DOAJ_Submit_Affiliation')) {
     {
 
         protected $common;
+        protected $status;
 
         public function __construct($plugin_name)
         {
             $this->common = new VB_DOAJ_Submit_Common($plugin_name);
+            $this->status = new VB_DOAJ_Submit_Status($plugin_name);
         }
 
         protected function get_textual_author_affiliation($user_id)
@@ -34,14 +36,17 @@ if (!class_exists('VB_DOAJ_Submit_Affiliation')) {
                 "headers" => array(
                     "Accept" =>  "application/json",
                 ),
+                "timeout" => 30,
             ));
 
             // validate response
             if (is_wp_error($response)) {
+                $this->status->set_last_error("Error retrieving affiliation from ROR-ID: " . $response->get_error_message());
                 return false;
             }
             $status_code = wp_remote_retrieve_response_code($response);
             if ($status_code !== 200) {
+                $this->status->set_last_error("Invalid status code '" . $status_code . "' when retrieving affiliation from ROR-ID");
                 return false;
             }
 
@@ -49,9 +54,11 @@ if (!class_exists('VB_DOAJ_Submit_Affiliation')) {
             $json_data = json_decode(wp_remote_retrieve_body($response));
             if (json_last_error() !== JSON_ERROR_NONE) {
                 // invalid json
+                $this->status->set_last_error("Invalid json response when retrieving affiliation from ROR-ID");
                 return false;
             }
             if ($json_data->number_of_results != 1 || count($json_data->items) != 1) {
+                $this->status->set_last_error("Invalid ROR-ID while retrieving affiliation");
                 return false;
             }
 
@@ -74,14 +81,17 @@ if (!class_exists('VB_DOAJ_Submit_Affiliation')) {
                 "headers" => array(
                     "Accept" =>  "application/xml",
                 ),
+                "timeout" => 30,
             ));
 
             // validate response
             if (is_wp_error($response)) {
+                $this->status->set_last_error("Error retrieving affiliation from ORCID: " . $response->get_error_message());
                 return false;
             }
             $status_code = wp_remote_retrieve_response_code($response);
             if ($status_code !== 200) {
+                $this->status->set_last_error("Invalid status code '" . $status_code . "' when retrieving affiliation from ORCID");
                 return false;
             }
 
@@ -90,11 +100,13 @@ if (!class_exists('VB_DOAJ_Submit_Affiliation')) {
             $xml = new SimpleXMLElement($xml_data);
             $organization_array = $xml->xpath('/record:record/activities:activities-summary/activities:employments/activities:affiliation-group/employment:employment-summary/common:organization');
             if (!$organization_array || count($organization_array) < 1) {
+                // no employment info
                 return false;
             }
             $name_array = $organization_array[0]->xpath("common:name");
             $country_array = $organization_array[0]->xpath("common:address/common:country");
             if (!$name_array || count($name_array) < 1 || !$country_array || count($country_array) < 1) {
+                // no employment name
                 return false;
             }
             return $name_array[0]->__toString() . ", " .$country_array[0]->__toString();
@@ -137,7 +149,9 @@ if (!class_exists('VB_DOAJ_Submit_Affiliation')) {
             $author_affiliations_meta_key = $this->common->get_settings_field_value("author_affiliations_meta_key");
 
             // encode json
-            update_post_meta($post->ID, $author_affiliations_meta_key, json_encode($affiliations));
+            if (!empty($affiliations)) {
+                update_post_meta($post->ID, $author_affiliations_meta_key, json_encode($affiliations));
+            }
         }
 
         public function get_author_affiliation_for_post($post, $user_id)
