@@ -164,8 +164,6 @@ if (!class_exists('VB_DOAJ_Submit_Queries')) {
 
         public function query_posts_that_need_identifying($batch)
         {
-            $require_doi = $this->common->get_settings_field_value("require_doi");
-
             $query_args = array(
                 'post_type' => 'post',
                 'post_status' => array('publish'),
