@@ -200,26 +200,6 @@ if (!class_exists('VB_GND_Taxonomy_Admin')) {
             <?php
         }
 
-        public function render_meta_box($post) {
-            ?>
-            <div class="<?php echo $this->common->plugin_name ?>_meta_box_content">
-                <input type="text" id="<?php echo $this->common->plugin_name ?>_input" value="" />
-                <input type="button" class="button" value="Add" />
-            </div>
-            <?php
-        }
-
-        public function add_meta_boxes() {
-            add_meta_box(
-                $this->common->plugin_name . "_meta_box",
-                'GND Taxonomy',
-                array($this, 'render_meta_box'),
-                'post',
-                'side',
-                'default'
-            );
-        }
-
         public function admin_enqueue_scripts()
         {
             wp_enqueue_script(
@@ -299,15 +279,6 @@ if (!class_exists('VB_GND_Taxonomy_Admin')) {
             );
         }
 
-        public function action_wp_head()
-        {
-            ?>
-            <script>
-
-            </script>
-            <?php
-        }
-
         public function run()
         {
             if (!is_admin()) {
@@ -318,8 +289,6 @@ if (!class_exists('VB_GND_Taxonomy_Admin')) {
             add_action('admin_init', array($this, 'action_admin_init'));
             add_action('admin_menu', array($this, 'action_admin_menu'));
             add_action('admin_enqueue_scripts', array($this, 'admin_enqueue_scripts'));
-            add_action("add_meta_boxes", array($this, 'add_meta_boxes'));
-            add_action('wp_head', array($this, 'action_wp_head'));
         }
 
     }
