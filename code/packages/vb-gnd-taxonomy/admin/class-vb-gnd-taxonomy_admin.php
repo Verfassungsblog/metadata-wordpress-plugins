@@ -202,6 +202,11 @@ if (!class_exists('VB_GND_Taxonomy_Admin')) {
 
         public function admin_enqueue_scripts()
         {
+            $suggest_enabled = $this->common->get_settings_field_value("suggest_enabled");
+            if (!$suggest_enabled) {
+                // skip adding any javascript that will perform autocomplete via lobid.org
+                return;
+            }
             wp_enqueue_script(
                 $this->common->plugin_name . '-admin-script',
                 plugins_url("js/index.js", __FILE__),
@@ -216,6 +221,7 @@ if (!class_exists('VB_GND_Taxonomy_Admin')) {
                     "api_baseurl" => $this->common->get_settings_field_value("api_baseurl"),
                     "query_filter" => $this->common->get_settings_field_value("query_filter"),
                     "query_size" => $this->common->get_settings_field_value("query_size"),
+                    "label_format" => $this->common->get_settings_field_value("label_format"),
                 ),
             );
         }

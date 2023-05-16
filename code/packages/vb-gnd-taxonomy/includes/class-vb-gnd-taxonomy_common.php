@@ -20,7 +20,9 @@ if (!class_exists('VB_GND_Taxonomy_Common')) {
                 // default settings for Verfassungsblog
                 $this->setting_field_defaults = array(
                     // general
+                    "suggest_enabled" => true,
                     "api_baseurl" => "https://lobid.org/gnd/",
+                    "label_format" => "suggest",
                     "merge_with_tags" => true,
                     "query_filter" => "type:SubjectHeading",
                     "query_size" => 10,
@@ -30,7 +32,9 @@ if (!class_exists('VB_GND_Taxonomy_Common')) {
                 // default settings for any other blog than Verfassungsblog
                 $this->setting_field_defaults = array(
                     // general
+                    "suggest_enabled" => true,
                     "api_baseurl" => "https://lobid.org/gnd/",
+                    "label_format" => "suggest",
                     "merge_with_tags" => false,
                     "query_filter" => "type:SubjectHeading",
                     "query_size" => 10,

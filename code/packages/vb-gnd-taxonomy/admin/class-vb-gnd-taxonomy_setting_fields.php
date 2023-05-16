@@ -22,12 +22,38 @@ if (!class_exists('VB_GND_Taxonomy_Setting_Fields')) {
             $this->settings_fields = array(
                 // ------------------- general settings ---------------------
                 array(
+                    "name" => "suggest_enabled",
+                    "type" => "boolean",
+                    "section" => "general",
+                    "label" => "Suggestions Enabled",
+                    "description" => "Whether suggestions are shown while typing the name of a GND entity.",
+                ),
+                array(
                     "name" => "api_baseurl",
                     "type" => "string",
                     "section" => "general",
                     "label" => "API Base URL",
                     "placeholder" => "lobid.org GND API URL",
-                    "description" => "The URL to the Lobid.org GND API.<br>Usually: <code>https://lobid.org/gnd/</code>",
+                    "description" => "The URL to the lobid.org
+                        <a href=\"https://lobid.org/gnd/api\" target=\"_blank\">GND API</a>.<br>
+                        Usually: <code>https://lobid.org/gnd/</code>",
+                ),
+                array(
+                    "name" => "label_format",
+                    "type" => "string",
+                    "section" => "general",
+                    "label" => "Label Format",
+                    "placeholder" => "lobid.org label format",
+                    "description" => "The label format that is used to describe GND entities.<br>
+                        For example:<br>
+                        <ul>
+                            <li><code>suggest</code> = default format</li>
+                            <li><code>preferredName</code> = only the preferred name of the entity</li>
+                            <li><code>preferredName,placeOfBirth</code> = preferred name and place of birth</li>
+                        </ul>
+                        Additional information can be found at the
+                        <a href=\"https://lobid.org/gnd/api#auto-complete\" target=\"_blank\">API documentation</a>.
+                    ",
                 ),
                 array(
                     "name" => "query_filter",
@@ -35,7 +61,7 @@ if (!class_exists('VB_GND_Taxonomy_Setting_Fields')) {
                     "section" => "general",
                     "label" => "Query Filter",
                     "placeholder" => "lobid.org query filter",
-                    "description" => "The filter that is used when suggesting GND entities via Lobid.org.<br>
+                    "description" => "The filter that is used when suggesting GND entities via lobid.org.<br>
                         For example:<br>
                         <ul>
                             <li>
@@ -48,7 +74,8 @@ if (!class_exists('VB_GND_Taxonomy_Setting_Fields')) {
                             </li>
                             <li>
                                 <code>gndSubjectCategory.id:\"https://d-nb.info/standards/vocab/gnd/gnd-sc#7.3\"</code>
-                                = Only things related to constitutional law</li>
+                                = Only things related to constitutional law
+                            </li>
                             <li>
                                 <code>+(type:SubjectHeading) +(gndSubjectCategory.id:\"https://d-nb.info/standards/vocab/gnd/gnd-sc#7.3\")</code>
                                 = A combination of multiple filters

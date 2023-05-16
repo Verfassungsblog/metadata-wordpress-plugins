@@ -12,7 +12,7 @@ jQuery( document ).ready( function( $ ) {
     }
 
     function encodeName(raw) {
-        return raw.replaceAll("<", "[").replaceAll(">", "]").replaceAll(",", " | ").replaceAll("  ", " ");
+        return raw.replaceAll("<", "[").replaceAll(">", "]").replaceAll(",", " ").replaceAll("  ", " ");
     };
 
     function codeFromURI(uri) {
@@ -20,7 +20,8 @@ jQuery( document ).ready( function( $ ) {
     }
 
     function buildSuggestQueryURL(term) {
-        let url = vb_gnd_taxonomy_options.api_baseurl + "search?format=json:suggest"
+        let url = vb_gnd_taxonomy_options.api_baseurl + "search?"
+            + "format=json:" + encodeURIComponent(vb_gnd_taxonomy_options.label_format)
             + "&q=" + encodeURIComponent(term)
             + "&size=" + encodeURIComponent(vb_gnd_taxonomy_options.query_size);
 
