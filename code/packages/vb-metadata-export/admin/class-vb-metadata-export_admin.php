@@ -83,7 +83,7 @@ if (!class_exists('VB_Metadata_Export_Admin')) {
             return array($this, 'render_' . $section_name . '_section');
         }
 
-        public function action_init()
+        public function action_admin_init()
         {
             // create sections
             $section_labels = $this->get_settings_section_labels();
@@ -533,7 +533,7 @@ if (!class_exists('VB_Metadata_Export_Admin')) {
                 return;
             }
 
-            add_action('admin_init', array($this, 'action_init'));
+            add_action('admin_init', array($this, 'action_admin_init'));
             add_action('admin_menu', array($this, 'action_admin_menu'));
         }
 

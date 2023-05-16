@@ -80,7 +80,7 @@ if (!class_exists('VB_DOAJ_Submit_Admin')) {
             return array($this, 'render_' . $section_name . '_section');
         }
 
-        public function action_init()
+        public function action_admin_init()
         {
             if (!current_user_can('manage_options')) {
                 // settings are not allowed for non-admin users
@@ -478,7 +478,7 @@ if (!class_exists('VB_DOAJ_Submit_Admin')) {
                 return;
             }
 
-            add_action('admin_init', array($this, 'action_init'));
+            add_action('admin_init', array($this, 'action_admin_init'));
             add_action('admin_menu', array($this, 'action_admin_menu'));
         }
 
