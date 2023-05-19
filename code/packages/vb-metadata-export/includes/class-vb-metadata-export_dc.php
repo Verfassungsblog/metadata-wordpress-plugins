@@ -132,6 +132,19 @@ if (!class_exists('VB_Metadata_Export_DC')) {
             return implode("", $subjects);
         }
 
+        public function render_gnd_subjects($post)
+        {
+            $gnd_terms = get_the_terms($post, "gnd");
+            $gnd_terms = !empty($gnd_terms) && !is_wp_error($gnd_terms) ? $gnd_terms : array();
+            $subjects = array();
+            foreach($gnd_terms as $gnd_term) {
+                $subjects = array_merge($subjects,
+                    array("<dc:subject>" . esc_html($gnd_term->name) ."</dc:subject>")
+                );
+            }
+            return implode("", $subjects);
+        }
+
         public function render_author($post)
         {
             $post_author = $this->get_post_author_name($post);
@@ -238,6 +251,7 @@ if (!class_exists('VB_Metadata_Export_DC')) {
                     $this->render_format($post),
                     $this->render_ddc_subjects($post),
                     $this->render_tags($post),
+                    $this->render_gnd_subjects($post),
                     $this->render_publisher($post),
                     $this->render_relation($post),
                     $this->render_copyright($post),
