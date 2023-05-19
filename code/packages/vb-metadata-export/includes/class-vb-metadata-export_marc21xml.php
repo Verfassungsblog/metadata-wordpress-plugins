@@ -358,6 +358,19 @@ if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
                     </marc21:datafield>
                 ";
             }
+
+            $gnd_terms = get_the_terms($post, "gnd");
+            $gnd_terms = $gnd_terms ? $gnd_terms : array();
+            foreach($gnd_terms as $gnd_term) {
+                $name_escaped = esc_html($gnd_term->name);
+                $slug_escaped = esc_html($gnd_term->slug);
+                $xml = $xml . "<marc21:datafield tag=\"650\" ind1=\"1\" ind2=\"7\">
+                        <marc21:subfield code=\"0\">(DE-588){$slug_escaped}</marc21:subfield>
+                        <marc21:subfield code=\"2\">gnd</marc21:subfield>
+                        <marc21:subfield code=\"a\">{$name_escaped}</marc21:subfield>
+                    </marc21:datafield>
+                ";
+            }
             return $xml;
         }
 
