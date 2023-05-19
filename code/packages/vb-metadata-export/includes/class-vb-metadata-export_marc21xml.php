@@ -349,7 +349,7 @@ if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
         public function render_datafield_650($post)
         {
             $tags = get_the_tags($post);
-            $tags = $tags ? $tags : array();
+            $tags = !empty($tags) && !is_wp_error($tags) ? $tags : array();
             $xml = "";
             foreach($tags as $tag) {
                 $tag_escaped = esc_html($tag->name);
@@ -360,7 +360,7 @@ if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
             }
 
             $gnd_terms = get_the_terms($post, "gnd");
-            $gnd_terms = $gnd_terms ? $gnd_terms : array();
+            $gnd_terms = !empty($gnd_terms) && !is_wp_error($gnd_terms) ? $gnd_terms : array();
             foreach($gnd_terms as $gnd_term) {
                 $name_escaped = esc_html($gnd_term->name);
                 $slug_escaped = esc_html($gnd_term->slug);
@@ -370,6 +370,7 @@ if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
                         <marc21:subfield code=\"a\">{$name_escaped}</marc21:subfield>
                     </marc21:datafield>
                 ";
+
             }
             return $xml;
         }
