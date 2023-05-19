@@ -24,9 +24,9 @@ if (!class_exists('VB_GND_Taxonomy_Common')) {
                     "api_baseurl" => "https://lobid.org/gnd/",
                     "label_format" => "suggest",
                     "merge_with_tags" => true,
-                    "query_filter" => "type:SubjectHeading",
+                    "query_filter" => "",
                     "query_size" => 10,
-
+                    "verify_gnd_id" => true,
                 );
             } else {
                 // default settings for any other blog than Verfassungsblog
@@ -36,8 +36,9 @@ if (!class_exists('VB_GND_Taxonomy_Common')) {
                     "api_baseurl" => "https://lobid.org/gnd/",
                     "label_format" => "suggest",
                     "merge_with_tags" => false,
-                    "query_filter" => "type:SubjectHeading",
+                    "query_filter" => "",
                     "query_size" => 10,
+                    "verify_gnd_id" => true,
                 );
             }
         }
@@ -59,6 +60,26 @@ if (!class_exists('VB_GND_Taxonomy_Common')) {
                 return $this->setting_field_defaults[$field_name];
             }
             return false;
+        }
+
+        public function set_last_error($error) {
+            return update_option($this->plugin_name . "_status_last_error", $error);
+        }
+
+        public function get_last_error() {
+            return get_option($this->plugin_name . "_status_last_error", false);
+        }
+
+        public function clear_last_error() {
+            delete_option($this->plugin_name . "_status_last_error");
+        }
+
+        public function extract_gnd_id_from_term($term) {
+            preg_match('/\[gnd:([^\]]+)\]/', $term, $matches);
+            if ($matches) {
+                return $matches[1];
+            }
+            return null;
         }
 
     }

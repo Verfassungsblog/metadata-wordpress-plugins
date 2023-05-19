@@ -1,8 +1,8 @@
 <?php
 
-if (!class_exists('VB_GND_Taxonomy_Setting_Fields')) {
+if (!class_exists('VB_GND_Taxonomy_Admin_Setting_Fields')) {
 
-    class VB_GND_Taxonomy_Setting_Fields
+    class VB_GND_Taxonomy_Admin_Setting_Fields
     {
 
         protected $settings_fields;
@@ -92,6 +92,13 @@ if (!class_exists('VB_GND_Taxonomy_Setting_Fields')) {
                     "label" => "Query Size",
                     "placeholder" => "the number of results to show",
                     "description" => "The number of GND entity suggestions to show to the user.",
+                ),
+                array(
+                    "name" => "verify_gnd_id",
+                    "type" => "boolean",
+                    "section" => "general",
+                    "label" => "Verify GND-ID",
+                    "description" => "Whether to check that a GND-ID actually exists. If enabled, invalid entries are not added to the taxonomy.",
                 ),
                 array(
                     "name" => "merge_with_tags",

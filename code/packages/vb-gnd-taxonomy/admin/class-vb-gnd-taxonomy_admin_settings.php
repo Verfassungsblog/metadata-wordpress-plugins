@@ -1,11 +1,11 @@
 <?php
 
 require_once plugin_dir_path(__FILE__) . '../includes/class-vb-gnd-taxonomy_common.php';
-require_once plugin_dir_path(__FILE__) . './class-vb-gnd-taxonomy_setting_fields.php';
+require_once plugin_dir_path(__FILE__) . './class-vb-gnd-taxonomy_admin_setting_fields.php';
 
-if (!class_exists('VB_GND_Taxonomy_Admin')) {
+if (!class_exists('VB_GND_Taxonomy_Admin_Settings')) {
 
-    class VB_GND_Taxonomy_Admin
+    class VB_GND_Taxonomy_Admin_Settings
     {
         protected $common;
 
@@ -14,7 +14,7 @@ if (!class_exists('VB_GND_Taxonomy_Admin')) {
         public function __construct($plugin_name)
         {
             $this->common = new VB_GND_Taxonomy_Common($plugin_name);
-            $this->setting_fields = new VB_GND_Taxonomy_Setting_Fields();
+            $this->setting_fields = new VB_GND_Taxonomy_Admin_Setting_Fields();
         }
 
         protected function get_tab_labels()
@@ -200,31 +200,7 @@ if (!class_exists('VB_GND_Taxonomy_Admin')) {
             <?php
         }
 
-        public function admin_enqueue_scripts()
-        {
-            $suggest_enabled = $this->common->get_settings_field_value("suggest_enabled");
-            if (!$suggest_enabled) {
-                // skip adding any javascript that will perform autocomplete via lobid.org
-                return;
-            }
-            wp_enqueue_script(
-                $this->common->plugin_name . '-admin-script',
-                plugins_url("js/index.js", __FILE__),
-                array('jquery', 'jquery-ui-autocomplete'),
-                filemtime(realpath(plugin_dir_path(__FILE__) . "js/index.js")),
-                false
-            );
-            wp_localize_script(
-                $this->common->plugin_name . '-admin-script',
-                "vb_gnd_taxonomy_options",
-                array(
-                    "api_baseurl" => $this->common->get_settings_field_value("api_baseurl"),
-                    "query_filter" => $this->common->get_settings_field_value("query_filter"),
-                    "query_size" => $this->common->get_settings_field_value("query_size"),
-                    "label_format" => $this->common->get_settings_field_value("label_format"),
-                ),
-            );
-        }
+
 
         public function action_admin_init()
         {
@@ -236,7 +212,6 @@ if (!class_exists('VB_GND_Taxonomy_Admin')) {
             // create sections
             $section_labels = $this->get_settings_section_labels();
             $tab_by_section = $this->get_tab_by_section_map();
-
 
             foreach ($section_labels as $section_name => $section_label) {
                 add_settings_section(
@@ -294,7 +269,6 @@ if (!class_exists('VB_GND_Taxonomy_Admin')) {
 
             add_action('admin_init', array($this, 'action_admin_init'));
             add_action('admin_menu', array($this, 'action_admin_menu'));
-            add_action('admin_enqueue_scripts', array($this, 'admin_enqueue_scripts'));
         }
 
     }

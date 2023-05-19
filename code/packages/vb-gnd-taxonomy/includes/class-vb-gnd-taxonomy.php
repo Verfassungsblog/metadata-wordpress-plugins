@@ -1,7 +1,10 @@
 <?php
 
-require_once plugin_dir_path(__FILE__) . '../admin/class-vb-gnd-taxonomy_admin.php';
 require_once plugin_dir_path(__FILE__) . './class-vb-gnd-taxonomy_common.php';
+
+require_once plugin_dir_path(__FILE__) . '../admin/class-vb-gnd-taxonomy_admin_settings.php';
+require_once plugin_dir_path(__FILE__) . '../admin/class-vb-gnd-taxonomy_admin_edit.php';
+
 
 if (!class_exists('VB_GND_Taxonomy')) {
 
@@ -13,14 +16,17 @@ if (!class_exists('VB_GND_Taxonomy')) {
 
         protected $base_file;
 
-        protected $admin;
+        protected $admin_settings;
+
+        protected $admin_edit;
 
         public function __construct($base_file, $plugin_name, $plugin_version)
         {
             $this->common = new VB_GND_Taxonomy_Common($plugin_name);
             $this->plugin_version = $plugin_version;
             $this->base_file = $base_file;
-            $this->admin = new VB_GND_Taxonomy_Admin($plugin_name);
+            $this->admin_settings = new VB_GND_Taxonomy_Admin_Settings($plugin_name);
+            $this->admin_edit = new VB_GND_Taxonomy_Admin_Edit($plugin_name);
         }
 
         public function activate()
@@ -33,121 +39,6 @@ if (!class_exists('VB_GND_Taxonomy')) {
             // empty
         }
 
-        protected function extract_gnd_id_from_term($term) {
-            preg_match('/\[gnd:([^\]]+)\]/', $term, $matches);
-            if ($matches) {
-                return $matches[1];
-            }
-            return null;
-        }
-
-        protected function load_gnd_entity_description($gnd_id) {
-            $url = "https://lobid.org/gnd/{$gnd_id}.json";
-            $response = wp_remote_request($url, array(
-                "method" => "GET",
-                "headers" => array(
-                    "Accept" =>  "application/json",
-                ),
-                "timeout" => 30,
-            ));
-
-            // validate response
-            if (is_wp_error($response)) {
-                return "";
-            }
-            $status_code = wp_remote_retrieve_response_code($response);
-            if ($status_code != 200) {
-                return "";
-            }
-
-            // parse response
-            $json_data = json_decode(wp_remote_retrieve_body($response));
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                return "";
-            }
-            if (!empty($json_data) && !empty($json_data->definition) && count($json_data->definition) > 0) {
-                return $json_data->definition[0];
-            }
-            return "";
-        }
-
-        public function meta_box_sanitize_cb($taxonomy, $terms)
-        {
-            if ($taxonomy !== "gnd") {
-                // only sanitize gnd taxonomy terms
-                return array();
-            }
-
-            // split terms by comma
-            if ( ! is_array( $terms ) ) {
-                $terms = explode( ',', trim( $terms, " \n\t\r\0\x0B," ) );
-            }
-
-            $term_ids = array();
-            foreach ( $terms as $term ) {
-                // empty terms are invalid input.
-                if ( empty( $term ) ) {
-                    continue;
-                }
-
-                $gnd_id = $this->extract_gnd_id_from_term($term);
-                $term_name = trim(str_replace("[gnd:{$gnd_id}]", "", $term), " \n\t\r\0\x0B,");
-
-                if (empty($term_name)) {
-                    // no term name
-                    continue;
-                }
-
-                if (empty($gnd_id)) {
-                    // check if gnd entity with that name already exists
-                    $_term = get_terms(
-                        array(
-                            'taxonomy'   => $taxonomy,
-                            'name'       => $term,
-                            'fields'     => 'ids',
-                            'hide_empty' => false,
-                        )
-                    );
-
-                    if (empty($_term)) {
-                        // invalid input (no gnd-id for non-existing entity)
-                        continue;
-                    } else {
-                        $term_ids[] = (int) $_term[0];
-                    }
-                } else {
-                    // gnd id is available
-                    // check if term with corresponding slug already exists
-                    $_term = get_term_by(
-                        'slug', $gnd_id, $taxonomy
-                    );
-
-                    if (empty($_term)) {
-                        // this is a new term
-                        $inserted_term = wp_insert_term(
-                            $term_name,
-                            $taxonomy,
-                            array(
-                                "slug" => $gnd_id,
-                                "description" => $this->load_gnd_entity_description($gnd_id),
-                            )
-                        );
-
-                        if (!is_wp_error($inserted_term)) {
-                            $term_ids[] = (int)$inserted_term["term_id"];
-                        } else {
-                            // something went wrong saving the new term
-                            continue;
-                        }
-
-                    } else {
-                        $term_ids[] = (int)$_term->term_id;
-                    }
-                }
-            }
-
-            return $term_ids;
-        }
 
         public function action_init()
         {
@@ -175,7 +66,7 @@ if (!class_exists('VB_GND_Taxonomy')) {
                 'show_admin_column' => true,
                 'query_var'         => true,
                 'rewrite'           => [ 'slug' => 'gnd' ],
-                'meta_box_sanitize_cb' => array($this, 'meta_box_sanitize_cb'),
+                'meta_box_sanitize_cb' => array($this->admin_edit, 'meta_box_sanitize_cb'),
             );
             register_taxonomy( 'gnd', [ 'post' ], $args );
 
@@ -217,8 +108,8 @@ if (!class_exists('VB_GND_Taxonomy')) {
 
             add_action("init", array($this, 'action_init'));
 
-
-            $this->admin->run();
+            $this->admin_settings->run();
+            $this->admin_edit->run();
         }
 
     }
