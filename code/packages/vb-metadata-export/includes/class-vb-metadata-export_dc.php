@@ -73,8 +73,8 @@ if (!class_exists('VB_Metadata_Export_DC')) {
             $post_url = get_the_permalink($post);
 
             $xml = implode("", array(
-                !empty($doi) ? "<dc:identifier xsi:type=\"dcterms:URI\">http://dx.doi.org/" . esc_html($doi) . "</dc:identifier>" : "",
-                !empty($post_url) ? "<dc:identifier xsi:type=\"dcterms:URI\">" . esc_html($post_url) . "</dc:identifier>" : "",
+                !empty($doi) ? "<dc:identifier>http://dx.doi.org/" . esc_html($doi) . "</dc:identifier>" : "",
+                !empty($post_url) ? "<dc:identifier>" . esc_html($post_url) . "</dc:identifier>" : "",
             ));
 
             return $xml;
@@ -113,7 +113,7 @@ if (!class_exists('VB_Metadata_Export_DC')) {
             $subjects = array();
             foreach ($trimmed_ddc as $ddc) {
                 $subjects = array_merge($subjects,
-                    array("<dc:subject xsi:type=\"dcterms:DDC\">" . esc_html($ddc) ."</dc:subject>")
+                    array("<dc:subject>ddc:" . esc_html($ddc) ."</dc:subject>")
                 );
             }
             return implode("", $subjects);
@@ -240,7 +240,7 @@ if (!class_exists('VB_Metadata_Export_DC')) {
                 "",
                 array(
                     "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n",
-                    "<dc xmlns=\"http://www.openarchives.org/OAI/2.0/oai_dc/\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:dcterms=\"http://purl.org/dc/terms/\" xsi:schemaLocation=\"http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n",
+                    "<dc xmlns=\"http://www.openarchives.org/OAI/2.0/oai_dc/\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xsi:schemaLocation=\"http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd http://dublincore.org/schemas/xmls/simpledc20021212.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n",
                     $this->render_identifier($post),
                     $this->render_title($post),
                     $this->render_author($post),
