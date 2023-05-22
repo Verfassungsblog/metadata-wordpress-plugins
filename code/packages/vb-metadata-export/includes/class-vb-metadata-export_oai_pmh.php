@@ -254,10 +254,10 @@ if (!class_exists('VB_Metadata_Export_OAI_PMH')) {
             $xml_array = array("<{$verb}>");
             foreach($posts as $post) {
                 $xml_array = array_merge($xml_array, array(
-                    "<record>",
+                    $verb == "ListRecords" ? "<record>" : "",
                     $this->get_post_header($post),
                     $verb == "ListRecords" ? $this->get_post_metadata($post, $metadataPrefix) : "",
-                    "</record>",
+                    $verb == "ListRecords" ? "</record>" : "",
                 ));
             }
             if($total_count > $list_count + $offset) {
