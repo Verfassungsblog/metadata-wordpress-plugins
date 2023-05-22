@@ -147,10 +147,23 @@ if (!class_exists('VB_Metadata_Export_OAI_PMH')) {
             return $this->date_to_iso8601($date);
         }
 
+        protected function complete_day_input($date, $is_after) {
+            if (!str_contains($date, "T")) {
+                if ($is_after) {
+                    return $date . "T00:00:00Z";
+                } else {
+                    return $date . "T23:59:59Z";
+                }
+            }
+            return $date;
+        }
+
         protected function query_for_posts($offset, $from, $until) {
+
             $after = empty($from) ? $this->get_earliest_post_date() : $from;
             $before = empty($until) ? $this->date_to_iso8601(new DateTime("now", new DateTimeZone("UTC"))) : $until;
-            $require_doi = $this->common->get_settings_field_value("require_doi");
+            $after = $this->complete_day_input($after, true);
+            $before = $this->complete_day_input($before, false);
 
             // convert after/before to UTC (even though they are UTC) because date_query will always convert to local
             $after = $this->local_to_utc_iso8601($after);
@@ -172,6 +185,7 @@ if (!class_exists('VB_Metadata_Export_OAI_PMH')) {
                 'order_by' => 'modified'
             );
 
+            $require_doi = $this->common->get_settings_field_value("require_doi");
             if ($require_doi) {
                 $doi_meta_key = $this->common->get_settings_field_value("doi_meta_key");
                 $query_args['meta_query'] = array(
