@@ -28,6 +28,7 @@ if (!class_exists('VB_Metadata_Export_Common')) {
                     "publisher" => $blog_title,
                     "require_doi" => true,
                     "include_excerpt" => true,
+                    "include_subheadline" => false,
                     "ddc_general" => "342",
                     "copyright_general" => "CC BY-SA 4.0",
                     "funding_general" => "funded by the government",

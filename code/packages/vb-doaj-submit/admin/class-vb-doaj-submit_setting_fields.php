@@ -112,6 +112,14 @@ if (!class_exists('VB_DOAJ_Submit_Setting_Fields')) {
                         a corresponding custom field.",
                 ),
                 array(
+                    "name" => "include_subheadline",
+                    "type" => "boolean",
+                    "section" => "general",
+                    "label" => __("Include Subheadline in Title", "vb-doaj-submit"),
+                    "description" => "Whether to include the subheadline in the main title with a minus
+                        symbol as separator.",
+                ),
+                array(
                     "name" => "include_excerpt",
                     "type" => "boolean",
                     "section" => "general",
@@ -192,6 +200,16 @@ if (!class_exists('VB_DOAJ_Submit_Setting_Fields')) {
                         Affiliation\" below), then tried to be extracted from the ROR-ID provided by the author (see
                         setting \"Author Affiliation ROR-ID\" below), and lastly tried to be extracted from the ORCID
                         provided by the author (see setting \"Author ORCID\" below).",
+                ),
+                array(
+                    "name" => "subheadline_meta_key",
+                    "type" => "string",
+                    "section" => "post_meta",
+                    "label" => "Sub-Headline<br>(custom field / meta key)",
+                    "placeholder" => "meta key for a sub-headline",
+                    "description" => "The meta key for the custom field that contains the sub-headline for a post.
+                        If the option \"Include Subheadline\" is enabled, the sub-headline is added to the title with
+                        a minus symbol as separator.",
                 ),
 
                 // ------------- custom user fields -------------

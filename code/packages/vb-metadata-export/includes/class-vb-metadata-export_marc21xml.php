@@ -227,6 +227,12 @@ if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
         {
             $title = esc_html(get_the_title($post));
             $subheadline = esc_html($this->common->get_post_meta_field_value("subheadline_meta_key", $post));
+            $include_subheadline = $this->common->get_settings_field_value("include_subheadline");
+            if ($include_subheadline && !empty($subheadline)) {
+                $title = $title . " - " . $subheadline;
+                $subheadline = "";
+            }
+
             $author_name = $this->get_post_author_name($post);
 
             $subfields = implode("", array(

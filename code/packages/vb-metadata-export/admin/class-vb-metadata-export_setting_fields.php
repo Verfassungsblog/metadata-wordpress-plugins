@@ -77,6 +77,14 @@ if (!class_exists('VB_Metadata_Export_Setting_Fields')) {
                         <a href=\"https://www.loc.gov/marc/bibliographic/bd520.html\" target=\"_blank\">Marc21 520a</a>).",
                 ),
                 array(
+                    "name" => "include_subheadline",
+                    "type" => "boolean",
+                    "section" => "general",
+                    "label" => __("Include Subheadline in Title", "vb-doaj-submit"),
+                    "description" => "Whether to include the subheadline in the main title with a minus
+                        symbol as separator.",
+                ),
+                array(
                     "name" => "ddc_general",
                     "type" => "string",
                     "section" => "general",

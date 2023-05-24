@@ -393,13 +393,52 @@ if (!class_exists('VB_Metadata_Export_Admin')) {
             <?php
         }
 
+        protected function find_example_post()
+        {
+            // get last modified post
+            $query_args = array(
+                'post_type' => 'post',
+                'post_status' => array('publish'),
+                'orderby' => 'modified',
+                'order' => 'DESC',
+                'posts_per_page' => 1,
+            );
+
+            // check with doi
+            $require_doi = $this->common->get_settings_field_value("require_doi");
+            if ($require_doi) {
+                $doi_meta_key = $this->common->get_settings_field_value("doi_meta_key");
+                $query_args['meta_query'] = array(
+                    'relation' => "AND",
+                    array(
+                        'key' => $doi_meta_key,
+                        'value' => "",
+                        'compare' => "!=",
+                    ),
+                );
+            }
+
+            // query for posts
+            $query = new WP_Query( $query_args );
+            if (count($query->posts) > 0) {
+                return $query->posts[0];
+            }
+
+            // otherwise, return any post
+            $posts = get_posts(array('numberposts' => 1));
+            if (count($posts) > 0) {
+                return $posts[0];
+            }
+            return false;
+        }
+
         public function render_marc21_tab()
         {
-            $posts = get_posts(array('numberposts' => 1));
-            if (count($posts) >= 1) {
+            $post = $this->find_example_post();
+            if (!empty($post)) {
                 $renderer = new VB_Metadata_Export_Marc21Xml($this->common->plugin_name);
-                $marc21xml = $renderer->render($posts[0]);
-                $example_url = $this->common->get_the_permalink("marc21xml", $posts[0]);
+                $marc21xml = $renderer->render($post);
+                $example_url = $this->common->get_the_permalink("marc21xml", $post);
                 ?>
                 <h2>
                     <a href="<?php echo $example_url ?>">
@@ -415,14 +454,14 @@ if (!class_exists('VB_Metadata_Export_Admin')) {
 
         public function render_mods_tab()
         {
-            $posts = get_posts(array('numberposts' => 1));
-            if (count($posts) >= 1) {
+            $post = $this->find_example_post();
+            if (!empty($post)) {
                 $renderer = new VB_Metadata_Export_Marc21Xml($this->common->plugin_name);
                 $converter = new VB_Metadata_Export_Converter();
 
-                $marc21xml = $renderer->render($posts[0]);
+                $marc21xml = $renderer->render($post);
                 $mods_xml = $converter->convertMarc21ToMods($marc21xml);
-                $example_url = $this->common->get_the_permalink("mods", $posts[0]);
+                $example_url = $this->common->get_the_permalink("mods", $post);
 
                 ?>
                 <h2>
@@ -440,11 +479,11 @@ if (!class_exists('VB_Metadata_Export_Admin')) {
         public function render_oai_pmh_tab()
         {
             $oaipmh_enabled = $this->common->get_settings_field_value("oai-pmh_enabled");
-            $posts = get_posts(array('numberposts' => 1));
-            if ($oaipmh_enabled && count($posts) >= 1) {
+            $post = $this->find_example_post();
+            if ($oaipmh_enabled && !empty($post)) {
                 $oaipmh = new VB_Metadata_Export_OAI_PMH($this->common->plugin_name);
                 $oai_baseurl = $oaipmh->get_base_url();
-                $post_identifier = $oaipmh->get_post_identifier($posts[0]);
+                $post_identifier = $oaipmh->get_post_identifier($post);
                 ?>
                 <h2>
                     Example Requests
@@ -503,11 +542,11 @@ if (!class_exists('VB_Metadata_Export_Admin')) {
 
         public function render_dc_tab()
         {
-            $posts = get_posts(array('numberposts' => 1));
-            if (count($posts) >= 1) {
+            $post = $this->find_example_post();
+            if (!empty($post)) {
                 $dc_renderer = new VB_Metadata_Export_DC($this->common->plugin_name);
-                $dc = $dc_renderer->render($posts[0]);
-                $example_url = $this->common->get_the_permalink("dc", $posts[0]);
+                $dc = $dc_renderer->render($post);
+                $example_url = $this->common->get_the_permalink("dc", $post);
 
                 ?>
                 <h2>

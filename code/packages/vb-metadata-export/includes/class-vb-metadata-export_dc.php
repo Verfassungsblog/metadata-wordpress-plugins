@@ -172,7 +172,8 @@ if (!class_exists('VB_Metadata_Export_DC')) {
         {
             $title = esc_html(get_the_title($post));
             $subheadline = esc_html($this->common->get_post_meta_field_value("subheadline_meta_key", $post));
-            if (!empty($subheadline)) {
+            $include_subheadline = $this->common->get_settings_field_value("include_subheadline");
+            if ($include_subheadline && !empty($subheadline)) {
                 $title = $title . " - " . $subheadline;
             }
 
