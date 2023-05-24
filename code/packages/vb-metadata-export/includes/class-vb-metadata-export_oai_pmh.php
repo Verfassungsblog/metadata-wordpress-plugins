@@ -430,6 +430,14 @@ if (!class_exists('VB_Metadata_Export_OAI_PMH')) {
                 return $this->render_error("GetRecord", "idDoesNotExist", "invalid identifier");
             }
 
+            $require_doi = $this->common->get_settings_field_value("require_doi");
+            if ($require_doi) {
+                $doi = $this->common->get_post_meta_field_value("doi_meta_key", $post);
+                if (empty($doi)) {
+                    return $this->render_error("GetRecord", "idDoesNotExist", "invalid identifier");
+                }
+            }
+
             $xml = implode("", array(
                 "<GetRecord>",
                 $this->get_post_header($post),
