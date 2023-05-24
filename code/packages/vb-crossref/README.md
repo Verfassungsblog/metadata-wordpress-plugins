@@ -1,1 +1,0 @@
-# Verfassungsblog CrossRef Plugin

@@ -1,0 +1,49 @@
+body.settings_page_vb-crossref-doi div#wpcontent {
+    padding-left: 0;
+}
+
+body.settings_page_vb-crossref-doi pre {
+    padding: 0.5em;
+    background-color: #fff;
+    border: 1px solid #dcdcde;
+    box-sizing: border-box;
+    overflow: auto;
+}
+
+.vb-crossref-doi-admin-header {
+    padding: 20px 0 0 0;
+    background-color: #fff;
+    text-align: center;
+    border-bottom: 1px solid #dcdcde;
+}
+
+.vb-crossref-doi-admin-header h1 {
+    line-height: 1.5em;
+}
+
+.vb-crossref-doi-admin-header-nav {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.vb-crossref-doi-admin-header-tab {
+    display: inline-block;
+    padding: 20px 15px 15px 15px;
+    margin: 0 5px;
+    text-decoration: none;
+    color: rgb(60, 67, 74);
+    border-bottom: 3px solid #fff;
+    box-sizing: border-box;
+
+}
+
+.vb-crossref-doi-admin-header-tab.active {
+    font-weight: 500;
+    border-bottom: 3px solid #2271b1;
+}
+
+
+.vb-crossref-doi-admin-content {
+    margin: 20px 20px 0 20px;
+}
