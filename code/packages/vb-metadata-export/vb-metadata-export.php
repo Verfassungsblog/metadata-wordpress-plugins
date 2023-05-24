@@ -5,8 +5,8 @@
  * Plugin URI: https://wordpress.org/plugins/vb-metadata-export/
  * Description: Export post metadata as Marc21 / MODS / OAI
  * Version: 0.0.2
- * Requires at least: 6.1.1
- * Requires PHP: 8.0.28
+ * Requires at least: 5.9.3
+ * Requires PHP: 7.4.29
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Author: Verfassungsblog
