@@ -129,6 +129,13 @@ if (!class_exists('VB_DOAJ_Submit_Render')) {
             }
             $tags = get_the_tags($post);
             $tags = $tags ? $tags : array();
+
+            $gnd_terms = get_the_terms($post, "gnd");
+            $gnd_terms = !empty($gnd_terms) && !is_wp_error($gnd_terms) ? $gnd_terms : array();
+            if (!empty($gnd_terms)) {
+                $tags = array_merge($tags, $gnd_terms);
+            }
+
             $keywords = array();
             foreach($tags as $tag) {
                 $keywords = array_merge($keywords, array(esc_html($tag->name)));

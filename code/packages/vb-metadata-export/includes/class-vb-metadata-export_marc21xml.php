@@ -370,7 +370,6 @@ if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
                         <marc21:subfield code=\"a\">{$name_escaped}</marc21:subfield>
                     </marc21:datafield>
                 ";
-
             }
             return $xml;
         }
