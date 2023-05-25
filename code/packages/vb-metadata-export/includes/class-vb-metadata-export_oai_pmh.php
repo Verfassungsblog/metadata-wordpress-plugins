@@ -41,7 +41,12 @@ if (!class_exists('VB_Metadata_Export_OAI_PMH')) {
         }
 
         protected function get_earliest_post_date() {
-            $oldest_posts = get_posts(array("numberposts" => 1, "order" => "ASC"));
+            $oldest_posts = get_posts(array(
+                "numberposts" => 1,
+                'orderby' => 'modified',
+                "order" => "ASC",
+                'ignore_sticky_posts' => true,
+            ));
             if (count($oldest_posts) == 1) {
                 return $this->post_date_to_iso8601($oldest_posts[0]->post_date_gmt);
             }
@@ -182,7 +187,8 @@ if (!class_exists('VB_Metadata_Export_OAI_PMH')) {
                 'post_type' => 'post',
                 'post_status' => array('publish', 'trash'),
                 'posts_per_page' => $this->get_list_size(),
-                'order_by' => 'modified',
+                'orderby' => 'modified',
+                'order' => 'DESC',
                 'ignore_sticky_posts' => true,
             );
 
