@@ -13,10 +13,15 @@ if (!class_exists('VB_Metadata_Export_DC')) {
             $this->common = new VB_Metadata_Export_Common($plugin_name);
         }
 
+        protected function escape($str)
+        {
+            return htmlspecialchars(html_entity_decode($str), ENT_XML1, 'UTF-8');
+        }
+
         protected function get_author_name($author)
         {
-            $last_name = esc_html(get_the_author_meta("last_name", $author));
-            $first_name = esc_html(get_the_author_meta("first_name", $author));
+            $last_name = get_the_author_meta("last_name", $author);
+            $first_name = get_the_author_meta("first_name", $author);
 
             $author = "";
             if (!empty($last_name) && !empty($first_name)) {
@@ -29,8 +34,8 @@ if (!class_exists('VB_Metadata_Export_DC')) {
 
         protected function get_coauthor_name($coauthor)
         {
-            $last_name = esc_html($coauthor->last_name);
-            $first_name = esc_html($coauthor->first_name);
+            $last_name = $coauthor->last_name;
+            $first_name = $coauthor->first_name;
 
             $author = "";
             if (!empty($last_name) && !empty($first_name)) {
@@ -55,12 +60,12 @@ if (!class_exists('VB_Metadata_Export_DC')) {
         }
 
         protected function get_post_language($post) {
-            $language = esc_html($this->common->get_settings_field_value("language"));
-            $language_alternate_category = esc_html($this->common->get_settings_field_value("language_alternate_category"));
+            $language = $this->common->get_settings_field_value("language");
+            $language_alternate_category = $this->common->get_settings_field_value("language_alternate_category");
             if (!empty($language_alternate_category)) {
                 $categories = array_map(function($category) { return $category->name; }, get_the_category($post->ID));
                 if (in_array($language_alternate_category, $categories)) {
-                    $language_alternate = esc_html($this->common->get_settings_field_value("language_alternate"));
+                    $language_alternate = $this->common->get_settings_field_value("language_alternate");
                     $language = $language_alternate;
                 }
             }
@@ -69,12 +74,12 @@ if (!class_exists('VB_Metadata_Export_DC')) {
 
         public function render_identifier($post)
         {
-            $doi = esc_html($this->common->get_post_meta_field_value("doi_meta_key", $post));
+            $doi = $this->common->get_post_meta_field_value("doi_meta_key", $post);
             $post_url = get_the_permalink($post);
 
             $xml = implode("", array(
-                !empty($doi) ? "<dc:identifier>http://dx.doi.org/" . esc_html($doi) . "</dc:identifier>" : "",
-                !empty($post_url) ? "<dc:identifier>" . esc_html($post_url) . "</dc:identifier>" : "",
+                !empty($doi) ? "<dc:identifier>http://dx.doi.org/" . $this->escape($doi) . "</dc:identifier>" : "",
+                !empty($post_url) ? "<dc:identifier>" . $this->escape($post_url) . "</dc:identifier>" : "",
             ));
 
             return $xml;
@@ -89,7 +94,7 @@ if (!class_exists('VB_Metadata_Export_DC')) {
                 $relation = $relation . "--" . $issn;
             }
             if (!empty($relation)) {
-                return "<dc:relation>". esc_html($relation) . "</dc:relation>";
+                return "<dc:relation>". $this->escape($relation) . "</dc:relation>";
             }
             return "";
         }
@@ -98,22 +103,22 @@ if (!class_exists('VB_Metadata_Export_DC')) {
         {
             $language = $this->get_post_language($post);
             if (!empty($language)) {
-                return "<dc:language>{$language}</dc:language>";
+                return "<dc:language>" . $this->escape($language) . "</dc:language>";
             }
             return "";
         }
 
         public function render_ddc_subjects($post)
         {
-            $global_ddc = esc_html($this->common->get_settings_field_value("ddc_general"));
-            $post_ddc = esc_html($this->common->get_post_meta_field_value("ddc_meta_key", $post));
+            $global_ddc = $this->common->get_settings_field_value("ddc_general");
+            $post_ddc = $this->common->get_post_meta_field_value("ddc_meta_key", $post);
             $combined_ddc = array_merge(explode(",", $global_ddc), explode(",", $post_ddc));
             $trimmed_ddc = array_filter(array_map('trim', $combined_ddc));
 
             $subjects = array();
             foreach ($trimmed_ddc as $ddc) {
                 $subjects = array_merge($subjects,
-                    array("<dc:subject>ddc:" . esc_html($ddc) ."</dc:subject>")
+                    array("<dc:subject>ddc:" . $this->escape($ddc) ."</dc:subject>")
                 );
             }
             return implode("", $subjects);
@@ -126,7 +131,7 @@ if (!class_exists('VB_Metadata_Export_DC')) {
             $subjects = array();
             foreach($tags as $tag) {
                 $subjects = array_merge($subjects,
-                    array("<dc:subject>" . esc_html($tag->name) ."</dc:subject>")
+                    array("<dc:subject>" . $this->escape($tag->name) ."</dc:subject>")
                 );
             }
             return implode("", $subjects);
@@ -139,7 +144,7 @@ if (!class_exists('VB_Metadata_Export_DC')) {
             $subjects = array();
             foreach($gnd_terms as $gnd_term) {
                 $subjects = array_merge($subjects,
-                    array("<dc:subject>" . esc_html($gnd_term->name) ."</dc:subject>")
+                    array("<dc:subject>" . $this->escape($gnd_term->name) ."</dc:subject>")
                 );
             }
             return implode("", $subjects);
@@ -149,7 +154,7 @@ if (!class_exists('VB_Metadata_Export_DC')) {
         {
             $post_author = $this->get_post_author_name($post);
             if (!empty($post_author)) {
-                return "<dc:creator>{$post_author}</dc:creator>";
+                return "<dc:creator>" . $this->escape($post_author) . "</dc:creator>";
             }
             return "";
         }
@@ -163,22 +168,22 @@ if (!class_exists('VB_Metadata_Export_DC')) {
                 if (empty($coauthor_name)) {
                     continue;
                 }
-                $xml = $xml . "<dc:creator>{$coauthor_name}</dc:creator>";
+                $xml = $xml . "<dc:creator>" . $this->escape($coauthor_name) . "</dc:creator>";
             }
             return $xml;
         }
 
         public function render_title($post)
         {
-            $title = esc_html(get_the_title($post));
-            $subheadline = esc_html($this->common->get_post_meta_field_value("subheadline_meta_key", $post));
+            $title = get_the_title($post);
+            $subheadline = $this->common->get_post_meta_field_value("subheadline_meta_key", $post);
             $include_subheadline = $this->common->get_settings_field_value("include_subheadline");
             if ($include_subheadline && !empty($subheadline)) {
                 $title = $title . " - " . $subheadline;
             }
 
             if (!empty($title)) {
-                return "<dc:title>{$title}</dc:title>";
+                return "<dc:title>" . $this->escape($title) . "</dc:title>";
             }
             return "";
         }
@@ -187,9 +192,9 @@ if (!class_exists('VB_Metadata_Export_DC')) {
         {
             $include_excerpt = $this->common->get_settings_field_value("include_excerpt");
             if ($include_excerpt) {
-                $excerpt = esc_html(strip_tags(get_the_excerpt($post)));
+                $excerpt = strip_tags(get_the_excerpt($post));
                 if (!empty($excerpt)) {
-                    return "<dc:description>{$excerpt}</dc:description>";
+                    return "<dc:description>" . $this->escape($excerpt) . "</dc:description>";
                 }
             }
             return "";
@@ -197,20 +202,20 @@ if (!class_exists('VB_Metadata_Export_DC')) {
 
         public function render_publisher($post)
         {
-            $publisher = esc_html($this->common->get_settings_field_value("publisher"));
+            $publisher = $this->common->get_settings_field_value("publisher");
             if (!empty($publisher)) {
-                return "<dc:publisher>{$publisher}</dc:publisher>";
+                return "<dc:publisher>" . $this->escape($publisher) . "</dc:publisher>";
             }
             return "";
         }
 
         public function render_copyright($post)
         {
-            $copyright_general = esc_html($this->common->get_settings_field_value("copyright_general"));
-            $copyright_custom = esc_html($this->common->get_post_meta_field_value("copyright_meta_key", $post));
+            $copyright_general = $this->common->get_settings_field_value("copyright_general");
+            $copyright_custom = $this->common->get_post_meta_field_value("copyright_meta_key", $post);
             $copyright = !empty($copyright_custom) ? $copyright_custom : $copyright_general;
             if (!empty($copyright)) {
-                return "<dc:rights>{$copyright}</dc:rights>";
+                return "<dc:rights>" . $this->escape($copyright) . "</dc:rights>";
             }
             return "";
         }
@@ -241,7 +246,7 @@ if (!class_exists('VB_Metadata_Export_DC')) {
                 "",
                 array(
                     "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n",
-                    "<dc xmlns=\"http://www.openarchives.org/OAI/2.0/oai_dc/\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xsi:schemaLocation=\"http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd http://dublincore.org/schemas/xmls/simpledc20021212.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n",
+                    "<dc xmlns=\"http://www.openarchives.org/OAI/2.0/oai_dc/\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xsi:schemaLocation=\"http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd http://purl.org/dc/elements/1.1/ http://dublincore.org/schemas/xmls/simpledc20021212.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n",
                     $this->render_identifier($post),
                     $this->render_title($post),
                     $this->render_author($post),

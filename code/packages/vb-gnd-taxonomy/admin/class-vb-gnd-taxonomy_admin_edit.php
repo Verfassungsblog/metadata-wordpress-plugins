@@ -197,7 +197,7 @@ if (!class_exists('VB_GND_Taxonomy_Admin_Edit')) {
                 if (!$this->lobid->check_gnd_entity_exists($gnd_id)) {
                     return new WP_Error(
                         $this->common->plugin_name . "_invalid_gndid",
-                        "The provided GND-ID '${gnd_id}' does not exist in lobid.org."
+                        "The provided GND-ID '{$gnd_id}' does not exist in lobid.org."
                     );
                 }
             }

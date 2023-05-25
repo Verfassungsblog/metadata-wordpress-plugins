@@ -16,6 +16,11 @@ if (!class_exists('VB_Metadata_Export_OAI_PMH')) {
             $this->common = new VB_Metadata_Export_Common($plugin_name);
         }
 
+        protected function escape($str)
+        {
+            return htmlspecialchars(html_entity_decode($str), ENT_XML1, 'UTF-8');
+        }
+
         protected function date_to_iso8601($date) {
             return $date->format("Y-m-d\TH:i:s\Z");
         }
@@ -100,7 +105,7 @@ if (!class_exists('VB_Metadata_Export_OAI_PMH')) {
         protected function implode_query_arguments($query) {
             $arguments = array();
             foreach ($query as $key => $value) {
-                array_push($arguments, "{$key}=\"${value}\"");
+                array_push($arguments, "{$key}=\"{$value}\"");
             };
             return implode(" ", $arguments);
         }
@@ -111,10 +116,10 @@ if (!class_exists('VB_Metadata_Export_OAI_PMH')) {
                 $post->post_status == "trash" ? " status=\"deleted\"" : "",
                 ">",
                 "<identifier>",
-                $this->get_post_identifier($post),
+                $this->escape($this->get_post_identifier($post)),
                 "</identifier>",
                 "<datestamp>",
-                $this->post_date_to_iso8601($post->post_modified_gmt),
+                $this->escape($this->post_date_to_iso8601($post->post_modified_gmt)),
                 "</datestamp>",
                 "<setSpec>posts</setSpec>",
                 "</header>",
@@ -345,8 +350,8 @@ if (!class_exists('VB_Metadata_Export_OAI_PMH')) {
                     xsi:schemaLocation=\"http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd\"
                     xmlns=\"http://www.openarchives.org/OAI/2.0/\"
                     xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">",
-                "<responseDate>{$response_date}</responseDate>",
-                "<request {$request_arguments}>{$base_url}</request>",
+                "<responseDate>" . $this->escape($response_date) . "</responseDate>",
+                "<request {$request_arguments}>" . $this->escape($base_url) . "</request>",
                 $content,
             "</OAI-PMH>"));
             return $this->common->format_xml($xml);
@@ -359,18 +364,18 @@ if (!class_exists('VB_Metadata_Export_OAI_PMH')) {
 
         public function render_identify() {
             // example: https://services.dnb.de/oai/repository?verb=Identify
-            $blog_title = esc_html($this->common->get_settings_field_value("blog_title"));
+            $blog_title = $this->common->get_settings_field_value("blog_title");
             $base_url = $this->get_base_url();
             $earliest_date = $this->get_earliest_post_date();
-            $admin_email = esc_html($this->common->get_settings_field_value("oai-pmh_admin_email"));
+            $admin_email = $this->common->get_settings_field_value("oai-pmh_admin_email");
 
             $xml = implode("", array(
                 "<Identify>",
-                "<repositoryName>{$blog_title}</repositoryName>",
-                "<baseURL>{$base_url}</baseURL>",
+                "<repositoryName>" . $this->escape($blog_title) . "</repositoryName>",
+                "<baseURL>" . $this->escape($base_url) . "</baseURL>",
                 "<protocolVersion>2.0</protocolVersion>",
-                "<adminEmail>{$admin_email}</adminEmail>",
-                "<earliestDatestamp>{$earliest_date}</earliestDatestamp>",
+                "<adminEmail>" . $this->escape($admin_email) . "</adminEmail>",
+                "<earliestDatestamp>" . $this->escape($earliest_date) . "</earliestDatestamp>",
                 "<deletedRecord>transient</deletedRecord>",
                 "<granularity>YYYY-MM-DDThh:mm:ssZ</granularity>",
                 "</Identify>",

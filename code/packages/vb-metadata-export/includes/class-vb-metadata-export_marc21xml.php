@@ -8,32 +8,34 @@ if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
     {
         protected $common;
 
-        protected $dc_author_fix;
-
-        public function __construct($plugin_name, $dc_author_fix=false)
+        public function __construct($plugin_name)
         {
             $this->common = new VB_Metadata_Export_Common($plugin_name);
-            $this->dc_author_fix = $dc_author_fix;
+        }
+
+        protected function escape($str)
+        {
+            return htmlspecialchars(html_entity_decode($str), ENT_XML1, 'UTF-8');
         }
 
         protected function render_subfield_from_value($value, $subfield_code)
         {
             if (!empty($value)) {
-                return "<marc21:subfield code=\"{$subfield_code}\">{$value}</marc21:subfield>";
+                return "<marc21:subfield code=\"{$subfield_code}\">" . $this->escape($value) . "</marc21:subfield>";
             }
             return "";
         }
 
         protected function render_subfield_from_option($field_name, $subfield_code)
         {
-            $value = esc_html($this->common->get_settings_field_value($field_name));
+            $value = $this->common->get_settings_field_value($field_name);
             return $this->render_subfield_from_value($value, $subfield_code);
         }
 
         protected function get_author_name($author)
         {
-            $last_name = esc_html(get_the_author_meta("last_name", $author));
-            $first_name = esc_html(get_the_author_meta("first_name", $author));
+            $last_name = get_the_author_meta("last_name", $author);
+            $first_name = get_the_author_meta("first_name", $author);
 
             $author = "";
             if (!empty($last_name) && !empty($first_name)) {
@@ -46,8 +48,8 @@ if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
 
         protected function get_coauthor_name($coauthor)
         {
-            $last_name = esc_html($coauthor->last_name);
-            $first_name = esc_html($coauthor->first_name);
+            $last_name = $coauthor->last_name;
+            $first_name = $coauthor->first_name;
 
             $author = "";
             if (!empty($last_name) && !empty($first_name)) {
@@ -82,57 +84,79 @@ if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
         }
 
         protected function get_post_language($post) {
-            $language = esc_html($this->common->get_settings_field_value("language"));
-            $language_alternate_category = esc_html($this->common->get_settings_field_value("language_alternate_category"));
+            $language = $this->common->get_settings_field_value("language");
+            $language_alternate_category = $this->common->get_settings_field_value("language_alternate_category");
             if ($this->is_post_in_category($post, $language_alternate_category)) {
-                $language_alternate = esc_html($this->common->get_settings_field_value("language_alternate"));
+                $language_alternate = $this->common->get_settings_field_value("language_alternate");
                 $language = $language_alternate;
             }
             return $language;
         }
 
-        public function render_leader($post)
+        protected function render_leader($post)
         {
             // leader definition see: https://www.loc.gov/marc/bibliographic/bdleader.html
             $podcast_category = $this->common->get_settings_field_value("podcast_category");
             $leader_field = $this->is_post_in_category($post, $podcast_category) ? "marc21_podcast_leader" : "marc21_leader";
-            $leader = esc_html(str_replace("_", " ", $this->common->get_settings_field_value($leader_field)));
+            $leader = str_replace("_", " ", $this->common->get_settings_field_value($leader_field));
             if (!empty($leader)) {
-                return "<marc21:leader>{$leader}</marc21:leader>";
+                return "<marc21:leader>" . $this->escape($leader) . "</marc21:leader>";
             }
             return "";
         }
 
-        public function render_control_numbers($post)
+        protected function render_control_field_identifier($post)
         {
-            // control number definition see: https://www.loc.gov/marc/bibliographic/bd001.html
-            $use_doi = $this->common->get_settings_field_value("marc21_doi_as_control_number");
-            if ($use_doi) {
-                $doi = $this->common->get_post_meta_field_value("doi_meta_key", $post);
-                $control_number = esc_html($doi);
-            } else {
-                $control_number = $post->ID;
-            }
-            $identifier = esc_html($this->common->get_settings_field_value("marc21_control_number_identifier"));
+            $identifier = $this->common->get_settings_field_value("marc21_control_number_identifier");
 
+            if(!empty($identifier)) {
+                return "<marc21:controlfield tag=\"003\">" . $this->escape($identifier) . "</marc21:controlfield>";
+            }
+            return "";
+        }
+
+        protected function render_control_field_physical_description($post)
+        {
             $podcast_category = $this->common->get_settings_field_value("podcast_category");
             $physical_description_field = $this->is_post_in_category($post, $podcast_category) ?
                  "marc21_podcast_physical_description" : "marc21_physical_description";
-            $physical_description = esc_html($this->common->get_settings_field_value($physical_description_field));
+            $physical_description = $this->common->get_settings_field_value($physical_description_field);
 
+            if (!empty($physical_description)) {
+                return "<marc21:controlfield tag=\"007\">" . $this->escape($physical_description) . "</marc21:controlfield>";
+            }
+            return "";
+        }
+
+        protected function render_control_field_008($post)
+        {
             $date = get_the_date("ymd", $post);
             $date = empty($date) ? "||||||" : $date;
             $year = get_the_date("Y", $post);
             $year = empty($year) ? "||||" : $year;
             $language = $this->get_post_language($post);
             $language = empty($language) ? "|||" : $language;
+            $code = "{$date}s{$year}||||xx#|||||o|||| ||| 0|{$language}||";
+            return "<marc21:controlfield tag=\"008\">" . $this->escape($code) . "</marc21:controlfield>";
+        }
+
+        protected function render_control_numbers($post)
+        {
+            // control number definition see: https://www.loc.gov/marc/bibliographic/bd001.html
+            $use_doi = $this->common->get_settings_field_value("marc21_doi_as_control_number");
+            if ($use_doi) {
+                $doi = $this->common->get_post_meta_field_value("doi_meta_key", $post);
+                $control_number = $doi;
+            } else {
+                $control_number = $post->ID;
+            }
 
             if (!empty($control_number)) {
                 return implode("", array(
-                    "<marc21:controlfield tag=\"001\">{$control_number}</marc21:controlfield>",
-                    !empty($identifier) ? "<marc21:controlfield tag=\"003\">{$identifier}</marc21:controlfield>" : "",
-                    !empty($physical_description) ? "<marc21:controlfield tag=\"007\">{$physical_description}</marc21:controlfield>" : "",
-                    "<marc21:controlfield tag=\"008\">{$date}s{$year}||||xx#|||||o|||| ||| 0|{$language}||</marc21:controlfield>"
+                    "<marc21:controlfield tag=\"001\">" . $this->escape($control_number) . "</marc21:controlfield>",
+                    $this->render_control_field_identifier($post),
+                    $this->render_control_field_physical_description($post),
+                    $this->render_control_field_008($post),
                 ));
             }
             return "";
@@ -140,7 +164,7 @@ if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
 
         public function render_subfield_orcid($user_id)
         {
-            $orcid = esc_html($this->common->get_user_meta_field_value("orcid_meta_key", $user_id));
+            $orcid = $this->common->get_user_meta_field_value("orcid_meta_key", $user_id);
             if (!empty($orcid)) {
                 $orcid = "(orcid)" .$orcid;
             }
@@ -149,7 +173,7 @@ if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
 
         public function render_subfield_gndid($user_id)
         {
-            $gndid = esc_html($this->common->get_user_meta_field_value("gndid_meta_key", $user_id));
+            $gndid = $this->common->get_user_meta_field_value("gndid_meta_key", $user_id);
             if (!empty($gndid)) {
                 $gndid = "(DE-588)" .$gndid;
             }
@@ -158,10 +182,10 @@ if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
 
         public function render_datafield_024($post)
         {
-            $doi = esc_html($this->common->get_post_meta_field_value("doi_meta_key", $post));
+            $doi = $this->common->get_post_meta_field_value("doi_meta_key", $post);
             if (!empty($doi)) {
                 return "<marc21:datafield tag=\"024\" ind1=\"7\" ind2=\" \">
-                    <marc21:subfield code=\"a\">{$doi}</marc21:subfield>
+                    <marc21:subfield code=\"a\">" . $this->escape($doi) . "</marc21:subfield>
                     <marc21:subfield code=\"2\">doi</marc21:subfield>
                 </marc21:datafield>";
             }
@@ -173,7 +197,7 @@ if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
             $control_number = $post->ID;
             if (!empty($control_number)) {
                 return "<marc21:datafield tag=\"035\" ind1=\" \" ind2=\" \">
-                    <marc21:subfield code=\"a\">{$control_number}</marc21:subfield>
+                    <marc21:subfield code=\"a\">". $this->escape($control_number) . "</marc21:subfield>
                 </marc21:datafield>";
             }
             return "";
@@ -184,7 +208,7 @@ if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
             $language = $this->get_post_language($post);
             if (!empty($language)) {
                 return "<marc21:datafield tag=\"041\" ind1=\" \" ind2=\" \">
-                    <marc21:subfield code=\"a\">{$language}</marc21:subfield>
+                    <marc21:subfield code=\"a\">" . $this->escape($language) . "</marc21:subfield>
                 </marc21:datafield>";
             }
             return "";
@@ -192,14 +216,14 @@ if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
 
         public function render_datafield_084($post)
         {
-            $global_ddc = esc_html($this->common->get_settings_field_value("ddc_general"));
-            $post_ddc = esc_html($this->common->get_post_meta_field_value("ddc_meta_key", $post));
+            $global_ddc = $this->common->get_settings_field_value("ddc_general");
+            $post_ddc = $this->common->get_post_meta_field_value("ddc_meta_key", $post);
             $combined_ddc = array_merge(explode(",", $global_ddc), explode(",", $post_ddc));
             $trimmed_ddc = array_filter(array_map('trim', $combined_ddc));
             $xml = "";
             foreach ($trimmed_ddc as $ddc) {
                 $xml = $xml . "<marc21:datafield tag=\"082\" ind1=\"0\" ind2=\"4\">
-                    <marc21:subfield code=\"a\">{$ddc}</marc21:subfield>
+                    <marc21:subfield code=\"a\">" . $this->escape($ddc) . "</marc21:subfield>
                     <marc21:subfield code=\"2\">23</marc21:subfield>
                 </marc21:datafield>";
             }
@@ -212,11 +236,11 @@ if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
             if (!empty($post_author)) {
                 return implode("", array(
                     "<marc21:datafield tag=\"100\" ind1=\"1\" ind2=\" \">",
-                    "<marc21:subfield code=\"a\">${post_author}</marc21:subfield>",
-                    $this->dc_author_fix ? "" : "<marc21:subfield code=\"e\">Author</marc21:subfield>",
-                    $this->dc_author_fix ? "": "<marc21:subfield code=\"4\">aut</marc21:subfield>",
-                    $this->dc_author_fix ? "" : $this->render_subfield_orcid($post->post_author),
-                    $this->dc_author_fix ? "" : $this->render_subfield_gndid($post->post_author),
+                    "<marc21:subfield code=\"a\">" . $this->escape($post_author) . "</marc21:subfield>",
+                    "<marc21:subfield code=\"e\">Author</marc21:subfield>",
+                    "<marc21:subfield code=\"4\">aut</marc21:subfield>",
+                    $this->render_subfield_orcid($post->post_author),
+                    $this->render_subfield_gndid($post->post_author),
                     "</marc21:datafield>")
                 );
             }
@@ -225,8 +249,8 @@ if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
 
         public function render_datafield_245($post)
         {
-            $title = esc_html(get_the_title($post));
-            $subheadline = esc_html($this->common->get_post_meta_field_value("subheadline_meta_key", $post));
+            $title = get_the_title($post);
+            $subheadline = $this->common->get_post_meta_field_value("subheadline_meta_key", $post);
             $include_subheadline = $this->common->get_settings_field_value("include_subheadline");
             if ($include_subheadline && !empty($subheadline)) {
                 $title = $title . " - " . $subheadline;
@@ -249,7 +273,7 @@ if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
 
         public function render_datafield_264($post)
         {
-            $publisher = esc_html($this->common->get_settings_field_value("publisher"));
+            $publisher = $this->common->get_settings_field_value("publisher");
             $date = get_the_date("Y-m-d", $post);
 
             $subfields = implode("", array(
@@ -270,14 +294,14 @@ if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
             $podcast_category = $this->common->get_settings_field_value("podcast_category");
             $content_type_field = $this->is_post_in_category($post, $podcast_category) ?
                  "marc21_podcast_content_type" : "marc21_content_type";
-            $content_type = esc_html($this->common->get_settings_field_value($content_type_field));
+            $content_type = $this->common->get_settings_field_value($content_type_field);
             $content_type_array = explode(",", $content_type);
             if (!empty($content_type) && count($content_type_array) == 3) {
                 return implode("", array(
                     "<marc21:datafield tag=\"336\" ind1=\" \" ind2=\" \">
-                    <marc21:subfield code=\"a\">{$content_type_array[0]}</marc21:subfield>
-                    <marc21:subfield code=\"b\">{$content_type_array[1]}</marc21:subfield>
-                    <marc21:subfield code=\"2\">{$content_type_array[2]}</marc21:subfield>
+                    <marc21:subfield code=\"a\">" . $this->escape($content_type_array[0]) . "</marc21:subfield>
+                    <marc21:subfield code=\"b\">" . $this->escape($content_type_array[1]) . "</marc21:subfield>
+                    <marc21:subfield code=\"2\">" . $this->escape($content_type_array[2]) . "</marc21:subfield>
                     </marc21:datafield>"
                 ));
             }
@@ -306,10 +330,10 @@ if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
         {
             $include_excerpt = $this->common->get_settings_field_value("include_excerpt");
             if ($include_excerpt) {
-                $excerpt = esc_html(strip_tags(get_the_excerpt($post)));
+                $excerpt = strip_tags(get_the_excerpt($post));
                 if (!empty($excerpt)) {
                 return "<marc21:datafield tag=\"520\" ind1=\" \" ind2=\" \">
-                        <marc21:subfield code=\"a\">${excerpt}</marc21:subfield>
+                        <marc21:subfield code=\"a\">" . $this->escape($excerpt) . "</marc21:subfield>
                     </marc21:datafield>";
                 }
             }
@@ -318,15 +342,15 @@ if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
 
         public function render_datafield_536($post)
         {
-            $funding_general = esc_html($this->common->get_settings_field_value("funding_general"));
-            $funding_custom = esc_html($this->common->get_post_meta_field_value("funding_meta_key", $post));
+            $funding_general = $this->common->get_settings_field_value("funding_general");
+            $funding_custom = $this->common->get_post_meta_field_value("funding_meta_key", $post);
             $funding = !empty($funding_custom) ? $funding_custom : $funding_general;
             if (!empty($funding)) {
                 return implode(
                     "",
                     array(
                         "<marc21:datafield tag=\"536\" ind1=\" \" ind2=\" \">",
-                        "<marc21:subfield code=\"a\">{$funding}</marc21:subfield>",
+                        "<marc21:subfield code=\"a\">" . $this->escape($funding) . "</marc21:subfield>",
                         "</marc21:datafield>"
                     )
                 );
@@ -336,15 +360,15 @@ if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
 
         public function render_datafield_540($post)
         {
-            $copyright_general = esc_html($this->common->get_settings_field_value("copyright_general"));
-            $copyright_custom = esc_html($this->common->get_post_meta_field_value("copyright_meta_key", $post));
+            $copyright_general = $this->common->get_settings_field_value("copyright_general");
+            $copyright_custom = $this->common->get_post_meta_field_value("copyright_meta_key", $post);
             $copyright = !empty($copyright_custom) ? $copyright_custom : $copyright_general;
             if (!empty($copyright)) {
                 return implode(
                     "",
                     array(
                         "<marc21:datafield tag=\"540\" ind1=\" \" ind2=\" \">",
-                        "<marc21:subfield code=\"a\">{$copyright}</marc21:subfield>",
+                        "<marc21:subfield code=\"a\">" . $this->escape($copyright) . "</marc21:subfield>",
                         "</marc21:datafield>"
                     )
                 );
@@ -358,9 +382,8 @@ if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
             $tags = !empty($tags) && !is_wp_error($tags) ? $tags : array();
             $xml = "";
             foreach($tags as $tag) {
-                $tag_escaped = esc_html($tag->name);
                 $xml = $xml . "<marc21:datafield tag=\"650\" ind1=\"1\" ind2=\"4\">
-                        <marc21:subfield code=\"a\">{$tag_escaped}</marc21:subfield>
+                        <marc21:subfield code=\"a\">" . $this->escape($tag->name) . "</marc21:subfield>
                     </marc21:datafield>
                 ";
             }
@@ -368,12 +391,10 @@ if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
             $gnd_terms = get_the_terms($post, "gnd");
             $gnd_terms = !empty($gnd_terms) && !is_wp_error($gnd_terms) ? $gnd_terms : array();
             foreach($gnd_terms as $gnd_term) {
-                $name_escaped = esc_html($gnd_term->name);
-                $slug_escaped = esc_html($gnd_term->slug);
                 $xml = $xml . "<marc21:datafield tag=\"650\" ind1=\"1\" ind2=\"7\">
-                        <marc21:subfield code=\"0\">(DE-588){$slug_escaped}</marc21:subfield>
+                        <marc21:subfield code=\"0\">(DE-588)" . $this->escape($gnd_term->slug) . "</marc21:subfield>
                         <marc21:subfield code=\"2\">gnd</marc21:subfield>
-                        <marc21:subfield code=\"a\">{$name_escaped}</marc21:subfield>
+                        <marc21:subfield code=\"a\">" . $this->escape($gnd_term->name) . "</marc21:subfield>
                     </marc21:datafield>
                 ";
             }
@@ -391,11 +412,11 @@ if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
                 }
                 $xml = $xml . implode("", array(
                     "<marc21:datafield tag=\"700\" ind1=\"1\" ind2=\" \">",
-                    "<marc21:subfield code=\"a\">{$coauthor_name}</marc21:subfield>",
-                    $this->dc_author_fix ? "" : "<marc21:subfield code=\"e\">Author</marc21:subfield>",
-                    $this->dc_author_fix ? "" : "<marc21:subfield code=\"4\">aut</marc21:subfield>",
-                    $this->dc_author_fix ? "" : $this->render_subfield_orcid($coauthor->ID),
-                    $this->dc_author_fix ? "" : $this->render_subfield_gndid($coauthor->ID),
+                    "<marc21:subfield code=\"a\">" . $this->escape($coauthor_name) . "</marc21:subfield>",
+                    "<marc21:subfield code=\"e\">Author</marc21:subfield>",
+                    "<marc21:subfield code=\"4\">aut</marc21:subfield>",
+                    $this->render_subfield_orcid($coauthor->ID),
+                    $this->render_subfield_gndid($coauthor->ID),
                     "</marc21:datafield>",
                 ));
             }
@@ -418,13 +439,13 @@ if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
 
         public function render_datafield_856($post)
         {
-            $post_url = esc_html(get_the_permalink($post));
+            $post_url = get_the_permalink($post);
             if (!empty($post_url)) {
                 return implode(
                     "",
                     array(
                         "<marc21:datafield tag=\"856\" ind1=\"4\" ind2=\"0\">",
-                        "<marc21:subfield code=\"u\">{$post_url}</marc21:subfield>",
+                        "<marc21:subfield code=\"u\">" . $this->escape($post_url) . "</marc21:subfield>",
                         "<marc21:subfield code=\"y\">raw object</marc21:subfield>",
                         "</marc21:datafield>"
                     )
