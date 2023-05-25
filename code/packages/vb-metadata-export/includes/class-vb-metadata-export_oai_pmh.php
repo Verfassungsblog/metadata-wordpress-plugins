@@ -182,7 +182,8 @@ if (!class_exists('VB_Metadata_Export_OAI_PMH')) {
                 'post_type' => 'post',
                 'post_status' => array('publish', 'trash'),
                 'posts_per_page' => $this->get_list_size(),
-                'order_by' => 'modified'
+                'order_by' => 'modified',
+                'ignore_sticky_posts' => true,
             );
 
             $require_doi = $this->common->get_settings_field_value("require_doi");
