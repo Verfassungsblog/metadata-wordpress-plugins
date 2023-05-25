@@ -61,13 +61,6 @@ if (!class_exists('VB_DOAJ_Submit_Update')) {
                 return;
             }
 
-            // iterate over all posts that require update because they were modified recently
-            $modified_query = $this->queries->query_posts_that_need_submitting_because_modified($batch);
-            if ($this->submit_posts_from_query($modified_query)) {
-                // stop if any posts were submitted
-                return;
-            }
-
             // iterate over all posts that require identifying
             $identify_query = $this->queries->query_posts_that_need_identifying($batch);
             if ($identify_query->post_count > 0) {
@@ -79,6 +72,14 @@ if (!class_exists('VB_DOAJ_Submit_Update')) {
                 }
                 return;
             }
+
+            // iterate over all posts that require update because they were modified recently
+            $modified_query = $this->queries->query_posts_that_need_submitting_because_modified($batch);
+            if ($this->submit_posts_from_query($modified_query)) {
+                // stop if any posts were submitted
+                return;
+            }
+
         }
 
         public function do_identify() {

@@ -32,6 +32,19 @@ if (!class_exists('VB_DOAJ_Submit_Queries')) {
             }
         }
 
+        protected function add_batch_arguments_to_query(&$query_args, $batch)
+        {
+            if ($batch) {
+                $query_args['posts_per_page'] = $batch;
+                $query_args['no_found_rows'] = true;
+                $query_args['orderby'] = 'modified';
+                $query_args['order'] = 'ASC';
+            } else {
+                $query_args['nopaging'] = true;
+                $query_args['fields'] = 'ids';
+            }
+        }
+
         public function get_number_of_posts_that_were_not_submitted_yet()
         {
             $query = $this->query_posts_that_were_not_submitted_yet(false);
@@ -43,35 +56,20 @@ if (!class_exists('VB_DOAJ_Submit_Queries')) {
             $query_args = array(
                 'post_type' => 'post',
                 'post_status' => array('publish'),
-                'orderby' => 'modified',
-                'order' => 'ASC',
+                'ignore_sticky_posts' => true,
                 'meta_query' => array(
                     'relation' => 'AND',
                     array(
                         'relation' => 'OR',
                         array(
-                            'relation' => 'AND',
-                            array(
-                                'key' => $this->common->get_identify_timestamp_meta_key(),
-                                'compare' => "EXIST",
-                            ),
-                            array(
-                                'key' => $this->common->get_identify_timestamp_meta_key(),
-                                'value' => "",
-                                'compare' => "!=",
-                            ),
+                            'key' => $this->common->get_identify_timestamp_meta_key(),
+                            'value' => "",
+                            'compare' => "!=",
                         ),
                         array(
-                            'relation' => 'AND',
-                            array(
-                                'key' => $this->common->get_article_id_meta_key(),
-                                'compare' => "EXISTS",
-                            ),
-                            array(
-                                'key' => $this->common->get_article_id_meta_key(),
-                                'value' => "",
-                                'compare' => "!=",
-                            ),
+                            'key' => $this->common->get_article_id_meta_key(),
+                            'value' => "",
+                            'compare' => "!=",
                         ),
                     ),
                     array(
@@ -89,12 +87,7 @@ if (!class_exists('VB_DOAJ_Submit_Queries')) {
                 ),
             );
 
-            if ($batch) {
-                $query_args['posts_per_page'] = $batch;
-            } else {
-                $query_args['nopaging'] = true;
-            }
-
+            $this->add_batch_arguments_to_query($query_args, $batch);
             $this->add_doi_requirement_to_query($query_args);
 
             return new WP_Query( $query_args );
@@ -112,22 +105,13 @@ if (!class_exists('VB_DOAJ_Submit_Queries')) {
             $query_args = array(
                 'post_type' => 'post',
                 'post_status' => array('publish', 'trash'),
-                'orderby' => 'modified',
-                'order' => 'ASC',
+                'ignore_sticky_posts' => true,
                 'meta_query' => array(
                     'relation' => 'AND',
                     array(
                         'key' => $this->common->get_identify_timestamp_meta_key(),
-                        'compare' => "EXIST",
-                    ),
-                    array(
-                        'key' => $this->common->get_identify_timestamp_meta_key(),
                         'value' => "",
                         'compare' => "!=",
-                    ),
-                    array(
-                        'key' => $this->common->get_submit_timestamp_meta_key(),
-                        'compare' => "EXISTS",
                     ),
                     array(
                         'key' => $this->common->get_submit_timestamp_meta_key(),
@@ -137,11 +121,7 @@ if (!class_exists('VB_DOAJ_Submit_Queries')) {
                 )
             );
 
-            if ($batch) {
-                $query_args['posts_per_page'] = $batch;
-            } else {
-                $query_args['nopaging'] = true;
-            }
+            $this->add_batch_arguments_to_query($query_args, $batch);
 
             // articles that have been modified since date
             $since = $this->status->get_last_updated_post_modified_date();
@@ -167,8 +147,7 @@ if (!class_exists('VB_DOAJ_Submit_Queries')) {
             $query_args = array(
                 'post_type' => 'post',
                 'post_status' => array('publish'),
-                'orderby' => 'modified',
-                'order' => 'ASC',
+                'ignore_sticky_posts' => true,
                 'meta_query' => array(
                     'relation' => 'AND',
                     array(
@@ -198,12 +177,7 @@ if (!class_exists('VB_DOAJ_Submit_Queries')) {
                 ),
             );
 
-            if ($batch) {
-                $query_args['posts_per_page'] = $batch;
-            } else {
-                $query_args['nopaging'] = true;
-            }
-
+            $this->add_batch_arguments_to_query($query_args, $batch);
             $this->add_doi_requirement_to_query($query_args);
 
             return new WP_Query( $query_args );
@@ -215,46 +189,28 @@ if (!class_exists('VB_DOAJ_Submit_Queries')) {
             return $query->post_count;
         }
 
-        public function query_posts_that_were_identified($batch)
+        protected function query_posts_that_were_identified($batch)
         {
             $query_args = array(
                 'post_type' => 'post',
                 'post_status' => array('publish'),
+                'ignore_sticky_posts' => true,
                 'meta_query' => array(
                     'relation' => 'OR',
                     array(
-                        'relation' => 'AND',
-                        array(
-                            'key' => $this->common->get_identify_timestamp_meta_key(),
-                            'compare' => "EXISTS",
-                        ),
-                        array(
-                            'key' => $this->common->get_identify_timestamp_meta_key(),
-                            'value' => "",
-                            'compare' => "!=",
-                        ),
+                        'key' => $this->common->get_identify_timestamp_meta_key(),
+                        'value' => "",
+                        'compare' => "!=",
                     ),
                     array(
-                        'relation' => 'AND',
-                        array(
-                            'key' => $this->common->get_article_id_meta_key(),
-                            'compare' => "EXISTS",
-                        ),
-                        array(
-                            'key' => $this->common->get_article_id_meta_key(),
-                            'value' => "",
-                            'compare' => "!=",
-                        ),
-                    )
+                        'key' => $this->common->get_article_id_meta_key(),
+                        'value' => "",
+                        'compare' => "!=",
+                    ),
                 )
             );
 
-            if ($batch) {
-                $query_args['posts_per_page'] = $batch;
-            } else {
-                $query_args['nopaging'] = true;
-            }
-
+            $this->add_batch_arguments_to_query($query_args, $batch);
             return new WP_Query( $query_args );
         }
 
@@ -264,17 +220,14 @@ if (!class_exists('VB_DOAJ_Submit_Queries')) {
             return $query->post_count;
         }
 
-        public function query_posts_that_have_article_id($batch)
+        protected function query_posts_that_have_article_id($batch)
         {
             $query_args = array(
                 'post_type' => 'post',
                 'post_status' => array('publish'),
+                'ignore_sticky_posts' => true,
                 'meta_query' => array(
                     'relation' => 'AND',
-                    array(
-                        'key' => $this->common->get_article_id_meta_key(),
-                        'compare' => "EXISTS",
-                    ),
                     array(
                         'key' => $this->common->get_article_id_meta_key(),
                         'value' => "",
@@ -283,12 +236,7 @@ if (!class_exists('VB_DOAJ_Submit_Queries')) {
                 )
             );
 
-            if ($batch) {
-                $query_args['posts_per_page'] = $batch;
-            } else {
-                $query_args['nopaging'] = true;
-            }
-
+            $this->add_batch_arguments_to_query($query_args, $batch);
             return new WP_Query( $query_args );
         }
 
@@ -298,25 +246,18 @@ if (!class_exists('VB_DOAJ_Submit_Queries')) {
             return $query->post_count;
         }
 
-        public function query_posts_that_were_submitted($batch)
+        protected function query_posts_that_were_submitted($batch)
         {
             $query_args = array(
                 'post_type' => 'post',
                 'post_status' => array('publish'),
+                'ignore_sticky_posts' => true,
                 'meta_query' => array(
                     'relation' => 'AND',
                     array(
                         'key' => $this->common->get_submit_timestamp_meta_key(),
-                        'compare' => "EXISTS",
-                    ),
-                    array(
-                        'key' => $this->common->get_submit_timestamp_meta_key(),
                         'value' => "",
                         'compare' => "!=",
-                    ),
-                    array(
-                        'key' => $this->common->get_article_id_meta_key(),
-                        'compare' => "EXISTS",
                     ),
                     array(
                         'key' => $this->common->get_article_id_meta_key(),
@@ -326,12 +267,7 @@ if (!class_exists('VB_DOAJ_Submit_Queries')) {
                 )
             );
 
-            if ($batch) {
-                $query_args['posts_per_page'] = $batch;
-            } else {
-                $query_args['nopaging'] = true;
-            }
-
+            $this->add_batch_arguments_to_query($query_args, $batch);
             return new WP_Query( $query_args );
         }
 
