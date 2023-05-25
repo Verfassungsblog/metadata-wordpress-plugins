@@ -170,6 +170,19 @@ if (!class_exists('VB_Metadata_Export_Setting_Fields')) {
                         <br>For Example: <code>Podcast</code>",
                 ),
 
+                // ---------------- theme settings ---------------------
+
+                array(
+                    "name" => "template_priority",
+                    "type" => "string",
+                    "section" => "theme",
+                    "label" => "Template Priority",
+                    "placeholder" => "priority value",
+                    "description" => "The Wordpress template priority of the meta data export template. In case meta
+                        data is not rendered, try a higher priority or use debug tools to figure out a appropriate
+                        priority.",
+                ),
+
                 // ----------------  custom field settings -----------------
 
                 array(

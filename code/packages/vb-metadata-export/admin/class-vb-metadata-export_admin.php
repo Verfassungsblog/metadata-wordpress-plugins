@@ -44,6 +44,7 @@ if (!class_exists('VB_Metadata_Export_Admin')) {
                 "general" => "General",
                 "language" => "Language",
                 "content_type" => "Content Types",
+                "theme" => "Theme Settings",
                 "post_meta" => "Custom Fields for Posts",
                 "user_meta" => "Custom Fields for Users",
                 "marc21" => "Marc21 XML Settings",
@@ -59,6 +60,7 @@ if (!class_exists('VB_Metadata_Export_Admin')) {
                 "general" => "general",
                 "language" => "general",
                 "content_type" => "general",
+                "theme" => "general",
                 "post_meta" => "fields",
                 "user_meta" => "fields",
                 "marc21" => "marc21",
@@ -169,6 +171,19 @@ if (!class_exists('VB_Metadata_Export_Admin')) {
                 <?php echo __(
                     'By default all posts are assumed to be classic textual articles. By assigning posts to the
                     following categories, they can be assigned to a different content type.',
+                    "vb-metadata-export"
+                );
+                ?>
+            </p>
+            <?php
+        }
+
+        public function render_theme_section($args)
+        {
+            ?>
+            <p id="<?php echo esc_attr($args['id']); ?>">
+                <?php echo __(
+                    'Settings that might need to be customized depending on the Wordpress theme that is used.',
                     "vb-metadata-export"
                 );
                 ?>

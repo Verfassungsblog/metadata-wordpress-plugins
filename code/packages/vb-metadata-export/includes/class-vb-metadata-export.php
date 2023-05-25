@@ -74,7 +74,9 @@ if (!class_exists('VB_Metadata_Export')) {
             register_uninstall_hook($this->base_file, 'vb_metadata_export_uninstall');
 
             add_action("init", array($this, 'action_init'));
-            add_action("template_include", array($this, 'action_template_include'));
+
+            $template_priority = $this->common->get_settings_field_value("template_priority");
+            add_filter("template_include", array($this, 'action_template_include'), $template_priority, 1);
 
             $this->admin->run();
             $this->shortcode->run();

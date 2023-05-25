@@ -41,6 +41,9 @@ if (!class_exists('VB_Metadata_Export_Common')) {
                     // content types
                     "podcast_category" => "Podcast",
 
+                    // theme
+                    "template_priority" => 120,
+
                     // custom fields
                     "doi_meta_key" => "doi",
                     "subheadline_meta_key" => "subheadline",
@@ -82,6 +85,9 @@ if (!class_exists('VB_Metadata_Export_Common')) {
 
                     // language
                     "language" => "eng",
+
+                    // theme
+                    "template_priority" => 10,
 
                     // marc21xml
                     "marc21xml_enabled" => true,
