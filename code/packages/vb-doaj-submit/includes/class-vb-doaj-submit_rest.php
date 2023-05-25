@@ -42,6 +42,10 @@ if (!class_exists('VB_DOAJ_Submit_REST')) {
             if ($identify_by_permalink) {
                 // identify by permalink
                 $permalink = rawurlencode(get_the_permalink($post));
+
+                // rewrite staging permalinks
+                $permalink = str_replace("staging.verfassungsblog.de", "verfassungsblog.de", $permalink);
+
                 if (empty($permalink)) {
                     $this->status->set_last_error("[ Post id=" . $post->ID . "] has no permalink?!");
                     return false;

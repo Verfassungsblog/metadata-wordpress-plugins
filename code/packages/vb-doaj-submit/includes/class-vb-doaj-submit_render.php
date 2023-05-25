@@ -239,6 +239,10 @@ if (!class_exists('VB_DOAJ_Submit_Render')) {
             $this->last_error = null;
             $this->last_post = $post;
 
+            // rewrite staging permalinks
+            $permalink = get_the_permalink($post);
+            $permalink = str_replace("staging.verfassungsblog.de", "verfassungsblog.de", $permalink);
+
             $json_data = array(
                 'bibjson' => array_filter(array(
                     'title' => $this->render_title($post),
@@ -248,7 +252,7 @@ if (!class_exists('VB_DOAJ_Submit_Render')) {
                     'journal' => $this->render_journal($post),
                     'keywords' => $this->render_keywords($post),
                     'link' => array(array(
-                        'url' => get_the_permalink($post),
+                        'url' => $permalink,
                         'content_type' => 'HTML', # see FAQ at https://doaj.org/api/v3/docs
                         'type' => 'fulltext',
                     )),
