@@ -113,12 +113,12 @@ if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
             } else {
                 $control_number = $post->ID;
             }
-            $identifier = $this->common->get_settings_field_value("marc21_control_number_identifier");
+            $identifier = esc_html($this->common->get_settings_field_value("marc21_control_number_identifier"));
 
             $podcast_category = $this->common->get_settings_field_value("podcast_category");
             $physical_description_field = $this->is_post_in_category($post, $podcast_category) ?
                  "marc21_podcast_physical_description" : "marc21_physical_description";
-            $physical_description = $this->common->get_settings_field_value($physical_description_field);
+            $physical_description = esc_html($this->common->get_settings_field_value($physical_description_field));
 
             $date = get_the_date("ymd", $post);
             $date = empty($date) ? "||||||" : $date;
@@ -140,7 +140,7 @@ if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
 
         public function render_subfield_orcid($user_id)
         {
-            $orcid = $this->common->get_user_meta_field_value("orcid_meta_key", $user_id);
+            $orcid = esc_html($this->common->get_user_meta_field_value("orcid_meta_key", $user_id));
             if (!empty($orcid)) {
                 $orcid = "(orcid)" .$orcid;
             }
@@ -149,7 +149,7 @@ if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
 
         public function render_subfield_gndid($user_id)
         {
-            $gndid = $this->common->get_user_meta_field_value("gndid_meta_key", $user_id);
+            $gndid = esc_html($this->common->get_user_meta_field_value("gndid_meta_key", $user_id));
             if (!empty($gndid)) {
                 $gndid = "(DE-588)" .$gndid;
             }
@@ -192,8 +192,8 @@ if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
 
         public function render_datafield_084($post)
         {
-            $global_ddc = $this->common->get_settings_field_value("ddc_general");
-            $post_ddc = $this->common->get_post_meta_field_value("ddc_meta_key", $post);
+            $global_ddc = esc_html($this->common->get_settings_field_value("ddc_general"));
+            $post_ddc = esc_html($this->common->get_post_meta_field_value("ddc_meta_key", $post));
             $combined_ddc = array_merge(explode(",", $global_ddc), explode(",", $post_ddc));
             $trimmed_ddc = array_filter(array_map('trim', $combined_ddc));
             $xml = "";
@@ -270,7 +270,7 @@ if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
             $podcast_category = $this->common->get_settings_field_value("podcast_category");
             $content_type_field = $this->is_post_in_category($post, $podcast_category) ?
                  "marc21_podcast_content_type" : "marc21_content_type";
-            $content_type = $this->common->get_settings_field_value($content_type_field);
+            $content_type = esc_html($this->common->get_settings_field_value($content_type_field));
             $content_type_array = explode(",", $content_type);
             if (!empty($content_type) && count($content_type_array) == 3) {
                 return implode("", array(
@@ -318,8 +318,8 @@ if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
 
         public function render_datafield_536($post)
         {
-            $funding_general = $this->common->get_settings_field_value("funding_general");
-            $funding_custom = $this->common->get_post_meta_field_value("funding_meta_key", $post);
+            $funding_general = esc_html($this->common->get_settings_field_value("funding_general"));
+            $funding_custom = esc_html($this->common->get_post_meta_field_value("funding_meta_key", $post));
             $funding = !empty($funding_custom) ? $funding_custom : $funding_general;
             if (!empty($funding)) {
                 return implode(
@@ -336,8 +336,8 @@ if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
 
         public function render_datafield_540($post)
         {
-            $copyright_general = $this->common->get_settings_field_value("copyright_general");
-            $copyright_custom = $this->common->get_post_meta_field_value("copyright_meta_key", $post);
+            $copyright_general = esc_html($this->common->get_settings_field_value("copyright_general"));
+            $copyright_custom = esc_html($this->common->get_post_meta_field_value("copyright_meta_key", $post));
             $copyright = !empty($copyright_custom) ? $copyright_custom : $copyright_general;
             if (!empty($copyright)) {
                 return implode(
@@ -418,7 +418,7 @@ if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
 
         public function render_datafield_856($post)
         {
-            $post_url = get_the_permalink($post);
+            $post_url = esc_html(get_the_permalink($post));
             if (!empty($post_url)) {
                 return implode(
                     "",

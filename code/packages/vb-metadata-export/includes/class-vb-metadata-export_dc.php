@@ -105,8 +105,8 @@ if (!class_exists('VB_Metadata_Export_DC')) {
 
         public function render_ddc_subjects($post)
         {
-            $global_ddc = $this->common->get_settings_field_value("ddc_general");
-            $post_ddc = $this->common->get_post_meta_field_value("ddc_meta_key", $post);
+            $global_ddc = esc_html($this->common->get_settings_field_value("ddc_general"));
+            $post_ddc = esc_html($this->common->get_post_meta_field_value("ddc_meta_key", $post));
             $combined_ddc = array_merge(explode(",", $global_ddc), explode(",", $post_ddc));
             $trimmed_ddc = array_filter(array_map('trim', $combined_ddc));
 
@@ -197,7 +197,7 @@ if (!class_exists('VB_Metadata_Export_DC')) {
 
         public function render_publisher($post)
         {
-            $publisher = $this->common->get_settings_field_value("publisher");
+            $publisher = esc_html($this->common->get_settings_field_value("publisher"));
             if (!empty($publisher)) {
                 return "<dc:publisher>{$publisher}</dc:publisher>";
             }
@@ -206,8 +206,8 @@ if (!class_exists('VB_Metadata_Export_DC')) {
 
         public function render_copyright($post)
         {
-            $copyright_general = $this->common->get_settings_field_value("copyright_general");
-            $copyright_custom = $this->common->get_post_meta_field_value("copyright_meta_key", $post);
+            $copyright_general = esc_html($this->common->get_settings_field_value("copyright_general"));
+            $copyright_custom = esc_html($this->common->get_post_meta_field_value("copyright_meta_key", $post));
             $copyright = !empty($copyright_custom) ? $copyright_custom : $copyright_general;
             if (!empty($copyright)) {
                 return "<dc:rights>{$copyright}</dc:rights>";
