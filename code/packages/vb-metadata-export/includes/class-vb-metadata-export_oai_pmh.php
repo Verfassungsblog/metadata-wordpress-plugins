@@ -146,9 +146,9 @@ if (!class_exists('VB_Metadata_Export_OAI_PMH')) {
         }
 
         protected function local_to_utc_iso8601($utc_iso) {
-            $local = new Datetime("now", wp_timezone());
+            $utc_date = $this->iso8601_to_date($utc_iso);
             $date = new Datetime("now", new DateTimeZone("UTC"));
-            $date->setTimestamp($this->iso8601_to_date($utc_iso)->getTimestamp() - wp_timezone()->getOffset($local));
+            $date->setTimestamp($utc_date->getTimestamp() - wp_timezone()->getOffset($utc_date));
             return $this->date_to_iso8601($date);
         }
 
