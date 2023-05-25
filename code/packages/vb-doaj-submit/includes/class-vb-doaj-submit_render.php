@@ -215,7 +215,7 @@ if (!class_exists('VB_DOAJ_Submit_Render')) {
 
         protected function render_title($post)
         {
-            $title = esc_html(get_the_title($post));
+            $title = get_the_title($post);
             $include_subheadline = $this->common->get_settings_field_value("include_subheadline");
             if ($include_subheadline) {
                 $subheadline = esc_html($this->common->get_post_meta_field_value("subheadline_meta_key", $post));
@@ -281,7 +281,7 @@ if (!class_exists('VB_DOAJ_Submit_Render')) {
                 $this->last_error = "article has no identifier or identifier is empty";
                 return false;
             }
-            return json_encode($json_data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+            return json_encode($json_data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         }
     }
 }
