@@ -75,7 +75,7 @@ if (!class_exists('VB_Metadata_Export')) {
 
             add_action("init", array($this, 'action_init'));
 
-            $template_priority = $this->common->get_settings_field_value("template_priority");
+            $template_priority = (int)$this->common->get_settings_field_value("template_priority");
             add_filter("template_include", array($this, 'action_template_include'), $template_priority, 1);
 
             $this->admin->run();
