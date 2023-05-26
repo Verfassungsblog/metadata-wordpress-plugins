@@ -76,7 +76,7 @@ if (!class_exists('VB_DOAJ_Submit_Render')) {
             return array_slice(get_coauthors($post->ID), 1);
         }
 
-        protected function render_abstract($post)
+        protected function get_abstract($post)
         {
             $include_excerpt = $this->common->get_settings_field_value("include_excerpt");
             if (!$include_excerpt) {
@@ -143,7 +143,7 @@ if (!class_exists('VB_DOAJ_Submit_Render')) {
 
             $keywords = array();
             foreach($tags as $tag) {
-                $keywords = array_merge($keywords, array($tag->name));
+                $keywords = array_merge($keywords, array($this->escape($tag->name)));
             }
             return array_slice(array_values(array_filter($keywords)), 0, 6);
         }
@@ -154,7 +154,7 @@ if (!class_exists('VB_DOAJ_Submit_Render')) {
                 return false;
             }
             return array(
-                'id' => $eissn,
+                'id' => $this->escape($eissn),
                 'type' => 'eissn',
             );
         }
@@ -165,7 +165,7 @@ if (!class_exists('VB_DOAJ_Submit_Render')) {
                 return false;
             }
             return array(
-                'id' => $pissn,
+                'id' => $this->escape($pissn),
                 'type' => 'pissn',
             );
         }
@@ -177,7 +177,7 @@ if (!class_exists('VB_DOAJ_Submit_Render')) {
             }
             return array(
                 "type" => "doi",
-                "id" => $doi,
+                "id" => $this->escape($doi),
             );
         }
 
@@ -190,7 +190,7 @@ if (!class_exists('VB_DOAJ_Submit_Render')) {
             )));
         }
 
-        protected function render_issue_number($post)
+        protected function get_issue_number($post)
         {
             $issue_general = $this->common->get_settings_field_value("issue");
             $issue_custom = $this->common->get_post_meta_field_value("issue_meta_key", $post);
@@ -198,7 +198,7 @@ if (!class_exists('VB_DOAJ_Submit_Render')) {
             return empty($issue) ? false : $issue;
         }
 
-        protected function render_volume($post)
+        protected function get_volume($post)
         {
             $volume_general = $this->common->get_settings_field_value("volume");
             $volume_custom = $this->common->get_post_meta_field_value("volume_meta_key", $post);
@@ -209,8 +209,8 @@ if (!class_exists('VB_DOAJ_Submit_Render')) {
         protected function render_journal($post)
         {
             return array_filter(array(
-                'number' => $this->render_issue_number($post),
-                'volume' => $this->render_volume($post),
+                'number' => $this->escape($this->get_issue_number($post)),
+                'volume' => $this->escape($this->get_volume($post)),
                 // title is overwritten by DOAJ
                 // publisher is overwritten by DOAJ
                 // country is overwritten by DOAJ
@@ -218,7 +218,7 @@ if (!class_exists('VB_DOAJ_Submit_Render')) {
             ));
         }
 
-        protected function render_title($post)
+        protected function get_title($post)
         {
             $title = get_the_title($post);
             $include_subheadline = $this->common->get_settings_field_value("include_subheadline");
@@ -250,14 +250,14 @@ if (!class_exists('VB_DOAJ_Submit_Render')) {
 
             $json_data = array(
                 'bibjson' => array_filter(array(
-                    'title' => $this->render_title($post),
+                    'title' => $this->escape($this->get_title($post)),
                     'author' =>  $this->render_authors($post),
                     'identifier' => $this->render_identifier($post),
-                    'abstract' => $this->render_abstract($post),
+                    'abstract' => $this->escape($this->get_abstract($post)),
                     'journal' => $this->render_journal($post),
                     'keywords' => $this->render_keywords($post),
                     'link' => array(array(
-                        'url' => $permalink,
+                        'url' => $this->escape($permalink),
                         'content_type' => 'HTML', # see FAQ at https://doaj.org/api/v3/docs
                         'type' => 'fulltext',
                     )),
