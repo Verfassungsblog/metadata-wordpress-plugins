@@ -44,7 +44,7 @@ if (!class_exists('VB_DOAJ_Submit_Admin')) {
                 "fields" => "Custom Fields",
                 "example" => "Example",
                 "status" => "Status",
-                "stats" => "Statistcs",
+                "statistics" => "Statistcs",
             );
         }
 
@@ -457,7 +457,7 @@ if (!class_exists('VB_DOAJ_Submit_Admin')) {
             <?php
         }
 
-        public function render_stats_tab()
+        public function render_statistics_tab()
         {
             ?>
             <h2>Statistics</h2>
