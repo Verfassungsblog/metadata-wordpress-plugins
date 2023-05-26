@@ -56,13 +56,24 @@ if (!class_exists('VB_DOAJ_Submit_Setting_Fields')) {
                     and new posts are submitted to the DOAJ.",
                 ),
                 array(
+                    "name" => "requests_per_second",
+                    "type" => "string",
+                    "section" => "general",
+                    "label" => "Requests per Second",
+                    "placeholder" => "requests per second",
+                    "description" => "The maximum number of API requests that are issued per second. The DOAJ accepts
+                        at most 2 requests per second according to the
+                        <a href=\"https://doaj.org/api/v3/docs\" taget=\"_blank\">API documentation</a>. Higher numbers
+                        might provoke the DOAJ to block your IP address.",
+                ),
+                array(
                     "name" => "batch",
                     "type" => "string",
                     "section" => "general",
                     "label" => "Batch Size",
                     "placeholder" => "batch size",
-                    "description" => "The number of posts that are processed in one batch. High values (>1) might
-                        trigger the DOAJ to block your IP for a while. Use at own risk!",
+                    "description" => "The number of posts that are processed in one batch. Higher numbers might
+                        cause a PHP timeout depending on your server settings.",
                 ),
                 array(
                     "name" => "eissn",

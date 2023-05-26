@@ -10,14 +10,44 @@ if (!class_exists('VB_DOAJ_Submit_REST')) {
     {
         protected $common;
         protected $status;
-
         protected $affiliation;
+        protected $last_doaj_request_time;
 
         public function __construct($plugin_name)
         {
             $this->common = new VB_DOAJ_Submit_Common($plugin_name);
             $this->status = new VB_DOAJ_Submit_Status($plugin_name);
             $this->affiliation = new VB_DOAJ_Submit_Affiliation($this->common->plugin_name);
+            $this->last_doaj_request_time = null;
+        }
+
+        protected function wait_for_next_request()
+        {
+            if (!empty($this->last_doaj_request_time)) {
+                $last_request_ms = (int)$this->last_doaj_request_time->format('Uv');
+
+                $now = new DateTime("now", new DateTimeZone("UTC"));
+                $now_ms = (int)$now->format('Uv');
+
+                $diff_ms = $now_ms - $last_request_ms;
+
+                $max_requests_per_second = (float)$this->common->get_settings_field_value("requests_per_second");
+                $max_requests_per_second = $max_requests_per_second < 1.0 ? 1.0 : $max_requests_per_second;
+                $minimum_time_between_requests_ms = 1000 / $max_requests_per_second;
+
+                if ($minimum_time_between_requests_ms > $diff_ms) {
+                    $wait_time_ms = $minimum_time_between_requests_ms - $diff_ms;
+
+                    // wait for next request in order not to trigger DOAJ rate limit
+                    usleep($wait_time_ms * 1000);
+                }
+            }
+        }
+
+        protected function update_last_request_time()
+        {
+            // save last request time for next request
+            $this->last_doaj_request_time = new DateTime("now", new DateTimeZone("UTC"));
         }
 
         public function identify_post($post)
@@ -62,7 +92,16 @@ if (!class_exists('VB_DOAJ_Submit_REST')) {
             }
 
             // do http request
-            $response = wp_remote_get($url);
+            $this->wait_for_next_request();
+            $response = wp_remote_request($url, array(
+                "method" => "GET",
+                "headers" => array(
+                    "Accept" =>  "application/json",
+                ),
+                "timeout" => 30,
+            ));
+            $this->update_last_request_time();
+
             if (is_wp_error($response)) {
                 $this->status->set_last_error("[Request Error] " . $response->get_error_message());
                 return false;
@@ -138,6 +177,7 @@ if (!class_exists('VB_DOAJ_Submit_REST')) {
             }
 
             // do http request
+            $this->wait_for_next_request();
             $response = wp_remote_request($url, array(
                 "method" => empty($article_id) ? "POST" : "PUT",
                 "headers" => array(
@@ -147,6 +187,7 @@ if (!class_exists('VB_DOAJ_Submit_REST')) {
                 "timeout" => 30,
                 "body" => $json,
             ));
+            $this->update_last_request_time();
 
             // validate response
             if (is_wp_error($response)) {
@@ -207,6 +248,7 @@ if (!class_exists('VB_DOAJ_Submit_REST')) {
                 $url = $baseurl . "articles/" . rawurlencode($article_id) . "?api_key=" . rawurlencode($apikey);
 
                 // do http request
+                $this->wait_for_next_request();
                 $response = wp_remote_request($url, array(
                     "method" => "DELETE",
                     "headers" => array(
@@ -214,6 +256,7 @@ if (!class_exists('VB_DOAJ_Submit_REST')) {
                     ),
                     "timeout" => 30,
                 ));
+                $this->update_last_request_time();
 
                 // validate response
                 if (is_wp_error($response)) {
@@ -232,7 +275,6 @@ if (!class_exists('VB_DOAJ_Submit_REST')) {
                 // update post status
                 $this->status->clear_post_article_id($post);
                 $this->status->clear_post_submit_timestamp($post);
-                $this->status->set_post_submit_timestamp($post);
             } else {
                 // do nothing for un-identified trashed article
             }
