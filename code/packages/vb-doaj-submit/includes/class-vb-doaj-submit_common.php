@@ -48,7 +48,7 @@ if (!class_exists('VB_DOAJ_Submit_Common')) {
                     "api_baseurl" => "https://doaj.org/api/",
                     "auto_update" => false,
                     "interval" => 1,
-                    "requests_per_second" => 2,
+                    "requests_per_second" => 2.0,
                     "batch" => 1,
                     "require_doi" => true,
                     "include_excerpt" => true,
