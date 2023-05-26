@@ -30,10 +30,15 @@ if (!class_exists('VB_DOAJ_Submit_Render')) {
             $this->affiliation = new VB_DOAJ_Submit_Affiliation($plugin_name);
         }
 
+        protected function escape($str)
+        {
+            return html_entity_decode($str);
+        }
+
         protected function get_author_name($author)
         {
-            $last_name = esc_html(get_the_author_meta("last_name", $author));
-            $first_name = esc_html(get_the_author_meta("first_name", $author));
+            $last_name = get_the_author_meta("last_name", $author);
+            $first_name = get_the_author_meta("first_name", $author);
 
             $author = "";
             if (!empty($last_name) && !empty($first_name)) {
@@ -46,8 +51,8 @@ if (!class_exists('VB_DOAJ_Submit_Render')) {
 
         protected function get_coauthor_name($coauthor)
         {
-            $last_name = esc_html($coauthor->last_name);
-            $first_name = esc_html($coauthor->first_name);
+            $last_name = $coauthor->last_name;
+            $first_name = $coauthor->first_name;
 
             $author = "";
             if (!empty($last_name) && !empty($first_name)) {
@@ -77,7 +82,7 @@ if (!class_exists('VB_DOAJ_Submit_Render')) {
             if (!$include_excerpt) {
                 return false;
             }
-            return esc_html(strip_tags(get_the_excerpt($post)));
+            return strip_tags(get_the_excerpt($post));
         }
 
         protected function render_author($name, $orcid, $affiliation)
@@ -86,9 +91,9 @@ if (!class_exists('VB_DOAJ_Submit_Render')) {
                 return array();
             }
             return array_filter(array(
-                "name" => $name,
-                "orcid_id" => !empty($orcid) ? "https://orcid.org/{$orcid}" : false,
-                "affiliation" => $affiliation,
+                "name" => $this->escape($name),
+                "orcid_id" => !empty($orcid) ? $this->escape("https://orcid.org/{$orcid}") : false,
+                "affiliation" => $this->escape($affiliation),
             ));
         }
 
@@ -138,7 +143,7 @@ if (!class_exists('VB_DOAJ_Submit_Render')) {
 
             $keywords = array();
             foreach($tags as $tag) {
-                $keywords = array_merge($keywords, array(esc_html($tag->name)));
+                $keywords = array_merge($keywords, array($tag->name));
             }
             return array_slice(array_values(array_filter($keywords)), 0, 6);
         }
@@ -166,7 +171,7 @@ if (!class_exists('VB_DOAJ_Submit_Render')) {
         }
 
         protected function render_doi($post) {
-            $doi = esc_html($this->common->get_post_meta_field_value("doi_meta_key", $post));
+            $doi = $this->common->get_post_meta_field_value("doi_meta_key", $post);
             if (empty($doi)) {
                 return false;
             }
@@ -187,16 +192,16 @@ if (!class_exists('VB_DOAJ_Submit_Render')) {
 
         protected function render_issue_number($post)
         {
-            $issue_general = esc_html($this->common->get_settings_field_value("issue"));
-            $issue_custom = esc_html($this->common->get_post_meta_field_value("issue_meta_key", $post));
+            $issue_general = $this->common->get_settings_field_value("issue");
+            $issue_custom = $this->common->get_post_meta_field_value("issue_meta_key", $post);
             $issue = !empty($issue_custom) ? $issue_custom : $issue_general;
             return empty($issue) ? false : $issue;
         }
 
         protected function render_volume($post)
         {
-            $volume_general = esc_html($this->common->get_settings_field_value("volume"));
-            $volume_custom = esc_html($this->common->get_post_meta_field_value("volume_meta_key", $post));
+            $volume_general = $this->common->get_settings_field_value("volume");
+            $volume_custom = $this->common->get_post_meta_field_value("volume_meta_key", $post);
             $volume = !empty($volume_custom) ? $volume_custom : $volume_general;
             return empty($volume) ? false : $volume;
         }
@@ -218,7 +223,7 @@ if (!class_exists('VB_DOAJ_Submit_Render')) {
             $title = get_the_title($post);
             $include_subheadline = $this->common->get_settings_field_value("include_subheadline");
             if ($include_subheadline) {
-                $subheadline = esc_html($this->common->get_post_meta_field_value("subheadline_meta_key", $post));
+                $subheadline = $this->common->get_post_meta_field_value("subheadline_meta_key", $post);
                 if (!empty($subheadline)) {
                     $title = $title . " - " . $subheadline;
                 }
@@ -281,7 +286,7 @@ if (!class_exists('VB_DOAJ_Submit_Render')) {
                 $this->last_error = "article has no identifier or identifier is empty";
                 return false;
             }
-            return json_encode($json_data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+            return json_encode($json_data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
         }
     }
 }
