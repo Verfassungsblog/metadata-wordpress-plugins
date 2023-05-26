@@ -179,7 +179,7 @@ if (!class_exists('VB_Metadata_Export_Setting_Fields')) {
                     "label" => "Template Priority",
                     "placeholder" => "priority value",
                     "description" => "The Wordpress template priority of the meta data export template. In case meta
-                        data is not rendered, try a higher priority or use debug tools to figure out a appropriate
+                        data is not rendered, try a higher priority or use debug tools to figure out an appropriate
                         priority.",
                 ),
 

@@ -44,6 +44,7 @@ if (!class_exists('VB_DOAJ_Submit_Admin')) {
                 "fields" => "Custom Fields",
                 "example" => "Example",
                 "status" => "Status",
+                "stats" => "Statistcs",
             );
         }
 
@@ -443,6 +444,22 @@ if (!class_exists('VB_DOAJ_Submit_Admin')) {
             </p>
             </form>
             <hr />
+            <h2>Reset</h2>
+            <p>Clicking the following button will reset all information related to the DOAJ for every post in the
+                database. Effectively, the status will be the same as if the plugin was just freshly installed.</p>
+            <form method="post" onsubmit="return confirm('Are you sure?');;">
+            <p>
+                <?php
+                submit_button(__('Reset Status of all Posts', "vb-doaj-submit"), "secondary", "reset_status", false);
+                ?>
+            </p>
+            </form>
+            <?php
+        }
+
+        public function render_stats_tab()
+        {
+            ?>
             <h2>Statistics</h2>
             <?php
             $need_identifying = $this->queries->get_number_of_posts_that_need_identifying();
@@ -460,14 +477,6 @@ if (!class_exists('VB_DOAJ_Submit_Admin')) {
                 <li>Posts that need submitting because modified: <?php echo $need_submitting_modified; ?></li>
                 <li>Posts that were successfully submitted: <?php echo $were_submitted; ?></li>
             </ul>
-            <hr />
-            <form method="post" onsubmit="return confirm('Are you sure?');;">
-            <p>
-                <?php
-                submit_button(__('Reset Status of all Posts', "vb-doaj-submit"), "secondary", "reset_status", false);
-                ?>
-            </p>
-            </form>
             <?php
         }
 
