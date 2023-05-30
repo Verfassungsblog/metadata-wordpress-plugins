@@ -72,22 +72,6 @@ if (!class_exists('VB_CrossRef_DOI_Setting_Fields')) {
                     "description" => "The name of the organization responsible for the information being registered.",
                 ),
                 array(
-                    "name" => "journal_title",
-                    "type" => "string",
-                    "section" => "general",
-                    "label" => "Journal Title",
-                    "placeholder" => "Title of the Journal",
-                    "description" => "The full title by which this journal is commonly known or cited.",
-                ),
-                array(
-                    "name" => "eissn",
-                    "type" => "string",
-                    "section" => "general",
-                    "label" => "eISSN",
-                    "placeholder" => "Electronic ISSN of this Journal",
-                    "description" => "The electronic ISSN assigned to this Journal.",
-                ),
-                array(
                     "name" => "doi_prefix",
                     "type" => "string",
                     "section" => "general",
@@ -101,19 +85,85 @@ if (!class_exists('VB_CrossRef_DOI_Setting_Fields')) {
                     "section" => "general",
                     "label" => "DOI Suffix Length",
                     "placeholder" => "DOI suffix length",
-                    "description" => "The length of the randomly generated suffix (min 8, max 64).",
+                    "description" => "The length of the randomly generated suffix (min 12, max 64).",
                 ),
+                array(
+                    "name" => "issn",
+                    "type" => "string",
+                    "section" => "general",
+                    "label" => "ISSN",
+                    "placeholder" => "ISSN",
+                    "description" => "The <a href=\"https://en.wikipedia.org/wiki/International_Standard_Serial_Number\" target=\"_blank\">
+                            International Standard Serial Number</a> (ISSN) of this journal.
+                        <br>For example: <code>2366-7044</code> = ISSN of the Verfassungsblog",
+                ),
+                array(
+                    "name" => "copyright_general",
+                    "type" => "string",
+                    "section" => "general",
+                    "label" => "Copyright / Licence <br>for all posts",
+                    "placeholder" => "a copyright / license note",
+                    "description" => "The default copyright or licence name for all posts. Only Creative Commons
+                    licences are supported. This note can be overwritten with a post-specific copyright note if it is
+                        provided via via a custom field, see tab \"Custom Fields\". <br>
+                        For example: <code>CC BY-SA 4.0</code> = Creative Commons Attribution-ShareAlike 4.0 International",
+                ),
+                array(
+                    "name" => "include_excerpt",
+                    "type" => "boolean",
+                    "section" => "general",
+                    "label" => __("Include Excerpt", "vb-crossref-doi"),
+                    "description" => "Whether to include the post excerpt as abstract when submitting meta data to CrossRef.",
+                ),
+
+                // ------------- institution fields -------------
+
+                array(
+                    "name" => "institution_name",
+                    "type" => "string",
+                    "section" => "institution",
+                    "label" => "Institution Name",
+                    "placeholder" => "name of the institution publishing articles.",
+                    "description" => "The name of the institution that is publishing articles.",
+                ),
+                array(
+                    "name" => "institution_rorid",
+                    "type" => "string",
+                    "section" => "institution",
+                    "label" => "Institution ROR-ID",
+                    "placeholder" => "ROR id of the institution publishing articles.",
+                    "description" => "The ROR-ID of the institution that is publishing articles.",
+                ),
+                array(
+                    "name" => "institution_isni",
+                    "type" => "string",
+                    "section" => "institution",
+                    "label" => "Institution ISNI",
+                    "placeholder" => "ISNI of the institution publishing articles.",
+                    "description" => "The ISNI of the institution that is publishing articles.",
+                ),
+                array(
+                    "name" => "institution_wikidata_id",
+                    "type" => "string",
+                    "section" => "institution",
+                    "label" => "Institution Wikidata ID",
+                    "placeholder" => "wikidata id of the institution publishing articles.",
+                    "description" => "The Wikidata ID of the institution that is publishing articles.",
+                ),
+
+                // ------------- update settings fields -------------
+
                 array(
                     "name" => "auto_update",
                     "type" => "boolean",
-                    "section" => "general",
+                    "section" => "update",
                     "label" => "Automatic Update",
                     "description" => "Whether new posts should be automatically submitted to CrossRef in regular intervals.",
                 ),
                 array(
                     "name" => "interval",
                     "type" => "string",
-                    "section" => "general",
+                    "section" => "update",
                     "label" => "Update Interval",
                     "placeholder" => "update interval in minutes",
                     "description" => "The number of minutes between updates. On each update, the database is checked
@@ -122,7 +172,7 @@ if (!class_exists('VB_CrossRef_DOI_Setting_Fields')) {
                 array(
                     "name" => "batch",
                     "type" => "string",
-                    "section" => "general",
+                    "section" => "update",
                     "label" => "Batch Size",
                     "placeholder" => "batch size",
                     "description" => "The number of posts that are processed in one batch. High values (>1) might
@@ -138,6 +188,27 @@ if (!class_exists('VB_CrossRef_DOI_Setting_Fields')) {
                     "label" => "Article DOI<br>(custom field / meta key)",
                     "placeholder" => "meta key for the DOI",
                     "description" => "The meta key for the custom field that stores the DOI for a post.<br>The DOI is provided as a code (not as URI), e.g. <code>10.1214/aos/1176345451</code>.",
+                ),
+                array(
+                    "name" => "copyright_meta_key",
+                    "type" => "string",
+                    "section" => "post_meta",
+                    "label" => "Copyright / Licence<br>(custom field / meta key)",
+                    "placeholder" => "meta key for a copyright / licence note",
+                    "description" => "The meta key for the custom field that contains the copyright or licence note for
+                        a specific post. If a post-specific copyright note is provided, the default copyright note is
+                        overwritten. Only Creative Commons licences are supported.",
+                ),
+
+                // ------------- custom user fields --------------
+
+                array(
+                    "name" => "orcid_meta_key",
+                    "type" => "string",
+                    "section" => "user_meta",
+                    "label" => "Author ORCID<br>(custom field / meta key)",
+                    "placeholder" => "meta key for the ORCID of the author",
+                    "description" => "The meta key for the custom field that contains the ORCID of the post author.<br>ORCIDs need to be provided as code (not as URI), e.g. <code>0000-0003-1279-3709</code>.",
                 ),
 
             );

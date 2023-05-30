@@ -1,6 +1,7 @@
 <?php
 
 require_once plugin_dir_path(__FILE__) . './class-vb-crossref-doi_common.php';
+require_once plugin_dir_path(__FILE__) . './class-vb-crossref-doi_update.php';
 
 require_once plugin_dir_path(__FILE__) . '../admin/class-vb-crossref-doi_admin.php';
 
@@ -14,11 +15,14 @@ if (!class_exists('VB_CrossRef_DOI')) {
 
         protected $admin;
 
+        protected $update;
+
         public function __construct($base_file, $plugin_name)
         {
             $this->base_file = $base_file;
             $this->common = new VB_CrossRef_DOI_Common($plugin_name);
             $this->admin = new VB_CrossRef_DOI_Admin($plugin_name);
+            $this->update = new VB_CrossRef_DOI_Update($plugin_name);
         }
 
         public function activate()
@@ -49,7 +53,7 @@ if (!class_exists('VB_CrossRef_DOI')) {
             add_action("init", array($this, 'action_init'));
 
             $this->admin->run();
-
+            $this->update->run();
         }
 
     }

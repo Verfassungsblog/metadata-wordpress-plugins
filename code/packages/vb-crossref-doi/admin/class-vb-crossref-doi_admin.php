@@ -3,6 +3,7 @@
 require_once plugin_dir_path(__FILE__) . '/class-vb-crossref-doi_setting_fields.php';
 require_once plugin_dir_path(__FILE__) . '../includes/class-vb-crossref-doi_common.php';
 require_once plugin_dir_path(__FILE__) . '../includes/class-vb-crossref-doi_render.php';
+require_once plugin_dir_path(__FILE__) . '../includes/class-vb-crossref-doi_queries.php';
 
 
 if (!class_exists('VB_CrossRef_DOI_Admin')) {
@@ -19,10 +20,19 @@ if (!class_exists('VB_CrossRef_DOI_Admin')) {
 
         protected $common;
 
+        protected $queries;
+
+        protected $status;
+
+        protected $update;
+
         public function __construct($plugin_name)
         {
             $this->common = new VB_CrossRef_DOI_Common($plugin_name);
             $this->setting_fields = new VB_CrossRef_DOI_Setting_Fields();
+            $this->queries = new VB_CrossRef_DOI_Queries($plugin_name);
+            $this->status = new VB_CrossRef_DOI_Status($plugin_name);
+            $this->update = new VB_CrossRef_DOI_Update($plugin_name);
         }
 
         protected function get_tab_labels()
@@ -32,6 +42,7 @@ if (!class_exists('VB_CrossRef_DOI_Admin')) {
                 "fields" => "Custom Fields",
                 "example" => "Example",
                 "status" => "Status",
+                "statistics" => "Statistics",
             );
         }
 
@@ -39,6 +50,8 @@ if (!class_exists('VB_CrossRef_DOI_Admin')) {
         {
             return array(
                 "general" => "General",
+                "institution" => "Institution",
+                "update" => "Automatic Updates",
                 "post_meta" => "Custom Fields for Posts",
                 "user_meta" => "Custom Fields for Users",
             );
@@ -48,6 +61,8 @@ if (!class_exists('VB_CrossRef_DOI_Admin')) {
         {
             return array(
                 "general" => "settings",
+                "institution" => "settings",
+                "update" => "settings",
                 "post_meta" => "fields",
                 "user_meta" => "fields",
             );
@@ -130,14 +145,14 @@ if (!class_exists('VB_CrossRef_DOI_Admin')) {
 
         public function admin_notices()
         {
-            /*$error = $this->status->get_last_error();
+            $error = $this->status->get_last_error();
             if (!empty($error)) {
                 ?>
                 <div class="error notice">
                     <p><?php echo "Error in " . $this->common->plugin_name . ": " . $error ?></p>
                 </div>
                 <?php
-            }*/
+            }
         }
 
         public function render_general_section($args)
@@ -146,6 +161,33 @@ if (!class_exists('VB_CrossRef_DOI_Admin')) {
             <p id="<?php echo esc_attr($args['id']); ?>">
                 <?php echo __(
                     'The following options influence how metadata is submitted to CrossRef.',
+                    "vb-crossref-doi"
+                );
+                ?>
+            </p>
+            <?php
+        }
+
+        public function render_institution_section($args)
+        {
+            ?>
+            <p id="<?php echo esc_attr($args['id']); ?>">
+                <?php echo __(
+                    'The following section allows to specify information about the institution that is publishing
+                    articles. If at least one identifier is provided, the information is associated with every post.',
+                    "vb-crossref-doi"
+                );
+                ?>
+            </p>
+            <?php
+        }
+
+        public function render_update_section($args)
+        {
+            ?>
+            <p id="<?php echo esc_attr($args['id']); ?>">
+                <?php echo __(
+                    'The following options influence how automatic updates are scheduled and performed.',
                     "vb-crossref-doi"
                 );
                 ?>
@@ -261,6 +303,18 @@ if (!class_exists('VB_CrossRef_DOI_Admin')) {
                 }
             }
 
+            if (!empty($_POST["reset_status"])) {
+                $this->status->reset_status();
+            }
+
+            if (!empty($_POST["manual_update"])) {
+                $this->update->do_update();
+            }
+
+            if (!empty($_POST["reset_last_error"])) {
+                $this->status->clear_last_error();
+            }
+
             $current_tab = isset($_GET['tab']) ? $_GET['tab'] : "settings";
             $current_tab = isset($this->get_tab_labels()[$current_tab]) ? $current_tab : "settings";
 
@@ -370,7 +424,59 @@ if (!class_exists('VB_CrossRef_DOI_Admin')) {
 
         public function render_status_tab()
         {
-            // empty
+            $last_error = $this->status->get_last_error();
+            ?>
+            <h2>Status</h2>
+            <ul>
+                <li>Automatic Update: <?php echo $this->common->get_settings_field_value("auto_update") ? "enabled" : "disabled" ?></li>
+                <li>Update Interval: <?php echo $this->update->get_update_interval_in_minutes() ?> min</li>
+                <li>Last Update: <?php echo $this->status->get_last_update_text() ?></li>
+                <li>Last Error: <?php echo $last_error ? $last_error : "none" ?></li>
+            </ul>
+            <form method="post" onsubmit="return;">
+            <p>
+                <?php
+                submit_button(__('Manually Update Now', "vb-crossref-doi"), "primary", "manual_update", false);
+                echo " ";
+                submit_button(__('Reset Last Error', "vb-crossref-doi"), "secondary", "reset_last_error", false);
+                ?>
+            </p>
+            </form>
+            <hr />
+            <h2>Reset</h2>
+            <p>
+                Clicking the following button will remove information about what posts were already submitted to
+                CrossRef. Effectively, the status will be the same as if the plugin was just freshly installed.
+                Of course, DOIs are not deleted.
+            </p>
+            <form method="post" onsubmit="return confirm('Are you sure?');;">
+            <p>
+                <?php
+                submit_button(__('Reset Status of all Posts', "vb-crossref-doi"), "secondary", "reset_status", false);
+                ?>
+            </p>
+            </form>
+            <?php
+        }
+
+        public function render_statistics_tab()
+        {
+            ?>
+            <h2>Statistics</h2>
+            <?php
+
+            $have_doi = $this->queries->get_number_of_posts_that_have_doi();
+            $need_submitting_never = $this->queries->get_number_of_posts_that_were_not_submitted_yet();
+            $need_submitting_modified = $this->queries->get_number_of_posts_that_need_submitting_because_modified();
+            $were_submitted = $this->queries->get_number_of_posts_that_were_submitted();
+            ?>
+            <ul>
+                <li>Posts that have a DOI: <?php echo $have_doi; ?></li>
+                <li>Posts that need submitting because no DOI yet: <?php echo $need_submitting_never; ?></li>
+                <li>Posts that need submitting because modified: <?php echo $need_submitting_modified; ?></li>
+                <li>Posts that were successfully submitted: <?php echo $were_submitted; ?></li>
+            </ul>
+            <?php
         }
 
         public function run()

@@ -20,30 +20,50 @@ if (!class_exists('VB_CrossRef_DOI_Common')) {
                 // default settings for Verfassungsblog
                 $this->setting_field_defaults = array(
                     // general
+                    "api_baseurl" => "https://api.crossref.org/v2/deposits",
                     "depositor_name" => "Wordpress Plugin " . $this->plugin_name,
                     "depositor_email" => "crossref@verfassungsblog.de",
                     "registrant" => $blog_title,
-                    "journal_title" => $blog_title,
-                    "eissn" => "2366-7044",
                     "doi_prefix" => "example-prefix",
                     "doi_suffix_length" => 16,
-                    "api_baseurl" => "https://api.crossref.org/v2/deposits",
+                    "issn" => "2366-7044",
+                    "copyright_general" => "CC BY-SA 4.0",
+                    "include_excerpt" => True,
+                    // institution
+                    "institution_name" => $blog_title,
+                    "institution_wikidata_id" => "Q97588182",
+                    // update
                     "auto_update" => false,
                     "interval" => 1,
                     "batch" => 1,
                     // post meta
                     "doi_meta_key" => "doi",
+                    "copyright_meta_key" => "copyright",
+                    // user meta
+                    "orcid_meta_key" => "orcid",
+                    "affiliation_meta_key" => "affiliation",
+                    "rorid_meta_key" => "rorid",
                 );
             } else {
                 // default settings for any other blog than Verfassungsblog
                 $this->setting_field_defaults = array(
                     // general
                     "api_baseurl" => "https://api.crossref.org/v2/deposits",
+                    "depositor_name" => "Wordpress Plugin " . $this->plugin_name,
+                    "doi_suffix_length" => 16,
+                    "include_excerpt" => True,
+                    // institution
+                    "institution_name" => $blog_title,
+                    // update
                     "auto_update" => false,
                     "interval" => 1,
                     "batch" => 1,
                     // post meta
                     "doi_meta_key" => "doi",
+                    // user meta
+                    "orcid_meta_key" => "orcid",
+                    "affiliation_meta_key" => "affiliation",
+                    "rorid_meta_key" => "rorid",
                 );
             }
         }
@@ -63,6 +83,15 @@ if (!class_exists('VB_CrossRef_DOI_Common')) {
             return get_post_meta($post->ID, $meta_key, true);
         }
 
+        public function get_user_meta_field_value($field_name, $user_id)
+        {
+            $meta_key = $this->get_settings_field_value($field_name);
+            if (empty($meta_key)) {
+                return false;
+            }
+            return get_user_meta($user_id, $meta_key, true);
+        }
+
         public function get_settings_field_id($field_name)
         {
             return $this->plugin_name . '_field_' . $field_name . '_value';
@@ -74,6 +103,19 @@ if (!class_exists('VB_CrossRef_DOI_Common')) {
                 return $this->setting_field_defaults[$field_name];
             }
             return false;
+        }
+
+        public function get_doi_meta_key() {
+            return $this->get_settings_field_value("doi_meta_key");
+        }
+
+        public function get_post_needs_update_meta_key()
+        {
+            return $this->plugin_name . "_post-needs-update";
+        }
+
+        public function get_submit_timestamp_meta_key() {
+            return $this->plugin_name . "_submit-timestamp";
         }
 
         public function format_xml($xml_str)
