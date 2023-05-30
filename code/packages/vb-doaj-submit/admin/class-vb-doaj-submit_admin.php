@@ -44,7 +44,7 @@ if (!class_exists('VB_DOAJ_Submit_Admin')) {
                 "fields" => "Custom Fields",
                 "example" => "Example",
                 "status" => "Status",
-                "statistics" => "Statistcs",
+                "statistics" => "Statistics",
             );
         }
 
