@@ -58,6 +58,22 @@ if (!class_exists('VB_CrossRef_DOI_Status')) {
             delete_post_meta($post->ID, $this->common->get_submit_timestamp_meta_key());
         }
 
+        public function set_post_submit_batch_id($post, $batch_id) {
+            update_post_meta(
+                $post->ID,
+                $this->common->get_submit_batch_id_meta_key(),
+                $batch_id
+            );
+        }
+
+        public function set_post_submit_submission_id($post, $submission_id) {
+            update_post_meta(
+                $post->ID,
+                $this->common->get_submit_submission_id_meta_key(),
+                $submission_id,
+            );
+        }
+
         public function set_post_doi($post, $doi) {
             update_post_meta(
                 $post->ID,
@@ -70,6 +86,8 @@ if (!class_exists('VB_CrossRef_DOI_Status')) {
         {
             $meta_keys = array(
                 $this->common->get_submit_timestamp_meta_key(),
+                $this->common->get_submit_batch_id_meta_key(),
+                $this->common->get_submit_submission_id_meta_key(),
             );
 
             foreach($meta_keys as $meta_key) {

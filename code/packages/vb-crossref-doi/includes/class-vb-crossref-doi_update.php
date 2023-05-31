@@ -1,7 +1,7 @@
 <?php
 
 require_once plugin_dir_path(__FILE__) . './class-vb-crossref-doi_common.php';
-// require_once plugin_dir_path(__FILE__) . './class-vb-crossref-doi_rest.php';
+require_once plugin_dir_path(__FILE__) . './class-vb-crossref-doi_rest.php';
 require_once plugin_dir_path(__FILE__) . './class-vb-crossref-doi_status.php';
 require_once plugin_dir_path(__FILE__) . './class-vb-crossref-doi_queries.php';
 
@@ -12,14 +12,36 @@ if (!class_exists('VB_CrossRef_DOI_Update')) {
         protected $common;
         protected $status;
         protected $queries;
-        // protected $rest;
+        protected $rest;
 
         public function __construct($plugin_name)
         {
             $this->common = new VB_CrossRef_DOI_Common($plugin_name);
             $this->status = new VB_CrossRef_DOI_Status($plugin_name);
             $this->queries = new VB_CrossRef_DOI_Queries($plugin_name);
-            // $this->rest = new VB_CrossRef_DOI_REST($plugin_name);
+            $this->rest = new VB_CrossRef_DOI_REST($plugin_name);
+        }
+
+        protected function submit_posts_from_query($query)
+        {
+            if ($query->post_count > 0) {
+                foreach($query->posts as $post) {
+                    $success = false;
+                    if ($post->post_status == "publish") {
+                        $success = $this->rest->submit_new_or_existing_post($post);
+                    } else {
+                        $this->status->set_last_error("cannot submit post with post status '" . $post->post_status . "'");
+                    }
+
+                    if ($success) {
+                        // TODO
+                    } else {
+                        return true;
+                    }
+                }
+                return true;
+            }
+            return false;
         }
 
         public function do_update() {
@@ -28,8 +50,13 @@ if (!class_exists('VB_CrossRef_DOI_Update')) {
             $batch = (int)$this->common->get_settings_field_value("batch");
             $batch = $batch < 1 ? 1 : $batch;
 
-            // TODO
-            $this->status->set_last_error("TODO update not working yet");
+            // iterate over all posts that were never submitted before
+            $not_submitted_yet_query = $this->queries->query_posts_that_were_not_submitted_yet($batch);
+            if ($this->submit_posts_from_query($not_submitted_yet_query)) {
+                // stop if any posts were submitted
+                return;
+            }
+
         }
 
         public function action_init() {

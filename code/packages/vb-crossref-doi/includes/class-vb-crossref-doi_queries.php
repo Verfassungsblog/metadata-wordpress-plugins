@@ -17,21 +17,6 @@ if (!class_exists('VB_CrossRef_DOI_Queries')) {
             $this->status = new VB_CrossRef_DOI_Status($plugin_name);
         }
 
-        protected function add_doi_requirement_to_query(&$query_args)
-        {
-            $require_doi = $this->common->get_settings_field_value("require_doi");
-            if ($require_doi) {
-                $doi_meta_key = $this->common->get_settings_field_value("doi_meta_key");
-                $query_args['meta_query'] = array_merge($query_args['meta_query'], array(
-                    array(
-                        'key' => $doi_meta_key,
-                        'value' => "",
-                        'compare' => "!=",
-                    ),
-                ));
-            }
-        }
-
         protected function add_batch_arguments_to_query(&$query_args, $batch)
         {
             if ($batch) {

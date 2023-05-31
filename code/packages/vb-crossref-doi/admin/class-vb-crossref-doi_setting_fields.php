@@ -26,9 +26,10 @@ if (!class_exists('VB_CrossRef_DOI_Setting_Fields')) {
                     "name" => "api_user",
                     "type" => "string",
                     "section" => "general",
-                    "label" => "Deposit Username",
-                    "placeholder" => "CrossRef Deposit API Username",
-                    "description" => "The username to the CrossRef Deposit API.",
+                    "label" => "Deposit User",
+                    "placeholder" => "CrossRef Deposit API Username/Role",
+                    "description" => "The user and role to the CrossRef Deposit API as <code>USER/ROLE</code>. <br>
+                        For example: <code>user@example.com/myrole</code>",
                 ),
                 array(
                     "name" => "api_password",
@@ -39,10 +40,10 @@ if (!class_exists('VB_CrossRef_DOI_Setting_Fields')) {
                     "description" => "The password to the CrossRef Deposit API.",
                 ),
                 array(
-                    "name" => "api_baseurl",
+                    "name" => "api_url",
                     "type" => "string",
                     "section" => "general",
-                    "label" => "API Base URL",
+                    "label" => "Deposit API URL",
                     "placeholder" => "URL to the CrossRef Deposit API",
                     "description" => "The URL to the CrossRef Deposit API.<br>
                         Usually <code>https://api.crossref.org/v2/deposits</code>, for testing <code>https://test.crossref.org/v2/deposits</code>",
@@ -177,6 +178,15 @@ if (!class_exists('VB_CrossRef_DOI_Setting_Fields')) {
                     "placeholder" => "batch size",
                     "description" => "The number of posts that are processed in one batch. High values (>1) might
                         trigger the CrossRef to block your IP for a while. Use at own risk!",
+                ),
+                array(
+                    "name" => "requests_per_second",
+                    "type" => "string",
+                    "section" => "update",
+                    "label" => "Requests per Second",
+                    "placeholder" => "requests per second",
+                    "description" => "The maximum number of API requests that are issued per second. CrossRef states
+                        that they rate limit requests. High numbers might provoke CrossRef to block your IP address.",
                 ),
 
                 // ------------- custom post fields -------------

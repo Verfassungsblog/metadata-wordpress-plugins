@@ -20,7 +20,7 @@ if (!class_exists('VB_CrossRef_DOI_Common')) {
                 // default settings for Verfassungsblog
                 $this->setting_field_defaults = array(
                     // general
-                    "api_baseurl" => "https://api.crossref.org/v2/deposits",
+                    "api_url" => "https://api.crossref.org/v2/deposits",
                     "depositor_name" => "Wordpress Plugin " . $this->plugin_name,
                     "depositor_email" => "crossref@verfassungsblog.de",
                     "registrant" => $blog_title,
@@ -36,6 +36,7 @@ if (!class_exists('VB_CrossRef_DOI_Common')) {
                     "auto_update" => false,
                     "interval" => 1,
                     "batch" => 1,
+                    "requests_per_second" => 2.0,
                     // post meta
                     "doi_meta_key" => "doi",
                     "copyright_meta_key" => "copyright",
@@ -48,7 +49,7 @@ if (!class_exists('VB_CrossRef_DOI_Common')) {
                 // default settings for any other blog than Verfassungsblog
                 $this->setting_field_defaults = array(
                     // general
-                    "api_baseurl" => "https://api.crossref.org/v2/deposits",
+                    "api_url" => "https://api.crossref.org/v2/deposits",
                     "depositor_name" => "Wordpress Plugin " . $this->plugin_name,
                     "doi_suffix_length" => 16,
                     "include_excerpt" => True,
@@ -58,6 +59,7 @@ if (!class_exists('VB_CrossRef_DOI_Common')) {
                     "auto_update" => false,
                     "interval" => 1,
                     "batch" => 1,
+                    "requests_per_second" => 2.0,
                     // post meta
                     "doi_meta_key" => "doi",
                     // user meta
@@ -116,6 +118,14 @@ if (!class_exists('VB_CrossRef_DOI_Common')) {
 
         public function get_submit_timestamp_meta_key() {
             return $this->plugin_name . "_submit-timestamp";
+        }
+
+        public function get_submit_batch_id_meta_key() {
+            return $this->plugin_name . "_submit-batch-id";
+        }
+
+        public function get_submit_submission_id_meta_key() {
+            return $this->plugin_name . "_submit-submission-id";
         }
 
         public function format_xml($xml_str)

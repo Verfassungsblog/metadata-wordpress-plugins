@@ -392,6 +392,14 @@ if (!class_exists('VB_CrossRef_DOI_Admin')) {
 
         protected function find_example_post()
         {
+            $never_submitted_query = $this->queries->query_posts_that_were_not_submitted_yet(1);
+            if (count($never_submitted_query->posts) > 0) {
+                return $never_submitted_query->posts[0];
+            }
+            $modified_query = $this->queries->query_posts_that_need_submitting_because_modified(1);
+            if (count($modified_query->posts) > 0) {
+                return $modified_query->posts[0];
+            }
             $posts = get_posts(array('numberposts' => 1));
             if (count($posts) > 0) {
                 return $posts[0];
