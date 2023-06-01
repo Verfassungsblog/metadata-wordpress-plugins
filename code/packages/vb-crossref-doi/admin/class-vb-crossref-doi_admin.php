@@ -392,13 +392,9 @@ if (!class_exists('VB_CrossRef_DOI_Admin')) {
 
         protected function find_example_post()
         {
-            $never_submitted_query = $this->queries->query_posts_that_were_not_submitted_yet(1);
-            if (count($never_submitted_query->posts) > 0) {
-                return $never_submitted_query->posts[0];
-            }
-            $modified_query = $this->queries->query_posts_that_need_submitting_because_modified(1);
-            if (count($modified_query->posts) > 0) {
-                return $modified_query->posts[0];
+            $submit_query = $this->queries->query_posts_that_need_submitting(1);
+            if (count($submit_query->posts) > 0) {
+                return $submit_query->posts[0];
             }
             $posts = get_posts(array('numberposts' => 1));
             if (count($posts) > 0) {
@@ -413,7 +409,7 @@ if (!class_exists('VB_CrossRef_DOI_Admin')) {
             $post = $this->find_example_post();
             if ($post) {
                 $renderer = new VB_CrossRef_DOI_Render($this->common->plugin_name);
-                $json_text = $renderer->render($post);
+                $json_text = $renderer->render($post, $this->common->get_current_utc_timestamp());
 
                 ?>
                 <h2>Example</h2>
@@ -439,6 +435,7 @@ if (!class_exists('VB_CrossRef_DOI_Admin')) {
                 <li>Automatic Update: <?php echo $this->common->get_settings_field_value("auto_update") ? "enabled" : "disabled" ?></li>
                 <li>Update Interval: <?php echo $this->update->get_update_interval_in_minutes() ?> min</li>
                 <li>Last Update: <?php echo $this->status->get_last_update_text() ?></li>
+                <li>Last Check for Modified Posts: <?php echo $this->status->get_text_of_last_modified_check() ?></li>
                 <li>Last Error: <?php echo $last_error ? $last_error : "none" ?></li>
             </ul>
             <form method="post" onsubmit="return;">
@@ -475,14 +472,41 @@ if (!class_exists('VB_CrossRef_DOI_Admin')) {
 
             $have_doi = $this->queries->get_number_of_posts_that_have_doi();
             $need_submitting_never = $this->queries->get_number_of_posts_that_were_not_submitted_yet();
+            $need_submitting_retry = $this->queries->get_number_of_posts_that_should_be_retried();
             $need_submitting_modified = $this->queries->get_number_of_posts_that_need_submitting_because_modified();
-            $were_submitted = $this->queries->get_number_of_posts_that_were_submitted();
+            $were_submitted = $this->queries->get_number_of_posts_that_were_successfully_submitted();
+            $pending = $this->queries->get_number_of_posts_that_have_pending_submissions();
+            $were_modified = $this->queries->get_number_of_posts_that_were_modified_since_last_check();
             ?>
             <ul>
                 <li>Posts that have a DOI: <?php echo $have_doi; ?></li>
+                <li>Posts that were modified since last update: <?php echo $were_modified ?></li>
                 <li>Posts that need submitting because no DOI yet: <?php echo $need_submitting_never; ?></li>
                 <li>Posts that need submitting because modified: <?php echo $need_submitting_modified; ?></li>
+                <li>Posts that need submitting again after error: <?php echo $need_submitting_retry; ?></li>
+                <li>Posts that have pending submission: <?php echo $pending; ?></li>
                 <li>Posts that were successfully submitted: <?php echo $were_submitted; ?></li>
+            </ul>
+            <hr/>
+            <?php
+            $batch = (int)$this->common->get_settings_field_value("batch");
+            $batch = $batch < 1 ? 1 : $batch;
+            $error_count = $this->queries->get_number_of_posts_with_submit_error();
+            $error_query = $this->queries->query_posts_with_submit_error($batch);
+            ?>
+            <h3>Posts with Errors (<?php echo $error_count ?>)</h3>
+            <ul>
+            <?php
+            foreach($error_query->posts as $post) {
+                ?>
+                <li>
+                    <a href="<?php echo get_edit_post_link($post) ?>">
+                        Post [id=" <?php echo $post->ID ?> "]
+                    </a>: <?php echo $this->status->get_post_submit_error($post) ?>
+                </li>
+                <?php
+            }
+            ?>
             </ul>
             <?php
         }

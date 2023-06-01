@@ -30,6 +30,20 @@ if (!class_exists('VB_CrossRef_DOI_Queries')) {
             }
         }
 
+        public function query_posts_that_need_submitting($batch)
+        {
+            $modified = $this->query_posts_that_need_submitting_because_modified($batch);
+            $retried = $this->query_posts_that_should_be_retried($batch);
+            $not_yet = $this->query_posts_that_were_not_submitted_yet($batch);
+
+            $combined = new WP_Query();
+            $combined->posts = array_merge($modified->posts, $retried->posts, $not_yet->posts);
+            $combined->posts = array_slice($combined->posts, 0, $batch);
+            $combined->post_count = min($batch, $modified->post_count + $retried->post_count + $not_yet->post_count);
+
+            return $combined;
+        }
+
         public function get_number_of_posts_that_were_not_submitted_yet()
         {
             $query = $this->query_posts_that_were_not_submitted_yet(false);
@@ -43,15 +57,66 @@ if (!class_exists('VB_CrossRef_DOI_Queries')) {
                 'post_status' => array('publish'),
                 'ignore_sticky_posts' => true,
                 'meta_query' => array(
-                    'relation' => 'OR',
+                    'relation' => 'AND',
                     array(
-                        'key' => $this->common->get_doi_meta_key(),
-                        'compare' => "NOT EXISTS",
+                        'relation' => 'OR',
+                        array(
+                            'key' => $this->common->get_post_doi_meta_key(),
+                            'compare' => "NOT EXISTS",
+                        ),
+                        array(
+                            'key' => $this->common->get_post_doi_meta_key(),
+                            'value' => "",
+                            'compare' => "==",
+                        ),
                     ),
                     array(
-                        'key' => $this->common->get_doi_meta_key(),
-                        'value' => "",
-                        'compare' => "==",
+                        'relation' => 'AND',
+                        array(
+                            'key' => $this->common->get_post_submit_timestamp_meta_key(),
+                            'compare' => "NOT EXISTS",
+                        ),
+                    ),
+                ),
+            );
+
+            $this->add_batch_arguments_to_query($query_args, $batch);
+            return new WP_Query( $query_args );
+        }
+
+        public function get_number_of_posts_that_should_be_retried()
+        {
+            $query = $this->query_posts_that_should_be_retried(false);
+            return $query->post_count;
+        }
+
+        public function query_posts_that_should_be_retried($batch)
+        {
+            $retry_minutes = $this->common->get_settings_field_value("retry_minutes");
+            $retry_timestamp = $this->common->get_current_utc_timestamp() - $retry_minutes * 60;
+
+            $query_args = array(
+                'post_type' => 'post',
+                'post_status' => array('publish'),
+                'ignore_sticky_posts' => true,
+                'meta_query' => array(
+                    'relation' => 'AND',
+                    array(
+                        'relation' => 'OR',
+                        array(
+                            'key' => $this->common->get_post_doi_meta_key(),
+                            'compare' => "NOT EXISTS",
+                        ),
+                        array(
+                            'key' => $this->common->get_post_doi_meta_key(),
+                            'value' => "",
+                            'compare' => "==",
+                        ),
+                    ),
+                    array(
+                        'key' => $this->common->get_post_submit_timestamp_meta_key(),
+                        'value' => $retry_timestamp,
+                        'compare' => "<",
                     ),
                 ),
             );
@@ -69,6 +134,9 @@ if (!class_exists('VB_CrossRef_DOI_Queries')) {
 
         public function query_posts_that_need_submitting_because_modified($batch)
         {
+            $retry_minutes = $this->common->get_settings_field_value("retry_minutes");
+            $retry_timestamp = $this->common->get_current_utc_timestamp() - $retry_minutes * 60;
+
             $query_args = array(
                 'post_type' => 'post',
                 'post_status' => array('publish'),
@@ -76,8 +144,14 @@ if (!class_exists('VB_CrossRef_DOI_Queries')) {
                 'meta_query' => array(
                     'relation' => 'AND',
                     array(
-                        'key' => $this->common->get_post_needs_update_meta_key(),
-                        'compare' => "EXISTS",
+                        'key' => $this->common->get_post_submit_needs_update_meta_key(),
+                        'value' => true,
+                        'compare' => "=",
+                    ),
+                    array(
+                        'key' => $this->common->get_post_submit_timestamp_meta_key(),
+                        'value' => $retry_timestamp,
+                        'compare' => "<",
                     ),
                 )
             );
@@ -101,7 +175,7 @@ if (!class_exists('VB_CrossRef_DOI_Queries')) {
                 'meta_query' => array(
                     'relation' => 'AND',
                     array(
-                        'key' => $this->common->get_doi_meta_key(),
+                        'key' => $this->common->get_post_doi_meta_key(),
                         'value' => "",
                         'compare' => "!=",
                     ),
@@ -112,13 +186,13 @@ if (!class_exists('VB_CrossRef_DOI_Queries')) {
             return new WP_Query( $query_args );
         }
 
-        public function get_number_of_posts_that_were_submitted()
+        public function get_number_of_posts_that_were_successfully_submitted()
         {
-            $query = $this->query_posts_that_were_submitted(false);
+            $query = $this->query_posts_that_were_successfully_submitted(false);
             return $query->post_count;
         }
 
-        protected function query_posts_that_were_submitted($batch)
+        protected function query_posts_that_were_successfully_submitted($batch)
         {
             $query_args = array(
                 'post_type' => 'post',
@@ -127,7 +201,108 @@ if (!class_exists('VB_CrossRef_DOI_Queries')) {
                 'meta_query' => array(
                     'relation' => 'AND',
                     array(
-                        'key' => $this->common->get_submit_timestamp_meta_key(),
+                        'key' => $this->common->get_post_doi_meta_key(),
+                        'value' => "",
+                        'compare' => "!=",
+                    ),
+                    array(
+                        'key' => $this->common->get_post_submit_timestamp_meta_key(),
+                        'value' => "",
+                        'compare' => "!=",
+                    ),
+                )
+            );
+
+            $this->add_batch_arguments_to_query($query_args, $batch);
+            return new WP_Query( $query_args );
+        }
+
+        public function get_number_of_posts_that_were_modified_since_last_check()
+        {
+            $query = $this->query_posts_that_were_modified_since_last_check();
+            return $query->post_count;
+        }
+
+        public function query_posts_that_were_modified_since_last_check()
+        {
+            $last_check_date = $this->status->get_date_of_last_modified_check();
+            $after_utc = $this->common->local_to_utc_iso8601($this->common->date_to_iso8601($last_check_date));
+            $after = $this->common->local_to_utc_iso8601($after_utc);
+            $query_args = array(
+                'post_type' => 'post',
+                'post_status' => array('publish'),
+                'ignore_sticky_posts' => true,
+                'date_query' => array(
+                    'column' => 'post_modified_gmt',
+                    array(
+                        'after'     => $after,
+                        'inclusive' => false,
+                    ),
+                ),
+                'meta_query' => array(
+                    'relation' => 'AND',
+                    array(
+                        'key' => $this->common->get_post_doi_meta_key(),
+                        'value' => "",
+                        'compare' => "!=",
+                    ),
+                )
+            );
+
+            $this->add_batch_arguments_to_query($query_args, false);
+            return new WP_Query( $query_args );
+        }
+
+        public function get_number_of_posts_that_have_pending_submissions()
+        {
+            $query = $this->query_posts_that_have_pending_submissions(false);
+            return $query->post_count;
+        }
+
+        public function query_posts_that_have_pending_submissions($batch)
+        {
+            $timeout_minutes = $this->common->get_settings_field_value("timeout_minutes");
+            $timeout_timestamp = $this->common->get_current_utc_timestamp() - $timeout_minutes * 60;
+
+            $query_args = array(
+                'post_type' => 'post',
+                'post_status' => array('publish'),
+                'ignore_sticky_posts' => true,
+                'meta_query' => array(
+                    'relation' => 'AND',
+                    array(
+                        'key' => $this->common->get_post_submit_pending_meta_key(),
+                        'value' => true,
+                        'compare' => "=",
+                    ),
+                    array(
+                        'key' => $this->common->get_post_submit_timestamp_meta_key(),
+                        'value' => $timeout_timestamp,
+                        'compare' => ">",
+                    ),
+                ),
+            );
+
+            $this->add_batch_arguments_to_query($query_args, $batch);
+            return new WP_Query( $query_args );
+        }
+
+        public function get_number_of_posts_with_submit_error()
+        {
+            $query = $this->query_posts_with_submit_error(false);
+            return $query->post_count;
+        }
+
+        public function query_posts_with_submit_error($batch)
+        {
+            $query_args = array(
+                'post_type' => 'post',
+                'post_status' => array('publish'),
+                'ignore_sticky_posts' => true,
+                'meta_query' => array(
+                    'relation' => 'AND',
+                    array(
+                        'key' => $this->common->get_post_submit_error_meta_key(),
                         'value' => "",
                         'compare' => "!=",
                     ),

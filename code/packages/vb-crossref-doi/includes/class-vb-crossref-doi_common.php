@@ -20,7 +20,8 @@ if (!class_exists('VB_CrossRef_DOI_Common')) {
                 // default settings for Verfassungsblog
                 $this->setting_field_defaults = array(
                     // general
-                    "api_url" => "https://api.crossref.org/v2/deposits",
+                    "api_url_deposit" => "https://api.crossref.org/v2/deposits",
+                    "api_url_submission" => "https://doi.crossref.org/servlet/submissionDownload",
                     "depositor_name" => "Wordpress Plugin " . $this->plugin_name,
                     "depositor_email" => "crossref@verfassungsblog.de",
                     "registrant" => $blog_title,
@@ -37,6 +38,8 @@ if (!class_exists('VB_CrossRef_DOI_Common')) {
                     "interval" => 1,
                     "batch" => 1,
                     "requests_per_second" => 2.0,
+                    "timeout_minutes" => 10,
+                    "retry_minutes" => 60,
                     // post meta
                     "doi_meta_key" => "doi",
                     "copyright_meta_key" => "copyright",
@@ -49,7 +52,8 @@ if (!class_exists('VB_CrossRef_DOI_Common')) {
                 // default settings for any other blog than Verfassungsblog
                 $this->setting_field_defaults = array(
                     // general
-                    "api_url" => "https://api.crossref.org/v2/deposits",
+                    "api_url_deposit" => "https://api.crossref.org/v2/deposits",
+                    "api_url_submission" => "https://doi.crossref.org/servlet/submissionDownload",
                     "depositor_name" => "Wordpress Plugin " . $this->plugin_name,
                     "doi_suffix_length" => 16,
                     "include_excerpt" => True,
@@ -60,6 +64,8 @@ if (!class_exists('VB_CrossRef_DOI_Common')) {
                     "interval" => 1,
                     "batch" => 1,
                     "requests_per_second" => 2.0,
+                    "timeout_minutes" => 10,
+                    "retry_minutes" => 60,
                     // post meta
                     "doi_meta_key" => "doi",
                     // user meta
@@ -107,25 +113,53 @@ if (!class_exists('VB_CrossRef_DOI_Common')) {
             return false;
         }
 
-        public function get_doi_meta_key() {
+        public function get_post_doi_meta_key() {
             return $this->get_settings_field_value("doi_meta_key");
         }
 
-        public function get_post_needs_update_meta_key()
+        public function get_post_submit_needs_update_meta_key()
         {
-            return $this->plugin_name . "_post-needs-update";
+            return $this->plugin_name . "_submit-needs-update";
         }
 
-        public function get_submit_timestamp_meta_key() {
+        public function get_post_submit_pending_meta_key()
+        {
+            return $this->plugin_name . "_submit-pending";
+        }
+
+        public function get_post_submit_timestamp_meta_key() {
             return $this->plugin_name . "_submit-timestamp";
         }
 
-        public function get_submit_batch_id_meta_key() {
-            return $this->plugin_name . "_submit-batch-id";
+        public function get_post_submit_id_meta_key() {
+            return $this->plugin_name . "_submit-id";
         }
 
-        public function get_submit_submission_id_meta_key() {
-            return $this->plugin_name . "_submit-submission-id";
+        public function get_post_submit_error_meta_key() {
+            return $this->plugin_name . "_submit-error";
+        }
+
+        public function get_current_utc_timestamp() {
+            return (new DateTime("now", new DateTimeZone("UTC")))->getTimestamp();
+        }
+
+        public function date_to_iso8601($date) {
+            return $date->format("Y-m-d\TH:i:s\Z");
+        }
+
+        public function iso8601_to_date($iso) {
+            $date = date_create_immutable_from_format('Y-m-d\\TH:i:s\\Z', $iso, new DateTimeZone('UTC'));
+            if (!$date) {
+                $date = date_create_immutable_from_format('Y-m-d', $iso, new DateTimeZone('UTC'));
+            }
+            return $date;
+        }
+
+        public function local_to_utc_iso8601($utc_iso) {
+            $local = new Datetime("now", wp_timezone());
+            $date = new Datetime("now", new DateTimeZone("UTC"));
+            $date->setTimestamp($this->iso8601_to_date($utc_iso)->getTimestamp() - wp_timezone()->getOffset($local));
+            return $this->date_to_iso8601($date);
         }
 
         public function format_xml($xml_str)

@@ -40,13 +40,22 @@ if (!class_exists('VB_CrossRef_DOI_Setting_Fields')) {
                     "description" => "The password to the CrossRef Deposit API.",
                 ),
                 array(
-                    "name" => "api_url",
+                    "name" => "api_url_deposit",
                     "type" => "string",
                     "section" => "general",
                     "label" => "Deposit API URL",
                     "placeholder" => "URL to the CrossRef Deposit API",
                     "description" => "The URL to the CrossRef Deposit API.<br>
                         Usually <code>https://api.crossref.org/v2/deposits</code>, for testing <code>https://test.crossref.org/v2/deposits</code>",
+                ),
+                array(
+                    "name" => "api_url_submission",
+                    "type" => "string",
+                    "section" => "general",
+                    "label" => "Submission API URL",
+                    "placeholder" => "URL to the CrossRef Submission API",
+                    "description" => "The URL to the CrossRef Submission API.<br>
+                        Usually <code>https://doi.crossref.org/servlet/submissionDownload</code>, for testing <code>https://test.crossref.org/servlet/submissionDownload</code>",
                 ),
                 array(
                     "name" => "depositor_name",
@@ -188,6 +197,24 @@ if (!class_exists('VB_CrossRef_DOI_Setting_Fields')) {
                     "description" => "The maximum number of API requests that are issued per second. CrossRef states
                         that they rate limit requests. High numbers might provoke CrossRef to block your IP address.",
                 ),
+                array(
+                    "name" => "timeout_minutes",
+                    "type" => "string",
+                    "section" => "update",
+                    "label" => "Timeout Minutes",
+                    "placeholder" => "number of minutes",
+                    "description" => "The number of minutes that need to pass before a submission is considered to have
+                        failed without any response from CrossRef.",
+                ),
+                array(
+                    "name" => "retry_minutes",
+                    "type" => "string",
+                    "section" => "update",
+                    "label" => "Retry Minutes",
+                    "placeholder" => "number of minutes",
+                    "description" => "The number of minutes that need to pass before a failed submission is tried again.",
+                ),
+
 
                 // ------------- custom post fields -------------
 

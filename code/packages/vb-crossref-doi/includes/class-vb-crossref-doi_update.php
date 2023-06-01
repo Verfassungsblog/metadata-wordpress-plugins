@@ -26,15 +26,26 @@ if (!class_exists('VB_CrossRef_DOI_Update')) {
         {
             if ($query->post_count > 0) {
                 foreach($query->posts as $post) {
-                    $success = false;
-                    if ($post->post_status == "publish") {
-                        $success = $this->rest->submit_new_or_existing_post($post);
+                    $success = $this->rest->submit_new_or_existing_post($post);
+                    if ($success) {
+                        continue;
                     } else {
-                        $this->status->set_last_error("cannot submit post with post status '" . $post->post_status . "'");
+                        return true;
                     }
+                }
+                return true;
+            }
+            return false;
+        }
+
+        protected function check_submissions_from_query($query)
+        {
+            if ($query->post_count > 0) {
+                foreach($query->posts as $post) {
+                    $success = $this->rest->check_submission_result($post);
 
                     if ($success) {
-                        // TODO
+                        continue;
                     } else {
                         return true;
                     }
@@ -50,12 +61,29 @@ if (!class_exists('VB_CrossRef_DOI_Update')) {
             $batch = (int)$this->common->get_settings_field_value("batch");
             $batch = $batch < 1 ? 1 : $batch;
 
-            // iterate over all posts that were never submitted before
-            $not_submitted_yet_query = $this->queries->query_posts_that_were_not_submitted_yet($batch);
-            if ($this->submit_posts_from_query($not_submitted_yet_query)) {
+            // check posts that need updating because modified
+            $modified_query = $this->queries->query_posts_that_were_modified_since_last_check();
+            foreach ($modified_query->posts as $post_id) {
+                $this->status->set_post_submit_needs_update($post_id);
+                $this->status->clear_post_submit_error($post_id);
+            }
+            $this->status->set_date_of_last_modified_check();
+
+            // check pending submissions
+            $pending_query = $this->queries->query_posts_that_have_pending_submissions($batch);
+            if ($this->check_submissions_from_query($pending_query)) {
+                // stop if any pending submissions were checked
+                return;
+            }
+            return;
+
+            // iterate over all posts that need submitting (modified, retry, new)
+            $submit_query = $this->queries->query_posts_that_need_submitting($batch);
+            if ($this->submit_posts_from_query($submit_query)) {
                 // stop if any posts were submitted
                 return;
             }
+
 
         }
 

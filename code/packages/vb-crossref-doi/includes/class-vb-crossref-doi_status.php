@@ -45,39 +45,119 @@ if (!class_exists('VB_CrossRef_DOI_Status')) {
             return human_time_diff($date->getTimestamp()) . " ago";
         }
 
-        public function set_post_submit_timestamp($post) {
-            update_post_meta(
-                $post->ID,
-                $this->common->get_submit_timestamp_meta_key(),
-                (new DateTime("now", new DateTimeZone("UTC")))->getTimestamp()
-            );
+        public function set_date_of_last_modified_check() {
+            $timestamp = (new DateTime("now", new DateTimeZone("UTC")))->getTimestamp();
+            return update_option($this->common->plugin_name . "_date_of_last_modified_check", $timestamp);
         }
 
-        public function clear_post_submit_timestamp($post)
+        public function get_date_of_last_modified_check() {
+            $timestamp = get_option($this->common->plugin_name . "_date_of_last_modified_check", false);
+            if (empty($timestamp)) {
+                // no date available, set it
+                $this->set_date_of_last_modified_check();
+                $timestamp = (new DateTime("now", new DateTimeZone("UTC")))->getTimestamp();
+            }
+            return (new DateTime())->setTimestamp($timestamp)->setTimezone(wp_timezone());
+        }
+
+        public function get_text_of_last_modified_check()
         {
-            delete_post_meta($post->ID, $this->common->get_submit_timestamp_meta_key());
+            $date = $this->get_date_of_last_modified_check();
+            return human_time_diff($date->getTimestamp()) . " ago";
         }
 
-        public function set_post_submit_batch_id($post, $batch_id) {
-            update_post_meta(
+        public function clear_date_of_last_modified_check() {
+            delete_option($this->common->plugin_name . "_date_of_last_modified_check");
+        }
+
+        public function get_post_submit_timestamp($post)
+        {
+            return get_post_meta(
                 $post->ID,
-                $this->common->get_submit_batch_id_meta_key(),
-                $batch_id
+                $this->common->get_post_submit_timestamp_meta_key(),
+                true
             );
         }
 
-        public function set_post_submit_submission_id($post, $submission_id) {
+        public function set_post_submit_timestamp($post, $timestamp) {
             update_post_meta(
                 $post->ID,
-                $this->common->get_submit_submission_id_meta_key(),
+                $this->common->get_post_submit_timestamp_meta_key(),
+                $timestamp,
+            );
+        }
+
+        public function clear_post_submit_timestamp($post_id)
+        {
+            delete_post_meta($post_id, $this->common->get_post_submit_timestamp_meta_key());
+        }
+
+        public function set_post_submit_id($post, $submission_id) {
+            update_post_meta(
+                $post->ID,
+                $this->common->get_post_submit_id_meta_key(),
                 $submission_id,
             );
         }
 
+        public function set_post_submit_needs_update($post_id) {
+            update_post_meta(
+                $post_id,
+                $this->common->get_post_submit_needs_update_meta_key(),
+                True,
+            );
+        }
+
+        public function clear_post_needs_update($post) {
+            delete_post_meta(
+                $post->ID,
+                $this->common->get_post_submit_needs_update_meta_key(),
+            );
+        }
+
+        public function set_post_submit_pending($post) {
+            update_post_meta(
+                $post->ID,
+                $this->common->get_post_submit_pending_meta_key(),
+                True,
+            );
+        }
+
+        public function clear_post_submit_pending($post) {
+            delete_post_meta(
+                $post->ID,
+                $this->common->get_post_submit_pending_meta_key(),
+            );
+        }
+
+        public function get_post_submit_error($post) {
+            return get_post_meta(
+                $post->ID,
+                $this->common->get_post_submit_error_meta_key(),
+                true,
+            );
+        }
+
+        public function set_post_submit_error($post, $msg) {
+            update_post_meta(
+                $post->ID,
+                $this->common->get_post_submit_error_meta_key(),
+                $msg,
+            );
+        }
+
+        public function clear_post_submit_error($post_id) {
+            delete_post_meta(
+                $post_id,
+                $this->common->get_post_submit_error_meta_key(),
+            );
+        }
+
+
         public function set_post_doi($post, $doi) {
             update_post_meta(
                 $post->ID,
-                $this->common->get_doi_meta_key(),
+                $this->common->get_post_doi_meta_key(),
                 $doi,
             );
         }
@@ -85,15 +165,18 @@ if (!class_exists('VB_CrossRef_DOI_Status')) {
         public function reset_status()
         {
             $meta_keys = array(
-                $this->common->get_submit_timestamp_meta_key(),
-                $this->common->get_submit_batch_id_meta_key(),
-                $this->common->get_submit_submission_id_meta_key(),
+                $this->common->get_post_submit_timestamp_meta_key(),
+                $this->common->get_post_submit_id_meta_key(),
+                $this->common->get_post_submit_error_meta_key(),
+                $this->common->get_post_submit_needs_update_meta_key(),
+                $this->common->get_post_submit_pending_meta_key(),
             );
 
             foreach($meta_keys as $meta_key) {
                 delete_metadata('post', 0, $meta_key, false, true);
             }
 
+            $this->clear_date_of_last_modified_check();
             $this->clear_last_error();
         }
 

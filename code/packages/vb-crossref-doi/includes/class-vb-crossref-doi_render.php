@@ -54,7 +54,7 @@ if (!class_exists('VB_CrossRef_DOI_Render')) {
             return array_slice(get_coauthors($post->ID), 1);
         }
 
-        protected function render_head($post)
+        protected function render_head($post, $submit_timestamp)
         {
             $timestamp = $this->date_to_timestamp_format(new DateTime());
             $depositor_name = $this->common->get_settings_field_value("depositor_name");
@@ -78,7 +78,7 @@ if (!class_exists('VB_CrossRef_DOI_Render')) {
 
             return implode("", array(
                 "<head>",
-                "<doi_batch_id>{$post->ID}.{$timestamp}</doi_batch_id>",
+                "<doi_batch_id>{$post->ID}.{$submit_timestamp}</doi_batch_id>",
                 "<timestamp>{$timestamp}</timestamp>",
                 "<depositor>",
                 "<depositor_name>" . $this->escape($depositor_name) . "</depositor_name>",
@@ -401,7 +401,7 @@ if (!class_exists('VB_CrossRef_DOI_Render')) {
             return "[Post id=" . $this->last_post->ID . "] " .  $this->last_error;
         }
 
-        public function render($post)
+        public function render($post, $submit_timestamp)
         {
             // documentation see: https://data.crossref.org/reports/help/schema_doc/5.3.1/index.html
             // examples see: https://www.crossref.org/xml-samples/
@@ -409,7 +409,7 @@ if (!class_exists('VB_CrossRef_DOI_Render')) {
             $this->last_post = $post;
             $this->last_error = null;
 
-            $head = $this->render_head($post);
+            $head = $this->render_head($post, $submit_timestamp);
             $posted_content = $this->render_posted_content($post);
 
             if (empty($head) || empty($posted_content)) {
