@@ -75,7 +75,6 @@ if (!class_exists('VB_CrossRef_DOI_Update')) {
                 // stop if any pending submissions were checked
                 return;
             }
-            return;
 
             // iterate over all posts that need submitting (modified, retry, new)
             $submit_query = $this->queries->query_posts_that_need_submitting($batch);
