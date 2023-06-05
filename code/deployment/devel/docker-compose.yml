@@ -32,6 +32,7 @@ services:
         define( 'SAVEQUERIES', true );
     volumes:
       - ${DATA_DIR}/wordpress:/var/www/html:Z
+      - ${WORKSPACE_DIR}/code/packages/vb-author-affiliations:/var/www/html/wp-content/plugins/vb-author-affiliations:Z
       - ${WORKSPACE_DIR}/code/packages/vb-crossref-doi:/var/www/html/wp-content/plugins/vb-crossref-doi:Z
       - ${WORKSPACE_DIR}/code/packages/vb-doaj-submit:/var/www/html/wp-content/plugins/vb-doaj-submit:Z
       - ${WORKSPACE_DIR}/code/packages/vb-gnd-taxonomy:/var/www/html/wp-content/plugins/vb-gnd-taxonomy:Z

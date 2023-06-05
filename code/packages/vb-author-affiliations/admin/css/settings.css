@@ -1,0 +1,49 @@
+body.settings_page_vb-author-affiliations div#wpcontent {
+    padding-left: 0;
+}
+
+body.settings_page_vb-author-affiliations pre {
+    padding: 0.5em;
+    background-color: #fff;
+    border: 1px solid #dcdcde;
+    box-sizing: border-box;
+    overflow: auto;
+}
+
+.vb-author-affiliations-admin-header {
+    padding: 20px 0 0 0;
+    background-color: #fff;
+    text-align: center;
+    border-bottom: 1px solid #dcdcde;
+}
+
+.vb-author-affiliations-admin-header h1 {
+    line-height: 1.5em;
+}
+
+.vb-author-affiliations-admin-header-nav {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.vb-author-affiliations-admin-header-tab {
+    display: inline-block;
+    padding: 20px 15px 15px 15px;
+    margin: 0 5px;
+    text-decoration: none;
+    color: rgb(60, 67, 74);
+    border-bottom: 3px solid #fff;
+    box-sizing: border-box;
+
+}
+
+.vb-author-affiliations-admin-header-tab.active {
+    font-weight: 500;
+    border-bottom: 3px solid #2271b1;
+}
+
+
+.vb-author-affiliations-admin-content {
+    margin: 20px 20px 0 20px;
+}
