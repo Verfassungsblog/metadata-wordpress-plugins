@@ -94,10 +94,18 @@ if (!class_exists('VB_Author_Affiliations_Meta_Box')) {
                 $author_affiliations = array();
             }
 
+            // remove unknown authors
+            foreach ($author_affiliations as $author_id => $affiliation) {
+                if (!array_key_exists($author_id, $author_names)) {
+                    unset($author_affiliations[$author_id]);
+                }
+            }
+
+            // autofill new authors
             foreach ($author_names as $author_id => $author_name){
                 if (!array_key_exists($author_id, $author_affiliations) && $autofill) {
                     $affiliation = $this->rest->retrieve_author_affiliation($author_id);
-                    $rorid = $this->common->get_user_meta_field_value("rorid", $author_id);
+                    $rorid = $this->common->get_user_meta_field_value("rorid_meta_key", $author_id);
                     $author_affiliations[$author_id] = array(
                         "name" => $affiliation,
                         "rorid" => empty($rorid) ? "" : $rorid,
@@ -110,18 +118,27 @@ if (!class_exists('VB_Author_Affiliations_Meta_Box')) {
 
         public function render_meta_box($post)
         {
+            // generate new json from previous data, current authors and suggestions
             $author_names = $this->get_post_author_names($post);
             $author_affiliations = $this->get_post_author_affiliations($post);
             $json = json_encode($author_affiliations, JSON_UNESCAPED_SLASHES);
 
+            // save changes immediately (in case an author was added or deleted)
+            $author_affiliations_meta_key = $this->common->get_settings_field_value("author_affiliations_meta_key");
+            if (!empty($author_affiliations_meta_key)) {
+                update_post_meta($post->ID, $author_affiliations_meta_key, $json);
+            }
+
+            // render meta box
             $textarea_id = $this->common->plugin_name . "_textarea";
+            $table_id = $this->common->plugin_name . "_table";
             ?>
             <div class="hide-if-js">
                 <textarea id="<?php echo $textarea_id ?>" name="<?php echo $textarea_id ?>"><?php echo $json ?></textarea>
             </div>
-            <table>
+            <table id="<?php echo $table_id ?>">
                 <thead>
-                    <tr><th>Author</th><th>Affiliation</th><th>ROR-ID</th></tr>
+                    <tr><th class="author">Author</th><th>Affiliation</th><th class="rorid">ROR-ID</th></tr>
                 </thead>
                 <tbody>
                     <?php
@@ -135,8 +152,21 @@ if (!class_exists('VB_Author_Affiliations_Meta_Box')) {
                                     <?php echo $author_name ?>
                                 </a>
                             </td>
-                            <td><input type="text" value="<?php echo esc_attr($affiliation) ?>" placeholder="affiliation name" /></td>
-                            <td><input type="text" value="<?php echo esc_attr($rorid) ?>" placeholder="rorid" /></td>
+                            <td>
+                                <input type="text"
+                                    data-author-id="<?php echo esc_attr($author_id) ?>"
+                                    data-affiliation-field="name"
+                                    value="<?php echo esc_attr($affiliation) ?>"
+                                    placeholder="affiliation name"
+                                />
+                            </td>
+                            <td>
+                                <input type="text"
+                                    data-author-id="<?php echo esc_attr($author_id) ?>"
+                                    data-affiliation-field="rorid"
+                                    value="<?php echo esc_attr($rorid) ?>"
+                                    placeholder="rorid" />
+                            </td>
                         </tr>
                         <?php
                     }
@@ -161,10 +191,35 @@ if (!class_exists('VB_Author_Affiliations_Meta_Box')) {
             }
         }
 
+        public function admin_enqueue_scripts()
+        {
+            wp_enqueue_script(
+                $this->common->plugin_name . '-admin-script',
+                plugins_url("js/index.js", __FILE__),
+                array('jquery'),
+                filemtime(realpath(plugin_dir_path(__FILE__) . "js/index.js")),
+                false
+            );
+        }
+
         public function action_admin_init()
         {
             add_action('add_meta_boxes', array($this, 'action_add_meta_boxes'));
             add_action('save_post', array($this, "action_save_post"), 10, 3);
+
+            // add css
+            wp_register_style(
+                $this->common->plugin_name . '-admin-styles-meta-box',
+                plugins_url("css/meta_box.css", __FILE__),
+                array(),
+                filemtime(realpath(plugin_dir_path(__FILE__) . "css/meta_box.css")),
+                "screen"
+            );
+        }
+
+        public function action_admin_print_styles()
+        {
+            wp_enqueue_style($this->common->plugin_name . "-admin-styles-meta-box");
         }
 
         public function run()
@@ -175,6 +230,8 @@ if (!class_exists('VB_Author_Affiliations_Meta_Box')) {
             }
 
             add_action('admin_init', array($this, 'action_admin_init'));
+            add_action('admin_enqueue_scripts', array($this, 'admin_enqueue_scripts'));
+            add_action("admin_print_styles", array($this, "action_admin_print_styles"));
         }
 
     }

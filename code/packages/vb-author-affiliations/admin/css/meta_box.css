@@ -1,0 +1,15 @@
+table#vb-author-affiliations_table {
+    width: 100%;
+}
+
+table#vb-author-affiliations_table th.rorid {
+    width: 20%;
+}
+
+table#vb-author-affiliations_table th.author {
+    width: 30%;
+}
+
+table#vb-author-affiliations_table input {
+    width: 100%;
+}
