@@ -100,7 +100,7 @@ if (!class_exists('VB_CrossRef_DOI_REST')) {
                     "Content-Type" => "multipart/form-data; boundary=" . $boundary,
                     "Accept" =>  "application/xml",
                 ),
-                "timeout" => 2,
+                "timeout" => 30,
                 "body" => $body,
             );
 
@@ -148,7 +148,7 @@ if (!class_exists('VB_CrossRef_DOI_REST')) {
             if ($status_code == 403 || $success_count < 1 || $failure_count > 0 || $warning_count > 0) {
                 $msg = $response_xml->getElementsByTagName('msg')->item(0)->nodeValue;
                 $this->status->set_post_submit_error($post, $msg);
-                $this->status->clear_post_submit_pending($post);
+                $this->status->set_post_submit_status($post, VB_CrossRef_DOI_Status::SUBMIT_ERROR);
                 $this->status->set_last_error("CrossRef request failed with status code '" . $status_code . "' and
                     message '" . $msg . "' (batch id '" . $batch_id . "', submission id '" . $submission_id . "')");
                 return false;
@@ -160,8 +160,7 @@ if (!class_exists('VB_CrossRef_DOI_REST')) {
             // update post status
             $this->status->set_post_doi($post, $doi);
             $this->status->clear_post_submit_error($post);
-            $this->status->clear_post_needs_update($post);
-            $this->status->clear_post_submit_pending($post);
+            $this->status->set_post_submit_status($post, VB_CrossRef_DOI_Status::SUBMIT_SUCCESS);
             $this->status->set_post_submit_id($post, $submission_id);
         }
 
@@ -173,7 +172,7 @@ if (!class_exists('VB_CrossRef_DOI_REST')) {
             if (!empty($doi) && !str_starts_with($doi, $doi_prefix)) {
                 // this is some other doi that we can not process
                 // clear needs update status, which is the only way this could have happened
-                $this->status->clear_post_needs_update($post);
+                $this->status->set_post_submit_status($post, VB_CrossRef_DOI_Status::SUBMIT_NOT_POSSIBLE);
             }
 
             // wait until a request does not cause a rate limit
@@ -206,7 +205,7 @@ if (!class_exists('VB_CrossRef_DOI_REST')) {
 
             // save submit timestamp
             $this->status->set_post_submit_timestamp($post, $submit_timestamp);
-            $this->status->set_post_submit_pending($post);
+            $this->status->set_post_submit_status($post, VB_CrossRef_DOI_Status::SUBMIT_PENDING);
 
             // do http request
             $response = wp_remote_request($api_url_deposit, $this->build_request_parameters($form_elements, $xml));

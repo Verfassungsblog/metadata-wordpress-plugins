@@ -117,14 +117,9 @@ if (!class_exists('VB_CrossRef_DOI_Common')) {
             return $this->get_settings_field_value("doi_meta_key");
         }
 
-        public function get_post_submit_needs_update_meta_key()
+        public function get_post_submit_status_meta_key()
         {
-            return $this->plugin_name . "_submit-needs-update";
-        }
-
-        public function get_post_submit_pending_meta_key()
-        {
-            return $this->plugin_name . "_submit-pending";
+            return $this->plugin_name . "_submit-status";
         }
 
         public function get_post_submit_timestamp_meta_key() {

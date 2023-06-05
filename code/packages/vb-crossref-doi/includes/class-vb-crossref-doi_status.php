@@ -6,6 +6,12 @@ if (!class_exists('VB_CrossRef_DOI_Status')) {
 
     class VB_CrossRef_DOI_Status
     {
+        public const SUBMIT_SUCCESS = "success";
+        public const SUBMIT_ERROR = "error";
+        public const SUBMIT_PENDING = "pending";
+        public const SUBMIT_NOT_POSSIBLE = "not-possible";
+        public const SUBMIT_MODIFIED = "modified";
+
         protected $common;
 
         public function __construct($plugin_name)
@@ -45,8 +51,10 @@ if (!class_exists('VB_CrossRef_DOI_Status')) {
             return human_time_diff($date->getTimestamp()) . " ago";
         }
 
-        public function set_date_of_last_modified_check() {
-            $timestamp = (new DateTime("now", new DateTimeZone("UTC")))->getTimestamp();
+        public function set_date_of_last_modified_check($timestamp = null) {
+            if ($timestamp == null) {
+                $timestamp = (new DateTime("now", new DateTimeZone("UTC")))->getTimestamp();
+            }
             return update_option($this->common->plugin_name . "_date_of_last_modified_check", $timestamp);
         }
 
@@ -100,33 +108,11 @@ if (!class_exists('VB_CrossRef_DOI_Status')) {
             );
         }
 
-        public function set_post_submit_needs_update($post_id) {
-            update_post_meta(
-                $post_id,
-                $this->common->get_post_submit_needs_update_meta_key(),
-                True,
-            );
-        }
-
-        public function clear_post_needs_update($post) {
-            delete_post_meta(
-                $post->ID,
-                $this->common->get_post_submit_needs_update_meta_key(),
-            );
-        }
-
-        public function set_post_submit_pending($post) {
+        public function set_post_submit_status($post, $status) {
             update_post_meta(
                 $post->ID,
-                $this->common->get_post_submit_pending_meta_key(),
-                True,
-            );
-        }
-
-        public function clear_post_submit_pending($post) {
-            delete_post_meta(
-                $post->ID,
-                $this->common->get_post_submit_pending_meta_key(),
+                $this->common->get_post_submit_status_meta_key(),
+                $status,
             );
         }
 
@@ -146,9 +132,9 @@ if (!class_exists('VB_CrossRef_DOI_Status')) {
             );
         }
 
-        public function clear_post_submit_error($post_id) {
+        public function clear_post_submit_error($post) {
             delete_post_meta(
-                $post_id,
+                $post->ID,
                 $this->common->get_post_submit_error_meta_key(),
             );
         }
@@ -168,8 +154,7 @@ if (!class_exists('VB_CrossRef_DOI_Status')) {
                 $this->common->get_post_submit_timestamp_meta_key(),
                 $this->common->get_post_submit_id_meta_key(),
                 $this->common->get_post_submit_error_meta_key(),
-                $this->common->get_post_submit_needs_update_meta_key(),
-                $this->common->get_post_submit_pending_meta_key(),
+                $this->common->get_post_submit_status_meta_key(),
             );
 
             foreach($meta_keys as $meta_key) {

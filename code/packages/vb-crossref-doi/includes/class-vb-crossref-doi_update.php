@@ -55,19 +55,32 @@ if (!class_exists('VB_CrossRef_DOI_Update')) {
             return false;
         }
 
+        public function check_for_modified_posts()
+        {
+            // check posts that need updating because modified
+            $modified_query = $this->queries->query_posts_that_were_modified_since_last_check();
+            foreach ($modified_query->posts as $post_id) {
+                $post = $post = new stdClass();
+                $post->ID = $post_id;
+                $this->status->set_post_submit_status($post, VB_CrossRef_DOI_Status::SUBMIT_MODIFIED);
+                $this->status->clear_post_submit_error($post);
+            }
+            $this->status->set_date_of_last_modified_check();
+        }
+
+        public function mark_all_posts_as_modified()
+        {
+            $this->status->set_date_of_last_modified_check(1);
+            $this->check_for_modified_posts();
+        }
+
         public function do_update() {
             $this->status->clear_last_error();
             $this->status->set_last_update();
             $batch = (int)$this->common->get_settings_field_value("batch");
             $batch = $batch < 1 ? 1 : $batch;
 
-            // check posts that need updating because modified
-            $modified_query = $this->queries->query_posts_that_were_modified_since_last_check();
-            foreach ($modified_query->posts as $post_id) {
-                $this->status->set_post_submit_needs_update($post_id);
-                $this->status->clear_post_submit_error($post_id);
-            }
-            $this->status->set_date_of_last_modified_check();
+            $this->check_for_modified_posts();
 
             // check pending submissions
             $pending_query = $this->queries->query_posts_that_have_pending_submissions($batch);
@@ -82,8 +95,6 @@ if (!class_exists('VB_CrossRef_DOI_Update')) {
                 // stop if any posts were submitted
                 return;
             }
-
-
         }
 
         public function action_init() {

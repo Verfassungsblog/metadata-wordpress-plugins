@@ -240,10 +240,14 @@ if (!class_exists('VB_CrossRef_DOI_Admin')) {
                     <?php echo $value ? "checked" : "" ?>
                 >
                 <?php
-            } else {
+            } else if ($field["type"] == "text" || $field["type"] == "password") {
                 ?>
                 <input id="<?php echo esc_attr($field_id); ?>" name="<?php echo esc_attr($field_id); ?>" class="regular-text code"
-                    type="text" value="<?php echo $value ?>" placeholder="<?php echo $field["placeholder"] ?>">
+                    type="<?php echo $field["type"] ?>" value="<?php echo $value ?>" placeholder="<?php echo $field["placeholder"] ?>">
+                <?php
+            } else {
+                ?>
+                invalid setting type for field '<?php echo esc_html($field_id) ?>'
                 <?php
             }
             ?>
@@ -310,6 +314,16 @@ if (!class_exists('VB_CrossRef_DOI_Admin')) {
             if (!empty($_POST["manual_update"])) {
                 $this->update->do_update();
             }
+
+            if (!empty($_POST["check_modified"])) {
+                $this->update->check_for_modified_posts();
+            }
+
+            if (!empty($_POST["mark_all_posts_as_modified"])) {
+                $this->update->mark_all_posts_as_modified();
+            }
+
+
 
             if (!empty($_POST["reset_last_error"])) {
                 $this->status->clear_last_error();
@@ -443,18 +457,42 @@ if (!class_exists('VB_CrossRef_DOI_Admin')) {
                 <?php
                 submit_button(__('Manually Update Now', "vb-crossref-doi"), "primary", "manual_update", false);
                 echo " ";
+                submit_button(__('Manually Check for Modified Posts Now', "vb-crossref-doi"), "secondary", "check_modified", false);
+                ?>
+            </p>
+            <p>
+                <?php
                 submit_button(__('Reset Last Error', "vb-crossref-doi"), "secondary", "reset_last_error", false);
+                ?>
+            </p>
+            </form>
+            <hr />
+            <h2>Resubmit all Posts</h2>
+            <p>
+                Clicking the following button will schedule all published posts to be re-submitted to CrossRef.
+                This could take a very long time.
+            </p>
+            <form method="post" onsubmit="return confirm('Are you sure?');">
+            <p>
+                <?php
+                submit_button(
+                    __('Mark All Posts as Modified', "vb-crossref-doi"),
+                    "secondary",
+                    "mark_all_posts_as_modified",
+                    false
+                );
                 ?>
             </p>
             </form>
             <hr />
             <h2>Reset</h2>
             <p>
-                Clicking the following button will remove information about what posts were already submitted to
-                CrossRef. Effectively, the status will be the same as if the plugin was just freshly installed.
-                Of course, DOIs are not deleted.
+                Clicking the following button will remove the all status information about posts from the database.
+                This includes whether a post was already submitted to CrossRef and potential error messages. Of course,
+                DOIs are not deleted. Effectively, the status of the database will be the same as if the plugin was
+                just freshly installed.
             </p>
-            <form method="post" onsubmit="return confirm('Are you sure?');;">
+            <form method="post" onsubmit="return confirm('Are you sure?');">
             <p>
                 <?php
                 submit_button(__('Reset Status of all Posts', "vb-crossref-doi"), "secondary", "reset_status", false);
@@ -489,10 +527,8 @@ if (!class_exists('VB_CrossRef_DOI_Admin')) {
             </ul>
             <hr/>
             <?php
-            $batch = (int)$this->common->get_settings_field_value("batch");
-            $batch = $batch < 1 ? 1 : $batch;
             $error_count = $this->queries->get_number_of_posts_with_submit_error();
-            $error_query = $this->queries->query_posts_with_submit_error($batch);
+            $error_query = $this->queries->query_posts_with_submit_error(5);
             ?>
             <h3>Posts with Errors (<?php echo $error_count ?>)</h3>
             <ul>
@@ -501,7 +537,7 @@ if (!class_exists('VB_CrossRef_DOI_Admin')) {
                 ?>
                 <li>
                     <a href="<?php echo get_edit_post_link($post) ?>">
-                        Post [id=" <?php echo $post->ID ?> "]
+                        Post [id=<?php echo $post->ID ?>]
                     </a>: <?php echo $this->status->get_post_submit_error($post) ?>
                 </li>
                 <?php

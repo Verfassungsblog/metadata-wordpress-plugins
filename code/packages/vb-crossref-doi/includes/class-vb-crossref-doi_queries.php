@@ -104,14 +104,15 @@ if (!class_exists('VB_CrossRef_DOI_Queries')) {
                     array(
                         'relation' => 'OR',
                         array(
-                            'key' => $this->common->get_post_doi_meta_key(),
-                            'compare' => "NOT EXISTS",
+                            'key' => $this->common->get_post_submit_status_meta_key(),
+                            'value' => VB_CrossRef_DOI_Status::SUBMIT_PENDING,
+                            'compare' => "=",
                         ),
                         array(
-                            'key' => $this->common->get_post_doi_meta_key(),
-                            'value' => "",
-                            'compare' => "==",
-                        ),
+                            'key' => $this->common->get_post_submit_status_meta_key(),
+                            'value' => VB_CrossRef_DOI_Status::SUBMIT_ERROR,
+                            'compare' => "=",
+                        )
                     ),
                     array(
                         'key' => $this->common->get_post_submit_timestamp_meta_key(),
@@ -134,9 +135,6 @@ if (!class_exists('VB_CrossRef_DOI_Queries')) {
 
         public function query_posts_that_need_submitting_because_modified($batch)
         {
-            $retry_minutes = $this->common->get_settings_field_value("retry_minutes");
-            $retry_timestamp = $this->common->get_current_utc_timestamp() - $retry_minutes * 60;
-
             $query_args = array(
                 'post_type' => 'post',
                 'post_status' => array('publish'),
@@ -144,14 +142,9 @@ if (!class_exists('VB_CrossRef_DOI_Queries')) {
                 'meta_query' => array(
                     'relation' => 'AND',
                     array(
-                        'key' => $this->common->get_post_submit_needs_update_meta_key(),
-                        'value' => true,
+                        'key' => $this->common->get_post_submit_status_meta_key(),
+                        'value' => VB_CrossRef_DOI_Status::SUBMIT_MODIFIED,
                         'compare' => "=",
-                    ),
-                    array(
-                        'key' => $this->common->get_post_submit_timestamp_meta_key(),
-                        'value' => $retry_timestamp,
-                        'compare' => "<",
                     ),
                 )
             );
@@ -201,14 +194,9 @@ if (!class_exists('VB_CrossRef_DOI_Queries')) {
                 'meta_query' => array(
                     'relation' => 'AND',
                     array(
-                        'key' => $this->common->get_post_doi_meta_key(),
-                        'value' => "",
-                        'compare' => "!=",
-                    ),
-                    array(
-                        'key' => $this->common->get_post_submit_timestamp_meta_key(),
-                        'value' => "",
-                        'compare' => "!=",
+                        'key' => $this->common->get_post_submit_status_meta_key(),
+                        'value' => VB_CrossRef_DOI_Status::SUBMIT_SUCCESS,
+                        'compare' => "=",
                     ),
                 )
             );
@@ -239,14 +227,6 @@ if (!class_exists('VB_CrossRef_DOI_Queries')) {
                         'inclusive' => false,
                     ),
                 ),
-                'meta_query' => array(
-                    'relation' => 'AND',
-                    array(
-                        'key' => $this->common->get_post_doi_meta_key(),
-                        'value' => "",
-                        'compare' => "!=",
-                    ),
-                )
             );
 
             $this->add_batch_arguments_to_query($query_args, false);
@@ -271,8 +251,8 @@ if (!class_exists('VB_CrossRef_DOI_Queries')) {
                 'meta_query' => array(
                     'relation' => 'AND',
                     array(
-                        'key' => $this->common->get_post_submit_pending_meta_key(),
-                        'value' => true,
+                        'key' => $this->common->get_post_submit_status_meta_key(),
+                        'value' => VB_CrossRef_DOI_Status::SUBMIT_PENDING,
                         'compare' => "=",
                     ),
                     array(
@@ -301,6 +281,11 @@ if (!class_exists('VB_CrossRef_DOI_Queries')) {
                 'ignore_sticky_posts' => true,
                 'meta_query' => array(
                     'relation' => 'AND',
+                    array(
+                        'key' => $this->common->get_post_submit_status_meta_key(),
+                        'value' => VB_CrossRef_DOI_Status::SUBMIT_ERROR,
+                        'compare' => "=",
+                    ),
                     array(
                         'key' => $this->common->get_post_submit_error_meta_key(),
                         'value' => "",

@@ -24,7 +24,7 @@ if (!class_exists('VB_CrossRef_DOI_Setting_Fields')) {
 
                 array(
                     "name" => "api_user",
-                    "type" => "string",
+                    "type" => "text",
                     "section" => "general",
                     "label" => "Deposit User",
                     "placeholder" => "CrossRef Deposit API Username/Role",
@@ -33,7 +33,7 @@ if (!class_exists('VB_CrossRef_DOI_Setting_Fields')) {
                 ),
                 array(
                     "name" => "api_password",
-                    "type" => "string",
+                    "type" => "password",
                     "section" => "general",
                     "label" => "Deposit Password",
                     "placeholder" => "CrossRef Deposit API Password",
@@ -41,7 +41,7 @@ if (!class_exists('VB_CrossRef_DOI_Setting_Fields')) {
                 ),
                 array(
                     "name" => "api_url_deposit",
-                    "type" => "string",
+                    "type" => "text",
                     "section" => "general",
                     "label" => "Deposit API URL",
                     "placeholder" => "URL to the CrossRef Deposit API",
@@ -50,7 +50,7 @@ if (!class_exists('VB_CrossRef_DOI_Setting_Fields')) {
                 ),
                 array(
                     "name" => "api_url_submission",
-                    "type" => "string",
+                    "type" => "text",
                     "section" => "general",
                     "label" => "Submission API URL",
                     "placeholder" => "URL to the CrossRef Submission API",
@@ -59,7 +59,7 @@ if (!class_exists('VB_CrossRef_DOI_Setting_Fields')) {
                 ),
                 array(
                     "name" => "depositor_name",
-                    "type" => "string",
+                    "type" => "text",
                     "section" => "general",
                     "label" => "Depositer Name",
                     "placeholder" => "Depositor Name",
@@ -67,7 +67,7 @@ if (!class_exists('VB_CrossRef_DOI_Setting_Fields')) {
                 ),
                 array(
                     "name" => "depositor_email",
-                    "type" => "string",
+                    "type" => "text",
                     "section" => "general",
                     "label" => "Depositer eMail",
                     "placeholder" => "Depositor eMail",
@@ -75,7 +75,7 @@ if (!class_exists('VB_CrossRef_DOI_Setting_Fields')) {
                 ),
                 array(
                     "name" => "registrant",
-                    "type" => "string",
+                    "type" => "text",
                     "section" => "general",
                     "label" => "Registrant",
                     "placeholder" => "Name of Registrant",
@@ -83,7 +83,7 @@ if (!class_exists('VB_CrossRef_DOI_Setting_Fields')) {
                 ),
                 array(
                     "name" => "doi_prefix",
-                    "type" => "string",
+                    "type" => "text",
                     "section" => "general",
                     "label" => "DOI Prefix",
                     "placeholder" => "Prefix for DOIs",
@@ -91,7 +91,7 @@ if (!class_exists('VB_CrossRef_DOI_Setting_Fields')) {
                 ),
                 array(
                     "name" => "doi_suffix_length",
-                    "type" => "string",
+                    "type" => "text",
                     "section" => "general",
                     "label" => "DOI Suffix Length",
                     "placeholder" => "DOI suffix length",
@@ -99,7 +99,7 @@ if (!class_exists('VB_CrossRef_DOI_Setting_Fields')) {
                 ),
                 array(
                     "name" => "issn",
-                    "type" => "string",
+                    "type" => "text",
                     "section" => "general",
                     "label" => "ISSN",
                     "placeholder" => "ISSN",
@@ -109,7 +109,7 @@ if (!class_exists('VB_CrossRef_DOI_Setting_Fields')) {
                 ),
                 array(
                     "name" => "copyright_general",
-                    "type" => "string",
+                    "type" => "text",
                     "section" => "general",
                     "label" => "Copyright / Licence <br>for all posts",
                     "placeholder" => "a copyright / license note",
@@ -130,7 +130,7 @@ if (!class_exists('VB_CrossRef_DOI_Setting_Fields')) {
 
                 array(
                     "name" => "institution_name",
-                    "type" => "string",
+                    "type" => "text",
                     "section" => "institution",
                     "label" => "Institution Name",
                     "placeholder" => "name of the institution publishing articles.",
@@ -138,7 +138,7 @@ if (!class_exists('VB_CrossRef_DOI_Setting_Fields')) {
                 ),
                 array(
                     "name" => "institution_rorid",
-                    "type" => "string",
+                    "type" => "text",
                     "section" => "institution",
                     "label" => "Institution ROR-ID",
                     "placeholder" => "ROR id of the institution publishing articles.",
@@ -146,7 +146,7 @@ if (!class_exists('VB_CrossRef_DOI_Setting_Fields')) {
                 ),
                 array(
                     "name" => "institution_isni",
-                    "type" => "string",
+                    "type" => "text",
                     "section" => "institution",
                     "label" => "Institution ISNI",
                     "placeholder" => "ISNI of the institution publishing articles.",
@@ -154,7 +154,7 @@ if (!class_exists('VB_CrossRef_DOI_Setting_Fields')) {
                 ),
                 array(
                     "name" => "institution_wikidata_id",
-                    "type" => "string",
+                    "type" => "text",
                     "section" => "institution",
                     "label" => "Institution Wikidata ID",
                     "placeholder" => "wikidata id of the institution publishing articles.",
@@ -172,7 +172,7 @@ if (!class_exists('VB_CrossRef_DOI_Setting_Fields')) {
                 ),
                 array(
                     "name" => "interval",
-                    "type" => "string",
+                    "type" => "text",
                     "section" => "update",
                     "label" => "Update Interval",
                     "placeholder" => "update interval in minutes",
@@ -181,7 +181,7 @@ if (!class_exists('VB_CrossRef_DOI_Setting_Fields')) {
                 ),
                 array(
                     "name" => "batch",
-                    "type" => "string",
+                    "type" => "text",
                     "section" => "update",
                     "label" => "Batch Size",
                     "placeholder" => "batch size",
@@ -190,7 +190,7 @@ if (!class_exists('VB_CrossRef_DOI_Setting_Fields')) {
                 ),
                 array(
                     "name" => "requests_per_second",
-                    "type" => "string",
+                    "type" => "text",
                     "section" => "update",
                     "label" => "Requests per Second",
                     "placeholder" => "requests per second",
@@ -199,7 +199,7 @@ if (!class_exists('VB_CrossRef_DOI_Setting_Fields')) {
                 ),
                 array(
                     "name" => "timeout_minutes",
-                    "type" => "string",
+                    "type" => "text",
                     "section" => "update",
                     "label" => "Timeout Minutes",
                     "placeholder" => "number of minutes",
@@ -208,7 +208,7 @@ if (!class_exists('VB_CrossRef_DOI_Setting_Fields')) {
                 ),
                 array(
                     "name" => "retry_minutes",
-                    "type" => "string",
+                    "type" => "text",
                     "section" => "update",
                     "label" => "Retry Minutes",
                     "placeholder" => "number of minutes",
@@ -220,7 +220,7 @@ if (!class_exists('VB_CrossRef_DOI_Setting_Fields')) {
 
                 array(
                     "name" => "doi_meta_key",
-                    "type" => "string",
+                    "type" => "text",
                     "section" => "post_meta",
                     "label" => "Article DOI<br>(custom field / meta key)",
                     "placeholder" => "meta key for the DOI",
@@ -228,7 +228,7 @@ if (!class_exists('VB_CrossRef_DOI_Setting_Fields')) {
                 ),
                 array(
                     "name" => "copyright_meta_key",
-                    "type" => "string",
+                    "type" => "text",
                     "section" => "post_meta",
                     "label" => "Copyright / Licence<br>(custom field / meta key)",
                     "placeholder" => "meta key for a copyright / licence note",
@@ -241,7 +241,7 @@ if (!class_exists('VB_CrossRef_DOI_Setting_Fields')) {
 
                 array(
                     "name" => "orcid_meta_key",
-                    "type" => "string",
+                    "type" => "text",
                     "section" => "user_meta",
                     "label" => "Author ORCID<br>(custom field / meta key)",
                     "placeholder" => "meta key for the ORCID of the author",
