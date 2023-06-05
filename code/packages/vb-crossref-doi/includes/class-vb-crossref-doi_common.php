@@ -162,8 +162,10 @@ if (!class_exists('VB_CrossRef_DOI_Common')) {
             $dom = new DOMDocument("1.0");
             $dom->preserveWhiteSpace = false;
             $dom->formatOutput = true;
-            $dom->loadXML($xml_str);
-            return $dom->saveXML();
+            if ($dom->loadXML($xml_str)) {
+                return $dom->saveXML();
+            }
+            return false;
         }
 
     }

@@ -373,7 +373,7 @@ if (!class_exists('VB_CrossRef_DOI_Render')) {
         protected function render_posted_content($post)
         {
 
-            $title = esc_html(get_the_title($post));
+            $title = get_the_title($post);
             $doi_data = $this->render_doi_data($post);
 
             if (empty($doi_data)) {
@@ -384,7 +384,7 @@ if (!class_exists('VB_CrossRef_DOI_Render')) {
                 "<posted_content type=\"preprint\">",
                 $this->render_contributors($post),
                 "<titles>",
-                    "<title>{$title}</title>",
+                    "<title>" . $this->escape($title) . "</title>",
                 "</titles>",
                 $this->render_posted_date($post),
                 $this->render_institution($post),
