@@ -63,7 +63,7 @@ if (!class_exists('VB_CrossRef_DOI_Setting_Fields')) {
                     "section" => "general",
                     "label" => "Depositer Name",
                     "placeholder" => "Depositor Name",
-                    "description" => "The name of the organization registering the DOIs.",
+                    "description" => "The name of the person or organization submitting the DOIs.",
                 ),
                 array(
                     "name" => "depositor_email",
@@ -108,15 +108,26 @@ if (!class_exists('VB_CrossRef_DOI_Setting_Fields')) {
                         <br>For example: <code>2366-7044</code> = ISSN of the Verfassungsblog",
                 ),
                 array(
-                    "name" => "copyright_general",
+                    "name" => "copyright_name_general",
                     "type" => "text",
                     "section" => "general",
-                    "label" => "Copyright / Licence <br>for all posts",
-                    "placeholder" => "a copyright / license note",
-                    "description" => "The default copyright or licence name for all posts. Only Creative Commons
-                    licences are supported. This note can be overwritten with a post-specific copyright note if it is
-                        provided via via a custom field, see tab \"Custom Fields\". <br>
+                    "label" => "Copyright Licence Name<br>for all posts",
+                    "placeholder" => "a Creative Commons license name",
+                    "description" => "The default Creative Commons licence name for all posts. Based on the name, a link
+                        is generated automatically. However, a custom licence link can be provided below. Also, the
+                        licence name can be overwritten with a post-specific license name if it is provided via via a
+                        custom field, see tab \"Custom Fields\". <br>
                         For example: <code>CC BY-SA 4.0</code> = Creative Commons Attribution-ShareAlike 4.0 International",
+                ),
+                array(
+                    "name" => "copyright_link_general",
+                    "type" => "text",
+                    "section" => "general",
+                    "label" => "Copyright Licence Link <br>for all posts",
+                    "placeholder" => "a link to a license",
+                    "description" => "The default link to the licence for all posts. This link can be overwritten with
+                        a post-specific link if it is provided via via a custom field, see tab \"Custom Fields\". <br>
+                        For example: <code>https://creativecommons.org/licenses/by-sa/4.0/legalcode</code> = Link to CC BY-SA 4.0",
                 ),
                 array(
                     "name" => "include_excerpt",
@@ -194,8 +205,8 @@ if (!class_exists('VB_CrossRef_DOI_Setting_Fields')) {
                     "section" => "update",
                     "label" => "Requests per Second",
                     "placeholder" => "requests per second",
-                    "description" => "The maximum number of API requests that are issued per second. CrossRef states
-                        that they rate limit requests. High numbers might provoke CrossRef to block your IP address.",
+                    "description" => "The maximum number of API requests that are issued per second. CrossRef declares
+                        that they limit the number of requests per second. High numbers might provoke CrossRef to block your IP address.",
                 ),
                 array(
                     "name" => "timeout_minutes",
@@ -204,7 +215,8 @@ if (!class_exists('VB_CrossRef_DOI_Setting_Fields')) {
                     "label" => "Timeout Minutes",
                     "placeholder" => "number of minutes",
                     "description" => "The number of minutes that need to pass before a submission is considered to have
-                        failed without any response from CrossRef.",
+                        failed without any response from CrossRef. Pending submissions are checked again on every
+                        update. Therefore, the timeout needs to be larger than the update interval.",
                 ),
                 array(
                     "name" => "retry_minutes",
@@ -224,17 +236,27 @@ if (!class_exists('VB_CrossRef_DOI_Setting_Fields')) {
                     "section" => "post_meta",
                     "label" => "Article DOI<br>(custom field / meta key)",
                     "placeholder" => "meta key for the DOI",
-                    "description" => "The meta key for the custom field that stores the DOI for a post.<br>The DOI is provided as a code (not as URI), e.g. <code>10.1214/aos/1176345451</code>.",
+                    "description" => "The meta key for the custom field that stores the DOI for a post.<br>The DOI will be saved as a code (not as URI), e.g. <code>10.1214/aos/1176345451</code>.",
                 ),
                 array(
-                    "name" => "copyright_meta_key",
+                    "name" => "copyright_name_meta_key",
                     "type" => "text",
                     "section" => "post_meta",
-                    "label" => "Copyright / Licence<br>(custom field / meta key)",
-                    "placeholder" => "meta key for a copyright / licence note",
-                    "description" => "The meta key for the custom field that contains the copyright or licence note for
-                        a specific post. If a post-specific copyright note is provided, the default copyright note is
-                        overwritten. Only Creative Commons licences are supported.",
+                    "label" => "Copyright Licence Name<br>(custom field / meta key)",
+                    "placeholder" => "meta key for a copyright licence name",
+                    "description" => "The meta key for the custom field that contains the Creative Commons licence name
+                        for a specific post. If a post-specific license name is provided, it is used instead of the
+                        default license name.",
+                ),
+                array(
+                    "name" => "copyright_link_meta_key",
+                    "type" => "text",
+                    "section" => "post_meta",
+                    "label" => "Copyright Licence Link<br>(custom field / meta key)",
+                    "placeholder" => "meta key for a copyright licence link",
+                    "description" => "The meta key for the custom field that contains the licence link for a specific
+                        post. If a post-specific license link is provided, it is used instead of the default license
+                        link.",
                 ),
 
                 // ------------- custom user fields --------------

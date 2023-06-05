@@ -28,7 +28,7 @@ if (!class_exists('VB_CrossRef_DOI_Common')) {
                     "doi_prefix" => "example-prefix",
                     "doi_suffix_length" => 16,
                     "issn" => "2366-7044",
-                    "copyright_general" => "CC BY-SA 4.0",
+                    "copyright_name_general" => "CC BY-SA 4.0",
                     "include_excerpt" => True,
                     // institution
                     "institution_name" => $blog_title,
@@ -42,7 +42,8 @@ if (!class_exists('VB_CrossRef_DOI_Common')) {
                     "retry_minutes" => 60,
                     // post meta
                     "doi_meta_key" => "doi",
-                    "copyright_meta_key" => "copyright",
+                    "copyright_name_meta_key" => "copyright",
+                    "copyright_link_meta_key" => "copyright_link",
                     // user meta
                     "orcid_meta_key" => "orcid",
                     "affiliation_meta_key" => "affiliation",

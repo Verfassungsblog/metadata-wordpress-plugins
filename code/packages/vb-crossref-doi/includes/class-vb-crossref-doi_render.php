@@ -291,7 +291,7 @@ if (!class_exists('VB_CrossRef_DOI_Render')) {
             ));
         }
 
-        protected function get_copyright_link($copyright)
+        protected function get_creative_commons_link_from_name($copyright)
         {
             $lowercase = strtolower($copyright);
             $no_minus = str_replace("-", " ", $lowercase);
@@ -299,7 +299,7 @@ if (!class_exists('VB_CrossRef_DOI_Render')) {
             $trimmed = trim($no_double_spaces);
 
             if (str_starts_with($trimmed, "cc0")) {
-                return "https://creativecommons.org/publicdomain/zero/1.0/";
+                return "https://creativecommons.org/publicdomain/zero/1.0/legalcode";
             }
 
             $available_versions = array("4.0", "3.0", "2.5", "2.0", "1.0");
@@ -320,15 +320,40 @@ if (!class_exists('VB_CrossRef_DOI_Render')) {
             }
 
 
-            return "http://creativecommons.org/licenses/{$variant}/${version}/";
+            return "https://creativecommons.org/licenses/{$variant}/${version}/legalcode";
+        }
+
+        protected function get_copyright_link($post)
+        {
+            // use post-specific link if provided
+            $copyright_link_custom = $this->common->get_post_meta_field_value("copyright_link_meta_key", $post);
+            if (!empty($copyright_link_custom)) {
+                return $copyright_link_custom;
+            }
+
+            // generate link from post-specific name if provided
+            $copyright_name_custom = $this->common->get_post_meta_field_value("copyright_name_meta_key", $post);
+            if (!empty($copyright_name_custom)) {
+                return $this->get_creative_commons_link_from_name($copyright_name_custom);
+            }
+
+            // use general link if provided
+            $copyright_link_general = $this->common->get_settings_field_value("copyright_link_general");
+            if (!empty($copyright_link_general)) {
+                return $copyright_link_general;
+            }
+
+            // generate link from general name if provided
+            $copyright_name_general = $this->common->get_settings_field_value("copyright_name_general");
+            if (!empty($copyright_name_general)) {
+                return $this->get_creative_commons_link_from_name($copyright_name_general);
+            }
+            return "";
         }
 
         protected function render_copyright($post)
         {
-            $copyright_general = $this->common->get_settings_field_value("copyright_general");
-            $copyright_custom = $this->common->get_post_meta_field_value("copyright_meta_key", $post);
-            $copyright = !empty($copyright_custom) ? $copyright_custom : $copyright_general;
-            $copyright_link = $this->get_copyright_link($copyright);
+            $copyright_link = $this->get_copyright_link($post);
             if (!empty($copyright_link)) {
                 return implode("", array(
                     "<program xmlns=\"http://www.crossref.org/AccessIndicators.xsd\">",

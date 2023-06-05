@@ -487,7 +487,7 @@ if (!class_exists('VB_CrossRef_DOI_Admin')) {
             <hr />
             <h2>Reset</h2>
             <p>
-                Clicking the following button will remove the all status information about posts from the database.
+                Clicking the following button will remove all status information about posts from the database.
                 This includes whether a post was already submitted to CrossRef and potential error messages. Of course,
                 DOIs are not deleted. Effectively, the status of the database will be the same as if the plugin was
                 just freshly installed.
