@@ -121,7 +121,7 @@ if (!class_exists('VB_Author_Affiliations_Meta_Box')) {
             // generate new json from previous data, current authors and suggestions
             $author_names = $this->get_post_author_names($post);
             $author_affiliations = $this->get_post_author_affiliations($post);
-            $json = json_encode($author_affiliations, JSON_UNESCAPED_SLASHES);
+            $json = json_encode($author_affiliations, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 
             // save changes immediately (in case an author was added or deleted)
             $author_affiliations_meta_key = $this->common->get_settings_field_value("author_affiliations_meta_key");

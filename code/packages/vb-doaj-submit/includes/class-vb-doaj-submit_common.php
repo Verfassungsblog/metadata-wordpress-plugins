@@ -35,11 +35,8 @@ if (!class_exists('VB_DOAJ_Submit_Common')) {
                     "test_without_apikey" => false,
                     "article_id_meta_key" => "doaj_article_id",
                     "doi_meta_key" => "doi",
-                    "author_affiliations_meta_key" => "author_affiliations",
                     "subheadline_meta_key" => "subheadline",
                     "orcid_meta_key" => "orcid",
-                    "affiliation_meta_key" => "affiliation",
-                    "rorid_meta_key" => "rorid",
                 );
             } else {
                 // default settings for any other blog than Verfassungsblog
@@ -57,10 +54,7 @@ if (!class_exists('VB_DOAJ_Submit_Common')) {
                     "test_without_apikey" => false,
                     "article_id_meta_key" => "doaj_article_id",
                     "doi_meta_key" => "doi",
-                    "author_affiliations_meta_key" => "author_affiliations",
                     "orcid_meta_key" => "orcid",
-                    "affiliation_meta_key" => "affiliation",
-                    "rorid_meta_key" => "rorid",
                 );
             }
         }

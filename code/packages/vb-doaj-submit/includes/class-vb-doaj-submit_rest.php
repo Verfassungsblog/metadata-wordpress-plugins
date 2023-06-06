@@ -2,7 +2,6 @@
 
 require_once plugin_dir_path(__FILE__) . './class-vb-doaj-submit_common.php';
 require_once plugin_dir_path(__FILE__) . './class-vb-doaj-submit_status.php';
-require_once plugin_dir_path(__FILE__) . './class-vb-doaj-submit_affiliation.php';
 
 if (!class_exists('VB_DOAJ_Submit_REST')) {
 
@@ -17,7 +16,6 @@ if (!class_exists('VB_DOAJ_Submit_REST')) {
         {
             $this->common = new VB_DOAJ_Submit_Common($plugin_name);
             $this->status = new VB_DOAJ_Submit_Status($plugin_name);
-            $this->affiliation = new VB_DOAJ_Submit_Affiliation($this->common->plugin_name);
             $this->last_doaj_request_time = null;
         }
 
@@ -123,7 +121,6 @@ if (!class_exists('VB_DOAJ_Submit_REST')) {
                 $this->status->set_post_article_id($post, $article_id);
             } else {
                 // no match found (article is new)
-                $this->affiliation->save_author_affiliations_for_post($post);
             }
 
             $this->status->set_post_identify_timestamp($post);

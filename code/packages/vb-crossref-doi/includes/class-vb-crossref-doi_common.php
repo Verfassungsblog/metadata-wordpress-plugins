@@ -46,8 +46,6 @@ if (!class_exists('VB_CrossRef_DOI_Common')) {
                     "copyright_link_meta_key" => "copyright_link",
                     // user meta
                     "orcid_meta_key" => "orcid",
-                    "affiliation_meta_key" => "affiliation",
-                    "rorid_meta_key" => "rorid",
                 );
             } else {
                 // default settings for any other blog than Verfassungsblog
@@ -71,8 +69,6 @@ if (!class_exists('VB_CrossRef_DOI_Common')) {
                     "doi_meta_key" => "doi",
                     // user meta
                     "orcid_meta_key" => "orcid",
-                    "affiliation_meta_key" => "affiliation",
-                    "rorid_meta_key" => "rorid",
                 );
             }
         }

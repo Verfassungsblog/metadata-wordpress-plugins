@@ -10,15 +10,12 @@
  */
 
 require_once plugin_dir_path(__FILE__) . './class-vb-doaj-submit_common.php';
-require_once plugin_dir_path(__FILE__) . './class-vb-doaj-submit_affiliation.php';
 
 if (!class_exists('VB_DOAJ_Submit_Render')) {
 
     class VB_DOAJ_Submit_Render
     {
         protected $common;
-
-        protected $affiliation;
 
         protected $last_error;
 
@@ -27,7 +24,6 @@ if (!class_exists('VB_DOAJ_Submit_Render')) {
         public function __construct($plugin_name)
         {
             $this->common = new VB_DOAJ_Submit_Common($plugin_name);
-            $this->affiliation = new VB_DOAJ_Submit_Affiliation($plugin_name);
         }
 
         protected function escape($str)
@@ -85,7 +81,27 @@ if (!class_exists('VB_DOAJ_Submit_Render')) {
             return strip_tags(get_the_excerpt($post));
         }
 
-        protected function render_author($name, $orcid, $affiliation)
+        protected function get_all_author_affiliations($post)
+        {
+            if (!function_exists("get_the_vb_author_affiliations")) {
+                return array();
+            }
+            return get_the_vb_author_affiliations($post);
+        }
+
+        protected function get_affiliation_name_for_author($post, $userid)
+        {
+            $author_affiliations = $this->get_all_author_affiliations($post);
+            if (array_key_exists($userid, $author_affiliations)) {
+                $name = $author_affiliations[$userid] ?? false;
+                if (!empty($name)) {
+                    return $name;
+                }
+            }
+            return false;
+        }
+
+        protected function render_author($name, $orcid, $affiliation_name)
         {
             if (empty($name)) {
                 return array();
@@ -93,7 +109,7 @@ if (!class_exists('VB_DOAJ_Submit_Render')) {
             return array_filter(array(
                 "name" => $this->escape($name),
                 "orcid_id" => !empty($orcid) ? $this->escape("https://orcid.org/{$orcid}") : false,
-                "affiliation" => $this->escape($affiliation),
+                "affiliation" => $this->escape($affiliation_name),
             ));
         }
 
@@ -101,8 +117,8 @@ if (!class_exists('VB_DOAJ_Submit_Render')) {
         {
             $post_author_name = $this->get_author_name($post->post_author);
             $post_author_orcid = $this->get_orcid($post->post_author);
-            $post_author_affiliation = $this->affiliation->get_author_affiliation_for_post($post, $post->post_author);
-            return $this->render_author($post_author_name, $post_author_orcid, $post_author_affiliation);
+            $post_author_affiliation_name = $this->get_affiliation_name_for_author($post, $post->post_author);
+            return $this->render_author($post_author_name, $post_author_orcid, $post_author_affiliation_name);
         }
 
         protected function render_post_coauthors($post)
@@ -112,8 +128,9 @@ if (!class_exists('VB_DOAJ_Submit_Render')) {
             foreach ($coauthors as $coauthor) {
                 $coauthor_name = $this->get_coauthor_name($coauthor);
                 $coauthor_orcid = $this->get_orcid($coauthor->ID);
-                $coauthor_affiliation = $this->affiliation->get_author_affiliation_for_post($post, $coauthor->ID);
-                $result = array_merge($result, array($this->render_author($coauthor_name, $coauthor_orcid, $coauthor_affiliation)));
+                $coauthor_affiliation_name = $this->get_affiliation_name_for_author($post, $coauthor->ID);
+                $coauthor_result = $this->render_author($coauthor_name, $coauthor_orcid, $coauthor_affiliation_name);
+                $result = array_merge($result, array($coauthor_result));
             }
             return $result;
         }

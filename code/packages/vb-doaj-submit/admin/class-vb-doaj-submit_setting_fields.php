@@ -199,20 +199,6 @@ if (!class_exists('VB_DOAJ_Submit_Setting_Fields')) {
                     "description" => "The meta key for the custom field that contains the DOI for a post.<br>The DOI should be provided as code (not as URI), e.g. <code>10.1214/aos/1176345451</code>.",
                 ),
                 array(
-                    "name" => "author_affiliations_meta_key",
-                    "type" => "string",
-                    "section" => "post_meta",
-                    "label" => "Author Affiliations<br>(custom field / meta key)",
-                    "placeholder" => "meta key for the author affiliations",
-                    "description" => "The meta key for the custom field that stores the affiliations for
-                        each author at the time the post was submitted to the DOAJ. The affiliations are automatically
-                        copied from the current information provided by each author. The affiliation is first tried to
-                        be copied from the specfic textual affiliation provided by the author (see setting \"Author
-                        Affiliation\" below), then tried to be extracted from the ROR-ID provided by the author (see
-                        setting \"Author Affiliation ROR-ID\" below), and lastly tried to be extracted from the ORCID
-                        provided by the author (see setting \"Author ORCID\" below).",
-                ),
-                array(
                     "name" => "subheadline_meta_key",
                     "type" => "string",
                     "section" => "post_meta",
@@ -232,22 +218,6 @@ if (!class_exists('VB_DOAJ_Submit_Setting_Fields')) {
                     "label" => "Author ORCID<br>(custom field / meta key)",
                     "placeholder" => "meta key for the ORCID of the author",
                     "description" => "The meta key for the custom field that contains the ORCID of the post author.<br>ORCIDs need to be provided as code (not as URI), e.g. <code>0000-0003-1279-3709</code>.",
-                ),
-                array(
-                    "name" => "affiliation_meta_key",
-                    "type" => "string",
-                    "section" => "user_meta",
-                    "label" => "Author Affiliation<br>(custom field / meta key)",
-                    "placeholder" => "meta key for the affiliation of the author",
-                    "description" => "The meta key for the custom field that contains the textual description of the affiliation of the post author.<br>The textual description should be provided in the format <code>Institute Name, Country</code>.",
-                ),
-                array(
-                    "name" => "rorid_meta_key",
-                    "type" => "string",
-                    "section" => "user_meta",
-                    "label" => "Author Affiliation ROR-ID<br>(custom field / meta key)",
-                    "placeholder" => "meta key for the ROR-ID",
-                    "description" => "The meta key for the custom field that contains the ROR-ID of the affiliation of an author. <br>ROR-IDs should be provided as code (not as URI), e.g. <code>00ggpsq73</code>.",
                 ),
             );
             // index settings field by their name

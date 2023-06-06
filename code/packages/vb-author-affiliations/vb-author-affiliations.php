@@ -18,7 +18,7 @@
 define('VB_AUTHOR_AFFILIATIONS_VERSION', '0.0.1');
 
 require_once plugin_dir_path(__FILE__) . 'includes/class-vb-author-affiliations.php';
-
+require_once plugin_dir_path(__FILE__) . 'includes/template.php';
 
 function vb_author_affiliations_uninstall() {
 

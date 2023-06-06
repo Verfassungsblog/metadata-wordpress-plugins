@@ -155,12 +155,16 @@ if (!class_exists('VB_CrossRef_DOI_Render')) {
 
         protected function render_post_author_affiliation($affiliation)
         {
-            if (!empty($affiliation)) {
+            $name = $affiliation["name"] ?? false;
+            $rorid = $affiliation["rorid"] ?? false;
+
+            if (!empty($name)) {
                 return implode("", array(
                     "<affiliations>",
-                        "<institution>",
-                            "<institution_name>" . $this->escape($affiliation) . "</institution_name>",
-                        "</institution>",
+                    "<institution>",
+                    "<institution_name>" . $this->escape($name) . "</institution_name>",
+                    !empty($rorid) ? "<institution_id type=\"ror\">https://ror.org/" . $this->escape($rorid) . "</institution_id>" : "",
+                    "</institution>",
                     "</affiliations>",
                 ));
             }
@@ -191,11 +195,28 @@ if (!class_exists('VB_CrossRef_DOI_Render')) {
             ));
         }
 
+        protected function get_all_author_affiliations($post)
+        {
+            if (!function_exists("get_the_vb_author_affiliations")) {
+                return array();
+            }
+            return get_the_vb_author_affiliations($post);
+        }
+
+        protected function get_affiliation_of_author($post, $userid)
+        {
+            $author_affiliations = $this->get_all_author_affiliations($post);
+            if (array_key_exists($userid, $author_affiliations)) {
+                return $author_affiliations[$userid];
+            }
+            return array();
+        }
+
         protected function render_post_main_author($post)
         {
             $name = $this->get_author_name($post->post_author);
             $orcid = $this->common->get_user_meta_field_value("orcid_meta_key", $post->post_author);
-            $affiliation = ""; // $this->affiliation->get_author_affiliation_for_post($post, $post->post_author);
+            $affiliation = $this->get_affiliation_of_author($post, $post->post_author);
             return $this->render_post_author($name, $orcid, $affiliation, true);
         }
 
@@ -206,7 +227,7 @@ if (!class_exists('VB_CrossRef_DOI_Render')) {
             foreach ($coauthors as $coauthor) {
                 $name = $this->get_coauthor_name($coauthor);
                 $orcid = $this->common->get_user_meta_field_value("orcid_meta_key", $coauthor->ID);
-                $affiliation = ""; // $this->affiliation->get_author_affiliation_for_post($post, $coauthor->ID);
+                $affiliation = $this->get_affiliation_of_author($post, $coauthor->ID);
                 $result = array_merge($result, array($this->render_post_author($name, $orcid, $affiliation, false)));
             }
             return $result;
