@@ -323,8 +323,6 @@ if (!class_exists('VB_CrossRef_DOI_Admin')) {
                 $this->update->mark_all_posts_as_modified();
             }
 
-
-
             if (!empty($_POST["reset_last_error"])) {
                 $this->status->clear_last_error();
             }

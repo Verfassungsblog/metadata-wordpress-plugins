@@ -63,7 +63,6 @@ if (!class_exists('VB_CrossRef_DOI_Update')) {
                 $post = $post = new stdClass();
                 $post->ID = $post_id;
                 $this->status->set_post_submit_status($post, VB_CrossRef_DOI_Status::SUBMIT_MODIFIED);
-                $this->status->clear_post_submit_error($post);
             }
             $this->status->set_date_of_last_modified_check();
         }
