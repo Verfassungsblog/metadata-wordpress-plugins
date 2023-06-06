@@ -10,6 +10,15 @@ table#vb-author-affiliations_table th.author {
     width: 30%;
 }
 
+table#vb-author-affiliations_table th.rorlink {
+    width: 25px;
+}
+
+table#vb-author-affiliations_table a.rorlink {
+    text-decoration: none;
+}
+
 table#vb-author-affiliations_table input {
+    display: inline-block;
     width: 100%;
 }

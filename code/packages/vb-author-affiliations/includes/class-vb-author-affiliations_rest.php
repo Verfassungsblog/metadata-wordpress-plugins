@@ -28,13 +28,15 @@ if (!class_exists('VB_Author_Affiliations_REST')) {
 
             $rorid_encoded = rawurlencode($rorid);
             $url = "https://api.ror.org/organizations?query=%22{$rorid_encoded}%22";
+            $timeout = (int)$this->common->get_settings_field_value("timeout");
+            $timeout = $timeout < 1 ? 1 : $timeout;
             // do http request
             $response = wp_remote_request($url, array(
                 "method" => "GET",
                 "headers" => array(
                     "Accept" =>  "application/json",
                 ),
-                "timeout" => 30,
+                "timeout" => $timeout,
             ));
 
             // validate response
@@ -72,13 +74,15 @@ if (!class_exists('VB_Author_Affiliations_REST')) {
             $orcid_encoded = rawurlencode($orcid);
 
             $url = "https://pub.orcid.org/v3.0/{$orcid_encoded}/record";
+            $timeout = (int)$this->common->get_settings_field_value("timeout");
+            $timeout = $timeout < 1 ? 1 : $timeout;
             // do http request
             $response = wp_remote_request($url, array(
                 "method" => "GET",
                 "headers" => array(
                     "Accept" =>  "application/xml",
                 ),
-                "timeout" => 30,
+                "timeout" => $timeout,
             ));
 
             // validate response

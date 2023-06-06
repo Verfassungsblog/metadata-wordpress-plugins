@@ -43,6 +43,15 @@ if (!class_exists('VB_Author_Affiliations_Settings_Fields')) {
                     "label" => "Extract from ORCID",
                     "description" => "Whether to automatically extract the name of the affilitions from the user's ORCID (last employment).",
                 ),
+                array(
+                    "name" => "timeout",
+                    "type" => "text",
+                    "section" => "general",
+                    "label" => "Timeout in Seconds",
+                    "placeholder" => "timeout seconds",
+                    "description" => "The number of seconds that is waited for a response when retrieving the
+                        affiliation from <code>orcid.org</code> or <code>ror.org</code>.",
+                ),
 
                 // ------------- custom post fields -------------
 

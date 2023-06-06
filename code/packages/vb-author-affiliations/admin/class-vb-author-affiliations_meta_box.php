@@ -138,7 +138,12 @@ if (!class_exists('VB_Author_Affiliations_Meta_Box')) {
             </div>
             <table id="<?php echo $table_id ?>">
                 <thead>
-                    <tr><th class="author">Author</th><th>Affiliation</th><th class="rorid">ROR-ID</th></tr>
+                    <tr>
+                        <th class="author">Author</th>
+                        <th>Affiliation</th>
+                        <th class="rorid">ROR-ID</th>
+                        <th class="rorlink">&nbsp;</th>
+                    </tr>
                 </thead>
                 <tbody>
                     <?php
@@ -166,6 +171,13 @@ if (!class_exists('VB_Author_Affiliations_Meta_Box')) {
                                     data-affiliation-field="rorid"
                                     value="<?php echo esc_attr($rorid) ?>"
                                     placeholder="rorid" />
+                            </td>
+                            <td>
+                                <?php if (!empty($rorid)) { ?>
+                                <a href="https://ror.org/<?php echo $rorid ?>" target="_blank" class="rorlink">
+                                    <span class="dashicons dashicons-admin-site"></span>
+                                </a>
+                                <?php } ?>
                             </td>
                         </tr>
                         <?php
