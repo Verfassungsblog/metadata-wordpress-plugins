@@ -164,7 +164,7 @@ if (!class_exists('VB_DOAJ_Submit_Setting_Fields')) {
                 // ------------- custom post fields -------------
 
                 array(
-                    "name" => "article_id_meta_key",
+                    "name" => "doaj_article_id_meta_key",
                     "type" => "string",
                     "section" => "post_meta",
                     "label" => "DOAJ Article ID<br>(custom field / meta key)",

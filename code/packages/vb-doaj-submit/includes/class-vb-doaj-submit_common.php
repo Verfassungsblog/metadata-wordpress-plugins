@@ -33,7 +33,7 @@ if (!class_exists('VB_DOAJ_Submit_Common')) {
                     "include_subheadline" => false,
                     "identify_by_permalink" => true,
                     "test_without_apikey" => false,
-                    "article_id_meta_key" => "doaj_article_id",
+                    "doaj_article_id_meta_key" => "doaj_article_id",
                     "doi_meta_key" => "doi",
                     "subheadline_meta_key" => "subheadline",
                     "orcid_meta_key" => "orcid",
@@ -52,7 +52,7 @@ if (!class_exists('VB_DOAJ_Submit_Common')) {
                     "include_tags" => true,
                     "identify_by_permalink" => true,
                     "test_without_apikey" => false,
-                    "article_id_meta_key" => "doaj_article_id",
+                    "doaj_article_id_meta_key" => "doaj_article_id",
                     "doi_meta_key" => "doi",
                     "orcid_meta_key" => "orcid",
                 );
@@ -96,16 +96,29 @@ if (!class_exists('VB_DOAJ_Submit_Common')) {
             return false;
         }
 
-        public function get_article_id_meta_key() {
-            return $this->get_settings_field_value("article_id_meta_key");
+        public function get_doaj_article_id_meta_key() {
+            return $this->get_settings_field_value("doaj_article_id_meta_key");
         }
 
         public function get_identify_timestamp_meta_key() {
-            return $this->plugin_name . "_doaj_identify_timestamp";
+            return $this->plugin_name . "_identify-timestamp";
+        }
+
+        public function get_post_submit_status_meta_key()
+        {
+            return $this->plugin_name . "_submit-status";
         }
 
         public function get_submit_timestamp_meta_key() {
-            return $this->plugin_name . "_doaj_submit_timestamp";
+            return $this->plugin_name . "_submit-timestamp";
+        }
+
+        public function get_post_submit_error_meta_key() {
+            return $this->plugin_name . "_submit-error";
+        }
+
+        public function get_current_utc_timestamp() {
+            return (new DateTime("now", new DateTimeZone("UTC")))->getTimestamp();
         }
 
         public function date_to_iso8601($date) {

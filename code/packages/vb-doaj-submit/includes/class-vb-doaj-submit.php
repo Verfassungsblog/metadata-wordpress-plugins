@@ -2,7 +2,6 @@
 
 require_once plugin_dir_path(__FILE__) . './class-vb-doaj-submit_common.php';
 require_once plugin_dir_path(__FILE__) . './class-vb-doaj-submit_update.php';
-require_once plugin_dir_path(__FILE__) . './class-vb-doaj-submit_status.php';
 require_once plugin_dir_path(__FILE__) . '../admin/class-vb-doaj-submit_admin.php';
 
 if (!class_exists('VB_DOAJ_Submit')) {
@@ -15,15 +14,12 @@ if (!class_exists('VB_DOAJ_Submit')) {
 
         protected $admin;
 
-        protected $status;
-
         protected $update;
 
         public function __construct($base_file, $plugin_name)
         {
             $this->base_file = $base_file;
             $this->common = new VB_DOAJ_Submit_Common($plugin_name);
-            $this->status = new VB_DOAJ_Submit_Status($plugin_name);
             $this->update = new VB_DOAJ_Submit_Update($plugin_name);
             $this->admin = new VB_DOAJ_Submit_Admin($plugin_name);
         }
@@ -56,7 +52,6 @@ if (!class_exists('VB_DOAJ_Submit')) {
             add_action("init", array($this, 'action_init'));
 
             $this->admin->run();
-            $this->status->run();
             $this->update->run();
         }
 

@@ -35,11 +35,7 @@ if (!class_exists('VB_DOAJ_Submit_Update')) {
                         $this->status->set_last_error("cannot submit post with post status '" . $post->post_status . "'");
                     }
 
-                    if ($success) {
-                        // remember last modified date of last post succesfully processed
-                        // such that it is not processed again (unlesss modified again)
-                        $this->status->set_last_updated_post_modified_date($post);
-                    } else {
+                    if (!$success) {
                         return true;
                     }
                 }
@@ -48,11 +44,38 @@ if (!class_exists('VB_DOAJ_Submit_Update')) {
             return false;
         }
 
+        public function check_for_modified_posts()
+        {
+            // check posts that need updating because modified
+            $modified_query = $this->queries->query_posts_that_were_modified_since_last_check();
+            foreach ($modified_query->posts as $post_id) {
+                $post = $post = new stdClass();
+                $post->ID = $post_id;
+                $this->status->set_post_submit_status($post, VB_CrossRef_DOI_Status::SUBMIT_MODIFIED);
+            }
+            $this->status->set_date_of_last_modified_check();
+        }
+
+        public function mark_all_posts_as_modified()
+        {
+            $this->status->set_date_of_last_modified_check(1);
+            $this->check_for_modified_posts();
+        }
+
         public function do_update() {
             $this->status->clear_last_error();
             $this->status->set_last_update();
             $batch = (int)$this->common->get_settings_field_value("batch");
             $batch = $batch < 1 ? 1 : $batch;
+
+            $this->check_for_modified_posts();
+
+            // iterate over all posts that require update because they were modified recently
+            $modified_query = $this->queries->query_posts_that_need_submitting_because_modified($batch);
+            if ($this->submit_posts_from_query($modified_query)) {
+                // stop if any posts were submitted
+                return;
+            }
 
             // iterate over all posts that were never submitted before
             $not_submitted_yet_query = $this->queries->query_posts_that_were_not_submitted_yet($batch);
@@ -70,13 +93,6 @@ if (!class_exists('VB_DOAJ_Submit_Update')) {
                         return;
                     }
                 }
-                return;
-            }
-
-            // iterate over all posts that require update because they were modified recently
-            $modified_query = $this->queries->query_posts_that_need_submitting_because_modified($batch);
-            if ($this->submit_posts_from_query($modified_query)) {
-                // stop if any posts were submitted
                 return;
             }
 

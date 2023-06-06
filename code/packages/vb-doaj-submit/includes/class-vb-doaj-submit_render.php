@@ -93,7 +93,7 @@ if (!class_exists('VB_DOAJ_Submit_Render')) {
         {
             $author_affiliations = $this->get_all_author_affiliations($post);
             if (array_key_exists($userid, $author_affiliations)) {
-                $name = $author_affiliations[$userid] ?? false;
+                $name = $author_affiliations[$userid]["name"] ?? false;
                 if (!empty($name)) {
                     return $name;
                 }

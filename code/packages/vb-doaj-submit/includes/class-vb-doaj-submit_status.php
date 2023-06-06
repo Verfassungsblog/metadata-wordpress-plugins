@@ -6,31 +6,45 @@ if (!class_exists('VB_DOAJ_Submit_Status')) {
 
     class VB_DOAJ_Submit_Status
     {
+        public const SUBMIT_SUCCESS = "success";
+        public const SUBMIT_PENDING = "pending";
+        public const SUBMIT_ERROR = "error";
+        public const SUBMIT_MODIFIED = "modified";
+
         protected $common;
+
+        protected $date_of_last_modified_check_option_key;
+
+        protected $last_error_option_key;
+
+        protected $last_update_option_key;
 
         public function __construct($plugin_name)
         {
             $this->common = new VB_DOAJ_Submit_Common($plugin_name);
+            $this->date_of_last_modified_check_option_key = $plugin_name . "_date_of_last_modified_check";
+            $this->last_error_option_key = $plugin_name . "_status_last_error";
+            $this->last_update_option_key = $plugin_name . "_status_last_update";
         }
 
         public function set_last_error($error) {
-            return update_option($this->common->plugin_name . "_status_last_error", $error);
+            return update_option($this->last_error_option_key, $error);
         }
 
         public function get_last_error() {
-            return get_option($this->common->plugin_name . "_status_last_error", false);
+            return get_option($this->last_error_option_key, false);
         }
 
         public function clear_last_error() {
-            delete_option($this->common->plugin_name . "_status_last_error");
+            delete_option($this->last_error_option_key);
         }
 
         public function set_last_update() {
-            return update_option($this->common->plugin_name . "_status_last_update", time());
+            return update_option($this->last_update_option_key, time());
         }
 
         public function get_last_update_date() {
-            $timestamp = get_option($this->common->plugin_name . "_status_last_update", false);
+            $timestamp = get_option($this->last_update_option_key, false);
             if (empty($timestamp)) {
                 return false;
             }
@@ -45,40 +59,38 @@ if (!class_exists('VB_DOAJ_Submit_Status')) {
             return human_time_diff($date->getTimestamp()) . " ago";
         }
 
-        public function set_last_updated_post_modified_date($post) {
-            return update_option($this->common->plugin_name . "_modified_date_of_last_updated_post", $post->post_modified_gmt);
-        }
-
-        public function get_last_updated_post_modified_date() {
-            $date = get_option($this->common->plugin_name . "_modified_date_of_last_updated_post", false);
-            if (empty($date)) {
-                return false;
+        public function set_date_of_last_modified_check($timestamp = null) {
+            if ($timestamp == null) {
+                $timestamp = $this->common->get_current_utc_timestamp();
             }
-            $datetime = new DateTime();
-            $datetime->setTimezone(new DateTimeZone("UTC"));
-            $datetime->setTimestamp(strtotime($date));
-            return $datetime;
+            return update_option($this->date_of_last_modified_check_option_key, $timestamp);
         }
 
-        public function clear_last_updated_post_modified_date() {
-            delete_option($this->common->plugin_name . "_modified_date_of_last_updated_post");
-        }
-
-        public function get_last_updated_post_modified_text() {
-            $date = $this->get_last_updated_post_modified_date();
-            if (empty($date)) {
-                return "no post submitted yet";
+        public function get_date_of_last_modified_check() {
+            $timestamp = get_option($this->date_of_last_modified_check_option_key, false);
+            if (empty($timestamp)) {
+                // no date available, set it
+                $this->set_date_of_last_modified_check();
+                $timestamp = $this->common->get_current_utc_timestamp();
             }
-            $date->setTimezone(wp_timezone());
-            $timestamp = $date->getTimestamp() + $date->getOffset();
-            return date_i18n(get_option('date_format'), $timestamp) . " at " . date_i18n(get_option('time_format'), $timestamp);
+            return (new DateTime())->setTimestamp($timestamp)->setTimezone(wp_timezone());
+        }
+
+        public function get_text_of_last_modified_check()
+        {
+            $date = $this->get_date_of_last_modified_check();
+            return human_time_diff($date->getTimestamp()) . " ago";
+        }
+
+        public function clear_date_of_last_modified_check() {
+            delete_option($this->date_of_last_modified_check_option_key);
         }
 
         public function set_post_submit_timestamp($post) {
             update_post_meta(
                 $post->ID,
                 $this->common->get_submit_timestamp_meta_key(),
-                (new DateTime("now", new DateTimeZone("UTC")))->getTimestamp()
+                $this->common->get_current_utc_timestamp()
             );
         }
 
@@ -87,16 +99,47 @@ if (!class_exists('VB_DOAJ_Submit_Status')) {
             delete_post_meta($post->ID, $this->common->get_submit_timestamp_meta_key());
         }
 
-        public function set_post_article_id($post, $article_id) {
+        public function set_post_submit_status($post, $status) {
             update_post_meta(
                 $post->ID,
-                $this->common->get_article_id_meta_key(),
+                $this->common->get_post_submit_status_meta_key(),
+                $status,
+            );
+        }
+
+        public function get_post_submit_error($post) {
+            return get_post_meta(
+                $post->ID,
+                $this->common->get_post_submit_error_meta_key(),
+                true,
+            );
+        }
+
+        public function set_post_submit_error($post, $msg) {
+            update_post_meta(
+                $post->ID,
+                $this->common->get_post_submit_error_meta_key(),
+                $msg,
+            );
+        }
+
+        public function clear_post_submit_error($post) {
+            delete_post_meta(
+                $post->ID,
+                $this->common->get_post_submit_error_meta_key(),
+            );
+        }
+
+        public function set_post_doaj_article_id($post, $article_id) {
+            update_post_meta(
+                $post->ID,
+                $this->common->get_doaj_article_id_meta_key(),
                 $article_id,
             );
         }
 
-        public function clear_post_article_id($post) {
-            delete_post_meta($post->ID, $this->common->get_article_id_meta_key());
+        public function clear_post_doaj_article_id($post) {
+            delete_post_meta($post->ID, $this->common->get_doaj_article_id_meta_key());
         }
 
         public function set_post_identify_timestamp($post)
@@ -104,7 +147,7 @@ if (!class_exists('VB_DOAJ_Submit_Status')) {
             update_post_meta(
                 $post->ID,
                 $this->common->get_identify_timestamp_meta_key(),
-                (new DateTime("now", new DateTimeZone("UTC")))->getTimestamp()
+                $this->common->get_current_utc_timestamp()
             );
         }
 
@@ -115,12 +158,12 @@ if (!class_exists('VB_DOAJ_Submit_Status')) {
 
         public function reset_status()
         {
-            $this->clear_last_updated_post_modified_date();
-
             $meta_keys = array(
                 $this->common->get_identify_timestamp_meta_key(),
                 $this->common->get_submit_timestamp_meta_key(),
-                $this->common->get_article_id_meta_key(),
+                $this->common->get_post_submit_error_meta_key(),
+                $this->common->get_post_submit_status_meta_key(),
+                $this->common->get_doaj_article_id_meta_key(), // TODO: remove for final version?!?
             );
 
             foreach($meta_keys as $meta_key) {
@@ -128,14 +171,7 @@ if (!class_exists('VB_DOAJ_Submit_Status')) {
             }
 
             $this->clear_last_error();
-        }
-
-        public function action_init() {
-            add_option($this->common->plugin_name . "_status_last_update", 0);
-        }
-
-        public function run() {
-            add_action("init", array($this, 'action_init'));
+            $this->clear_date_of_last_modified_check();
         }
 
     }

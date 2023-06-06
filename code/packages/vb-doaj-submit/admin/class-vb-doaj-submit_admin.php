@@ -286,6 +286,14 @@ if (!class_exists('VB_DOAJ_Submit_Admin')) {
                 $this->update->do_identify();
             }
 
+            if (!empty($_POST["check_modified"])) {
+                $this->update->check_for_modified_posts();
+            }
+
+            if (!empty($_POST["mark_all_posts_as_modified"])) {
+                $this->update->mark_all_posts_as_modified();
+            }
+
             if (!empty($_POST["reset_last_error"])) {
                 $this->status->clear_last_error();
             }
@@ -367,13 +375,13 @@ if (!class_exists('VB_DOAJ_Submit_Admin')) {
 
         protected function find_example_post()
         {
-            $never_submitted_query = $this->queries->query_posts_that_were_not_submitted_yet(1);
-            if (count($never_submitted_query->posts) > 0) {
-                return $never_submitted_query->posts[0];
-            }
             $modified_query = $this->queries->query_posts_that_need_submitting_because_modified(1);
             if (count($modified_query->posts) > 0) {
                 return $modified_query->posts[0];
+            }
+            $never_submitted_query = $this->queries->query_posts_that_were_not_submitted_yet(1);
+            if (count($never_submitted_query->posts) > 0) {
+                return $never_submitted_query->posts[0];
             }
             $identify_query = $this->queries->query_posts_that_need_identifying(1);
             if (count($identify_query->posts) > 0) {
@@ -391,7 +399,7 @@ if (!class_exists('VB_DOAJ_Submit_Admin')) {
             // get next post that needs identifying or submitting; or last published post
             $post = $this->find_example_post();
             if ($post) {
-                $doaj_article_id = get_post_meta($post->ID, $this->common->get_article_id_meta_key(), true);
+                $doaj_article_id = get_post_meta($post->ID, $this->common->get_doaj_article_id_meta_key(), true);
                 $doaj_baseurl = $this->common->get_settings_field_value("api_baseurl");
                 $renderer = new VB_DOAJ_Submit_Render($this->common->plugin_name);
                 $json_text = $renderer->render($post);
@@ -429,7 +437,7 @@ if (!class_exists('VB_DOAJ_Submit_Admin')) {
                 <li>Automatic Update: <?php echo $this->common->get_settings_field_value("auto_update") ? "enabled" : "disabled" ?></li>
                 <li>Update Interval: <?php echo $this->update->get_update_interval_in_minutes() ?> min</li>
                 <li>Last Update: <?php echo $this->status->get_last_update_text() ?></li>
-                <li>Last Submitted Post Date: <?php echo $this->status->get_last_updated_post_modified_text() ?></li>
+                <li>Last Check for Modified Posts: <?php echo $this->status->get_text_of_last_modified_check() ?></li>
                 <li>Last Error: <?php echo $last_error ? $last_error : "none" ?></li>
             </ul>
             <form method="post" onsubmit="return;">
@@ -439,7 +447,30 @@ if (!class_exists('VB_DOAJ_Submit_Admin')) {
                 echo " ";
                 submit_button(__('Manually Identify Now', "vb-doaj-submit"), "secondary", "manual_identify", false);
                 echo " ";
+                submit_button(__('Manually Check for Modified Posts Now', "vb-crossref-doi"), "secondary", "check_modified", false);
+                ?>
+            </p>
+            <p>
+                <?php
                 submit_button(__('Reset Last Error', "vb-doaj-submit"), "secondary", "reset_last_error", false);
+                ?>
+            </p>
+            </form>
+            <hr />
+            <h2>Resubmit all Posts</h2>
+            <p>
+                Clicking the following button will schedule all published posts to be re-submitted to the DOAJ.
+                This could take a very long time.
+            </p>
+            <form method="post" onsubmit="return confirm('Are you sure?');">
+            <p>
+                <?php
+                submit_button(
+                    __('Mark All Posts as Modified', "vb-doaj-submit"),
+                    "secondary",
+                    "mark_all_posts_as_modified",
+                    false
+                );
                 ?>
             </p>
             </form>
@@ -462,20 +493,41 @@ if (!class_exists('VB_DOAJ_Submit_Admin')) {
             ?>
             <h2>Statistics</h2>
             <?php
+            $were_modified = $this->queries->get_number_of_posts_that_were_modified_since_last_check();
             $need_identifying = $this->queries->get_number_of_posts_that_need_identifying();
             $have_article_id = $this->queries->get_number_of_posts_that_have_article_id();
-            $were_identified = $this->queries->get_number_of_posts_that_were_identified();
+            $were_identified = $this->queries->get_number_of_posts_that_were_successfully_identified();
             $need_submitting_never = $this->queries->get_number_of_posts_that_were_not_submitted_yet();
             $need_submitting_modified = $this->queries->get_number_of_posts_that_need_submitting_because_modified();
-            $were_submitted = $this->queries->get_number_of_posts_that_were_submitted();
+            $were_submitted = $this->queries->get_number_of_posts_that_were_successfully_submitted();
             ?>
             <ul>
+                <li>Posts that were modified since last update: <?php echo $were_modified ?></li>
                 <li>Posts that need identifying (unknown DOAJ article id): <?php echo $need_identifying; ?></li>
                 <li>Posts that were successfully identified (known DOAJ article id): <?php echo $have_article_id; ?></li>
                 <li>Posts that were not identified (no DOAJ article id found): <?php echo ($were_identified - $have_article_id) ?></li>
                 <li>Posts that need submitting because not yet submitted: <?php echo $need_submitting_never; ?></li>
                 <li>Posts that need submitting because modified: <?php echo $need_submitting_modified; ?></li>
                 <li>Posts that were successfully submitted: <?php echo $were_submitted; ?></li>
+            </ul>
+            <hr/>
+            <?php
+            $error_count = $this->queries->get_number_of_posts_with_submit_error();
+            $error_query = $this->queries->query_posts_with_submit_error(5);
+            ?>
+            <h3>Posts with Errors (<?php echo $error_count ?>)</h3>
+            <ul>
+            <?php
+            foreach($error_query->posts as $post) {
+                ?>
+                <li>
+                    <a href="<?php echo get_edit_post_link($post) ?>">
+                        Post [id=<?php echo $post->ID ?>]
+                    </a>: <?php echo $this->status->get_post_submit_error($post) ?>
+                </li>
+                <?php
+            }
+            ?>
             </ul>
             <?php
         }

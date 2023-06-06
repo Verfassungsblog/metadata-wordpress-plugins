@@ -48,6 +48,37 @@ if (!class_exists('VB_DOAJ_Submit_REST')) {
             $this->last_doaj_request_time = new DateTime("now", new DateTimeZone("UTC"));
         }
 
+        protected function parse_repones_for_error($post, $response, $expected_status_code)
+        {
+            // validate response
+            if (is_wp_error($response)) {
+                $error = "[Request Error] " . $response->get_error_message();
+                $this->status->set_last_error($error);
+                return false;
+            }
+            $status_code = wp_remote_retrieve_response_code($response);
+            if ($status_code == 400 || $status_code == 401 || $status_code == 403) {
+                // parse error response
+                $json_data = json_decode(wp_remote_retrieve_body($response));
+                if (json_last_error() != JSON_ERROR_NONE) {
+                    $error = "DOAJ responded with unknown error (status code '" . $status_code . "')";
+                } else {
+                    $msg = $json_data->error;
+                    $error = "DOAJ responded with error '" . $msg . "' (status code '" . $status_code . "')";
+                }
+                $this->status->set_post_submit_status($post, VB_CrossRef_DOI_Status::SUBMIT_ERROR);
+                $this->status->set_post_submit_error($post, $error);
+                $this->status->set_last_error($error);
+                return false;
+            } else if ($status_code !== $expected_status_code) {
+                $this->status->set_last_error("DOAJ responsed with invalid status code '" . $status_code . "'");
+                $this->status->set_post_submit_status($post, VB_CrossRef_DOI_Status::SUBMIT_ERROR);
+                return false;
+            }
+
+            return true;
+        }
+
         public function identify_post($post)
         {
             $issn = rawurlencode($this->common->get_settings_field_value("eissn"));
@@ -106,7 +137,7 @@ if (!class_exists('VB_DOAJ_Submit_REST')) {
             }
             $status_code = wp_remote_retrieve_response_code($response);
             if ($status_code !== 200) {
-                $this->status->set_last_error("search request has invalid status code '" . $status_code . "'");
+                $this->status->set_last_error("identify request has invalid status code '" . $status_code . "'");
                 return false;
             }
             $json_data = json_decode(wp_remote_retrieve_body($response));
@@ -118,7 +149,7 @@ if (!class_exists('VB_DOAJ_Submit_REST')) {
             if ($json_data->total == 1 && count($json_data->results) == 1) {
                 // exact match found
                 $article_id = $json_data->results[0]->id;
-                $this->status->set_post_article_id($post, $article_id);
+                $this->status->set_post_doaj_article_id($post, $article_id);
             } else {
                 // no match found (article is new)
             }
@@ -136,21 +167,27 @@ if (!class_exists('VB_DOAJ_Submit_REST')) {
                 return false;
             }
 
-            $article_id = get_post_meta($post->ID, $this->common->get_article_id_meta_key(), true);
+            $article_id = get_post_meta($post->ID, $this->common->get_doaj_article_id_meta_key(), true);
 
             $test_without_api_key = $this->common->get_settings_field_value("test_without_api_key");
             if ($test_without_api_key) {
-                if (empty($article_id)) {
+                if (rand(0,1)) {
+                    // simulate success
+
                     // generate random article id for testing purposes
-                    $article_id = uniqid();
+                    $article_id = empty($article_id) ? uniqid() : $article_id;
+
+                    // update post status
+                    $this->status->set_post_doaj_article_id($post, $article_id);
+                    $this->status->set_post_identify_timestamp($post);
+                    $this->status->set_post_submit_status($post, VB_CrossRef_DOI_Status::SUBMIT_SUCCESS);
+
+                    return true;
+                } else {
+                    // simulate error
+                    $this->status->set_post_submit_status($post, VB_CrossRef_DOI_Status::SUBMIT_ERROR);
+                    $this->status->set_post_submit_error($post, "simulated error message");
                 }
-
-                // update post status
-                $this->status->set_post_article_id($post, $article_id);
-                $this->status->set_post_submit_timestamp($post);
-                $this->status->set_post_identify_timestamp($post);
-
-                return true;
             }
 
             $apikey = $this->common->get_settings_field_value("api_key");
@@ -173,8 +210,14 @@ if (!class_exists('VB_DOAJ_Submit_REST')) {
                 $url = $baseurl . "articles/" . rawurlencode($article_id) . "?api_key=" . rawurlencode($apikey);
             }
 
-            // do http request
+            // wait for rate limit
             $this->wait_for_next_request();
+
+            // save submit timestamp
+            $this->status->set_post_submit_timestamp($post);
+            $this->status->set_post_submit_status($post, VB_CrossRef_DOI_Status::SUBMIT_PENDING);
+
+            // do http request
             $response = wp_remote_request($url, array(
                 "method" => empty($article_id) ? "POST" : "PUT",
                 "headers" => array(
@@ -186,46 +229,36 @@ if (!class_exists('VB_DOAJ_Submit_REST')) {
             ));
             $this->update_last_request_time();
 
-            // validate response
-            if (is_wp_error($response)) {
-                $this->status->set_last_error("[Request Error] " . $response->get_error_message());
-                return false;
-            }
-            $status_code = wp_remote_retrieve_response_code($response);
-            if ($status_code == 401 || $status_code == 403) {
-                $this->status->set_last_error("DOAJ api key not correct (status code '" . $status_code . "')");
-                return false;
-            } else if ($status_code !== 200) {
-                $this->status->set_last_error("create new article request has invalid status code '" . $status_code . "'");
+            if (!$this->parse_repones_for_error($post, $response, empty($article_id) ? 201 : 204)) {
                 return false;
             }
 
-            // parse response
+            // parse success response
             $json_data = json_decode(wp_remote_retrieve_body($response));
             if (json_last_error() !== JSON_ERROR_NONE) {
                 $this->status->set_last_error("response is invalid json");
+                $this->status->set_post_submit_status($post, VB_CrossRef_DOI_Status::SUBMIT_ERROR);
                 return false;
             }
             $article_id = $json_data->id;
 
             // update post status
-            $this->status->set_post_article_id($post, $article_id);
-            $this->status->set_post_submit_timestamp($post);
+            $this->status->set_post_doaj_article_id($post, $article_id);
             $this->status->set_post_identify_timestamp($post);
-
+            $this->status->set_post_submit_status($post, VB_CrossRef_DOI_Status::SUBMIT_SUCCESS);
             return true;
         }
 
         public function submit_trashed_post($post)
         {
-            $article_id = get_post_meta($post->ID, $this->common->get_article_id_meta_key(), true);
+            $article_id = get_post_meta($post->ID, $this->common->get_doaj_article_id_meta_key(), true);
 
             if (!empty($article_id)) {
 
                 $test_without_api_key = $this->common->get_settings_field_value("test_without_api_key");
                 if ($test_without_api_key) {
                     // update post status
-                    $this->status->clear_post_article_id($post);
+                    $this->status->clear_post_doaj_article_id($post);
                     $this->status->set_post_submit_timestamp($post);
                     return true;
                 }
@@ -246,6 +279,11 @@ if (!class_exists('VB_DOAJ_Submit_REST')) {
 
                 // do http request
                 $this->wait_for_next_request();
+
+                // save submit timestamp
+                $this->status->set_post_submit_timestamp($post);
+                $this->status->set_post_submit_status($post, VB_CrossRef_DOI_Status::SUBMIT_PENDING);
+
                 $response = wp_remote_request($url, array(
                     "method" => "DELETE",
                     "headers" => array(
@@ -255,23 +293,14 @@ if (!class_exists('VB_DOAJ_Submit_REST')) {
                 ));
                 $this->update_last_request_time();
 
-                // validate response
-                if (is_wp_error($response)) {
-                    $this->status->set_last_error("[Request Error] " . $response->get_error_message());
-                    return false;
-                }
-                $status_code = wp_remote_retrieve_response_code($response);
-                if ($status_code == 401 || $status_code == 403) {
-                    $this->status->set_last_error("DOAJ api key not correct (status code '" . $status_code . "')");
-                    return false;
-                } else if ($status_code !== 204) {
-                    $this->status->set_last_error("delete article request has invalid status code '" . $status_code . "'");
+                if (!$this->parse_repones_for_error($post, $response, 204)) {
                     return false;
                 }
 
                 // update post status
-                $this->status->clear_post_article_id($post);
+                $this->status->clear_post_doaj_article_id($post);
                 $this->status->clear_post_submit_timestamp($post);
+                $this->status->set_post_submit_status($post, VB_DOAJ_Submit_Status::SUBMIT_SUCCESS);
             } else {
                 // do nothing for un-identified trashed article
             }
