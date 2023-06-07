@@ -70,16 +70,9 @@ if (!class_exists('VB_DOAJ_Submit_Update')) {
 
             $this->check_for_modified_posts();
 
-            // iterate over all posts that require update because they were modified recently
-            $modified_query = $this->queries->query_posts_that_need_submitting_because_modified($batch);
-            if ($this->submit_posts_from_query($modified_query)) {
-                // stop if any posts were submitted
-                return;
-            }
-
-            // iterate over all posts that were never submitted before
-            $not_submitted_yet_query = $this->queries->query_posts_that_were_not_submitted_yet($batch);
-            if ($this->submit_posts_from_query($not_submitted_yet_query)) {
+            // iterate over all posts that need submitting
+            $submit_query = $this->queries->query_posts_that_need_submitting($batch);
+            if ($this->submit_posts_from_query($submit_query)) {
                 // stop if any posts were submitted
                 return;
             }

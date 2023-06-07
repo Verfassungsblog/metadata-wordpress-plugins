@@ -81,6 +81,14 @@ if (!class_exists('VB_DOAJ_Submit_REST')) {
 
         public function identify_post($post)
         {
+            $article_id = $this->status->get_post_doaj_article_id($post);
+
+            if (!empty($article_id)) {
+                // post has DOAJ article id already available, do nothing
+                $this->status->set_post_identify_timestamp($post);
+                return true;
+            }
+
             $issn = rawurlencode($this->common->get_settings_field_value("eissn"));
             if (empty($issn)) {
                 $issn = rawurlencode($this->common->get_settings_field_value("pissn"));
@@ -171,9 +179,11 @@ if (!class_exists('VB_DOAJ_Submit_REST')) {
 
             $test_without_api_key = $this->common->get_settings_field_value("test_without_api_key");
             if ($test_without_api_key) {
-                if (rand(0,1)) {
-                    // simulate success
+                // set submit timestamp independent of success
+                $this->status->set_post_submit_timestamp($post);
 
+                // simulate success or failure
+                if (rand(0,1)) {
                     // generate random article id for testing purposes
                     $article_id = empty($article_id) ? uniqid() : $article_id;
 
@@ -181,12 +191,12 @@ if (!class_exists('VB_DOAJ_Submit_REST')) {
                     $this->status->set_post_doaj_article_id($post, $article_id);
                     $this->status->set_post_identify_timestamp($post);
                     $this->status->set_post_submit_status($post, VB_CrossRef_DOI_Status::SUBMIT_SUCCESS);
-
                     return true;
                 } else {
                     // simulate error
                     $this->status->set_post_submit_status($post, VB_CrossRef_DOI_Status::SUBMIT_ERROR);
                     $this->status->set_post_submit_error($post, "simulated error message");
+                    return false;
                 }
             }
 
@@ -245,6 +255,7 @@ if (!class_exists('VB_DOAJ_Submit_REST')) {
             // update post status
             $this->status->set_post_doaj_article_id($post, $article_id);
             $this->status->set_post_identify_timestamp($post);
+            $this->status->clear_post_submit_error($post);
             $this->status->set_post_submit_status($post, VB_CrossRef_DOI_Status::SUBMIT_SUCCESS);
             return true;
         }
@@ -253,59 +264,56 @@ if (!class_exists('VB_DOAJ_Submit_REST')) {
         {
             $article_id = get_post_meta($post->ID, $this->common->get_doaj_article_id_meta_key(), true);
 
-            if (!empty($article_id)) {
+            if (empty($article_id)) {
+                // post was never actually submitted, nothing to do here
+                $this->status->reset_post_status($post);
+                return true;
 
-                $test_without_api_key = $this->common->get_settings_field_value("test_without_api_key");
-                if ($test_without_api_key) {
-                    // update post status
-                    $this->status->clear_post_doaj_article_id($post);
-                    $this->status->set_post_submit_timestamp($post);
-                    return true;
-                }
-
-                $apikey = $this->common->get_settings_field_value("api_key");
-                if (empty($apikey)) {
-                    $this->status->set_last_error("DOAJ api key required for deleting articles");
-                    return false;
-                }
-
-                // build request url
-                $baseurl = $this->common->get_settings_field_value("api_baseurl");
-                if (empty($baseurl)) {
-                    $this->status->set_last_error("DOAJ api base URL can not be empty!");
-                    return false;
-                }
-                $url = $baseurl . "articles/" . rawurlencode($article_id) . "?api_key=" . rawurlencode($apikey);
-
-                // do http request
-                $this->wait_for_next_request();
-
-                // save submit timestamp
-                $this->status->set_post_submit_timestamp($post);
-                $this->status->set_post_submit_status($post, VB_CrossRef_DOI_Status::SUBMIT_PENDING);
-
-                $response = wp_remote_request($url, array(
-                    "method" => "DELETE",
-                    "headers" => array(
-                        "Accept" =>  "application/json",
-                    ),
-                    "timeout" => 30,
-                ));
-                $this->update_last_request_time();
-
-                if (!$this->parse_repones_for_error($post, $response, 204)) {
-                    return false;
-                }
-
-                // update post status
-                $this->status->clear_post_doaj_article_id($post);
-                $this->status->clear_post_submit_timestamp($post);
-                $this->status->set_post_submit_status($post, VB_DOAJ_Submit_Status::SUBMIT_SUCCESS);
-            } else {
-                // do nothing for un-identified trashed article
             }
 
-            // update global status
+            $test_without_api_key = $this->common->get_settings_field_value("test_without_api_key");
+            if ($test_without_api_key) {
+                // update post status
+                $this->status->reset_post_status($post);
+                return true;
+            }
+
+            $apikey = $this->common->get_settings_field_value("api_key");
+            if (empty($apikey)) {
+                $this->status->set_last_error("DOAJ api key required for deleting articles");
+                return false;
+            }
+
+            // build request url
+            $baseurl = $this->common->get_settings_field_value("api_baseurl");
+            if (empty($baseurl)) {
+                $this->status->set_last_error("DOAJ api base URL can not be empty!");
+                return false;
+            }
+            $url = $baseurl . "articles/" . rawurlencode($article_id) . "?api_key=" . rawurlencode($apikey);
+
+            // do http request
+            $this->wait_for_next_request();
+
+            // save submit timestamp
+            $this->status->set_post_submit_timestamp($post);
+            $this->status->set_post_submit_status($post, VB_CrossRef_DOI_Status::SUBMIT_PENDING);
+
+            $response = wp_remote_request($url, array(
+                "method" => "DELETE",
+                "headers" => array(
+                    "Accept" =>  "application/json",
+                ),
+                "timeout" => 30,
+            ));
+            $this->update_last_request_time();
+
+            if (!$this->parse_repones_for_error($post, $response, 204)) {
+                return false;
+            }
+
+            // update post status
+            $this->status->reset_post_status($post);
             return true;
         }
 

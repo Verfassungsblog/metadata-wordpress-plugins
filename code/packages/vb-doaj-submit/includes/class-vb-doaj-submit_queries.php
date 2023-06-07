@@ -45,6 +45,20 @@ if (!class_exists('VB_DOAJ_Submit_Queries')) {
             }
         }
 
+        public function query_posts_that_need_submitting($batch)
+        {
+            $modified = $this->query_posts_that_need_submitting_because_modified($batch);
+            $retried = $this->query_posts_that_should_be_retried($batch);
+            $not_yet = $this->query_posts_that_were_not_submitted_yet($batch);
+
+            $combined = new WP_Query();
+            $combined->posts = array_merge($modified->posts, $retried->posts, $not_yet->posts);
+            $combined->posts = array_slice($combined->posts, 0, $batch);
+            $combined->post_count = min($batch, $modified->post_count + $retried->post_count + $not_yet->post_count);
+
+            return $combined;
+        }
+
         public function get_number_of_posts_that_were_not_submitted_yet()
         {
             $query = $this->query_posts_that_were_not_submitted_yet(false);
@@ -60,23 +74,20 @@ if (!class_exists('VB_DOAJ_Submit_Queries')) {
                 'meta_query' => array(
                     'relation' => 'AND',
                     array(
-                        'relation' => 'OR',
-                        array(
-                            'key' => $this->common->get_identify_timestamp_meta_key(),
-                            'value' => "",
-                            'compare' => "!=",
-                        ),
-                        array(
-                            'key' => $this->common->get_doaj_article_id_meta_key(),
-                            'value' => "",
-                            'compare' => "!=",
-                        ),
+                        'key' => $this->common->get_identify_timestamp_meta_key(),
+                        'value' => "",
+                        'compare' => "!=",
                     ),
                     array(
-                        'relation' => 'AND',
+                        'relation' => 'OR',
                         array(
-                            'key' => $this->common->get_submit_timestamp_meta_key(),
+                            'key' => $this->common->get_post_submit_status_meta_key(),
                             'compare' => "NOT EXISTS",
+                        ),
+                        array(
+                            'key' => $this->common->get_post_submit_status_meta_key(),
+                            'value' => "",
+                            'compare' => "==",
                         ),
                     ),
                 ),
@@ -106,10 +117,10 @@ if (!class_exists('VB_DOAJ_Submit_Queries')) {
                     array(
                         'key' => $this->common->get_post_submit_status_meta_key(),
                         'value' => VB_DOAJ_Submit_Status::SUBMIT_MODIFIED,
-                        'compare' => "=",
+                        'compare' => "==",
                     ),
                     array(
-                        'key' => $this->common->get_doaj_article_id_meta_key(),
+                        'key' => $this->common->get_identify_timestamp_meta_key(),
                         'value' => "",
                         'compare' => "!=",
                     ),
@@ -136,15 +147,8 @@ if (!class_exists('VB_DOAJ_Submit_Queries')) {
                             'key' => $this->common->get_identify_timestamp_meta_key(),
                             'compare' => "NOT EXISTS",
                         ),
-                    ),
-                    array(
-                        'relation' => 'OR',
                         array(
-                            'key' => $this->common->get_doaj_article_id_meta_key(),
-                            'compare' => "NOT EXISTS",
-                        ),
-                        array(
-                            'key' => $this->common->get_doaj_article_id_meta_key(),
+                            'key' => $this->common->get_identify_timestamp_meta_key(),
                             'value' => "",
                             'compare' => "==",
                         ),
@@ -232,7 +236,7 @@ if (!class_exists('VB_DOAJ_Submit_Queries')) {
                     array(
                         'key' => $this->common->get_post_submit_status_meta_key(),
                         'value' => VB_DOAJ_Submit_Status::SUBMIT_SUCCESS,
-                        'compare' => "=",
+                        'compare' => "==",
                     ),
                 )
             );
@@ -269,7 +273,14 @@ if (!class_exists('VB_DOAJ_Submit_Queries')) {
                         'inclusive' => false,
                     ),
                 ),
-                'meta_query' => array(),
+                'meta_query' => array(
+                    'relation' => 'AND',
+                    array(
+                        'key' => $this->common->get_post_submit_status_meta_key(),
+                        'value' => VB_DOAJ_Submit_Status::SUBMIT_MODIFIED,
+                        'compare' => "!=",
+                    ),
+                ),
             );
 
             $this->add_batch_arguments_to_query($query_args, false);
@@ -294,7 +305,7 @@ if (!class_exists('VB_DOAJ_Submit_Queries')) {
                     array(
                         'key' => $this->common->get_post_submit_status_meta_key(),
                         'value' => VB_CrossRef_DOI_Status::SUBMIT_ERROR,
-                        'compare' => "=",
+                        'compare' => "==",
                     ),
                     array(
                         'key' => $this->common->get_post_submit_error_meta_key(),
@@ -302,6 +313,48 @@ if (!class_exists('VB_DOAJ_Submit_Queries')) {
                         'compare' => "!=",
                     ),
                 )
+            );
+
+            $this->add_batch_arguments_to_query($query_args, $batch);
+            return new WP_Query( $query_args );
+        }
+
+        public function get_number_of_posts_that_should_be_retried()
+        {
+            $query = $this->query_posts_that_should_be_retried(false);
+            return $query->post_count;
+        }
+
+        public function query_posts_that_should_be_retried($batch)
+        {
+            $retry_minutes = $this->common->get_settings_field_value("retry_minutes");
+            $retry_timestamp = $this->common->get_current_utc_timestamp() - $retry_minutes * 60;
+
+            $query_args = array(
+                'post_type' => 'post',
+                'post_status' => array('publish', 'trash'),
+                'ignore_sticky_posts' => true,
+                'meta_query' => array(
+                    'relation' => 'AND',
+                    array(
+                        'relation' => 'OR',
+                        array(
+                            'key' => $this->common->get_post_submit_status_meta_key(),
+                            'value' => VB_CrossRef_DOI_Status::SUBMIT_PENDING,
+                            'compare' => "==",
+                        ),
+                        array(
+                            'key' => $this->common->get_post_submit_status_meta_key(),
+                            'value' => VB_CrossRef_DOI_Status::SUBMIT_ERROR,
+                            'compare' => "==",
+                        )
+                    ),
+                    array(
+                        'key' => $this->common->get_submit_timestamp_meta_key(),
+                        'value' => $retry_timestamp,
+                        'compare' => "<",
+                    ),
+                ),
             );
 
             $this->add_batch_arguments_to_query($query_args, $batch);

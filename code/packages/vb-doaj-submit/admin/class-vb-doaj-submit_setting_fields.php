@@ -40,42 +40,6 @@ if (!class_exists('VB_DOAJ_Submit_Setting_Fields')) {
                         Usually <code>https://doaj.org/api/</code>, for testing: <code>https://testdoaj.cottagelabs.com/api/</code>",
                 ),
                 array(
-                    "name" => "auto_update",
-                    "type" => "boolean",
-                    "section" => "general",
-                    "label" => "Automatic Update",
-                    "description" => "Whether new posts should be automatically submitted to the DOAJ in regular intervals.",
-                ),
-                array(
-                    "name" => "interval",
-                    "type" => "string",
-                    "section" => "general",
-                    "label" => "Update Interval",
-                    "placeholder" => "update interval in minutes",
-                    "description" => "The number of minutes between updates. On each update, the database is checked
-                    and new posts are submitted to the DOAJ.",
-                ),
-                array(
-                    "name" => "requests_per_second",
-                    "type" => "string",
-                    "section" => "general",
-                    "label" => "Requests per Second",
-                    "placeholder" => "requests per second",
-                    "description" => "The maximum number of API requests that are issued per second. The DOAJ accepts
-                        at most 2 requests per second according to the
-                        <a href=\"https://doaj.org/api/v3/docs\" taget=\"_blank\">API documentation</a>. Higher numbers
-                        might provoke the DOAJ to block your IP address.",
-                ),
-                array(
-                    "name" => "batch",
-                    "type" => "string",
-                    "section" => "general",
-                    "label" => "Batch Size",
-                    "placeholder" => "batch size",
-                    "description" => "The number of posts that are processed in one batch. Higher numbers might
-                        cause a PHP timeout depending on your server settings.",
-                ),
-                array(
                     "name" => "eissn",
                     "type" => "string",
                     "section" => "general",
@@ -159,6 +123,53 @@ if (!class_exists('VB_DOAJ_Submit_Setting_Fields')) {
                     "section" => "general",
                     "label" => __("Test without API Key", "vb-doaj-submit"),
                     "description" => "If checked, articles are not submitted to the DOAJ for testing purposes.",
+                ),
+
+                // ---------------------- automatic update settings
+
+                array(
+                    "name" => "auto_update",
+                    "type" => "boolean",
+                    "section" => "update",
+                    "label" => "Automatic Update",
+                    "description" => "Whether new posts should be automatically submitted to the DOAJ in regular intervals.",
+                ),
+                array(
+                    "name" => "interval",
+                    "type" => "string",
+                    "section" => "update",
+                    "label" => "Update Interval",
+                    "placeholder" => "update interval in minutes",
+                    "description" => "The number of minutes between updates. On each update, the database is checked
+                    and new posts are submitted to the DOAJ.",
+                ),
+                array(
+                    "name" => "requests_per_second",
+                    "type" => "string",
+                    "section" => "update",
+                    "label" => "Requests per Second",
+                    "placeholder" => "requests per second",
+                    "description" => "The maximum number of API requests that are issued per second. The DOAJ accepts
+                        at most 2 requests per second according to the
+                        <a href=\"https://doaj.org/api/v3/docs\" taget=\"_blank\">API documentation</a>. Higher numbers
+                        might provoke the DOAJ to block your IP address.",
+                ),
+                array(
+                    "name" => "batch",
+                    "type" => "string",
+                    "section" => "update",
+                    "label" => "Batch Size",
+                    "placeholder" => "batch size",
+                    "description" => "The number of posts that are processed in one batch. Higher numbers might
+                        cause a PHP timeout depending on your server settings.",
+                ),
+                array(
+                    "name" => "retry_minutes",
+                    "type" => "text",
+                    "section" => "update",
+                    "label" => "Retry Minutes",
+                    "placeholder" => "number of minutes",
+                    "description" => "The number of minutes that need to pass before a failed submission is tried again.",
                 ),
 
                 // ------------- custom post fields -------------

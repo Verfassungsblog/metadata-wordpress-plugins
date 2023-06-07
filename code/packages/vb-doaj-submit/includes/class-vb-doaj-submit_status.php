@@ -107,6 +107,11 @@ if (!class_exists('VB_DOAJ_Submit_Status')) {
             );
         }
 
+        public function clear_post_submit_status($post)
+        {
+            delete_post_meta($post->ID, $this->common->get_post_submit_status_meta_key());
+        }
+
         public function get_post_submit_error($post) {
             return get_post_meta(
                 $post->ID,
@@ -138,6 +143,14 @@ if (!class_exists('VB_DOAJ_Submit_Status')) {
             );
         }
 
+        public function get_post_doaj_article_id($post) {
+            return get_post_meta(
+                $post->ID,
+                $this->common->get_doaj_article_id_meta_key(),
+                true,
+            );
+        }
+
         public function clear_post_doaj_article_id($post) {
             delete_post_meta($post->ID, $this->common->get_doaj_article_id_meta_key());
         }
@@ -154,6 +167,15 @@ if (!class_exists('VB_DOAJ_Submit_Status')) {
         public function clear_post_identify_timestamp($post)
         {
             delete_post_meta($post->ID, $this->common->get_identify_timestamp_meta_key());
+        }
+
+        public function reset_post_status($post)
+        {
+            $this->clear_post_doaj_article_id($post);
+            $this->clear_post_submit_timestamp($post);
+            $this->clear_post_identify_timestamp($post);
+            $this->clear_post_submit_error($post);
+            $this->clear_post_submit_status($post);
         }
 
         public function reset_status()

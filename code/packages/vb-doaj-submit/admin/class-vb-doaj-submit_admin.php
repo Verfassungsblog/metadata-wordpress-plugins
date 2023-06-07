@@ -52,6 +52,7 @@ if (!class_exists('VB_DOAJ_Submit_Admin')) {
         {
             return array(
                 "general" => "General",
+                "update" => "Automatic Updates",
                 "post_meta" => "Custom Fields for Posts",
                 "user_meta" => "Custom Fields for Users",
             );
@@ -61,6 +62,7 @@ if (!class_exists('VB_DOAJ_Submit_Admin')) {
         {
             return array(
                 "general" => "settings",
+                "update" => "settings",
                 "post_meta" => "fields",
                 "user_meta" => "fields",
             );
@@ -159,6 +161,19 @@ if (!class_exists('VB_DOAJ_Submit_Admin')) {
             <p id="<?php echo esc_attr($args['id']); ?>">
                 <?php echo __(
                     'The following options influence how metadata is submitted to the DOAJ.',
+                    "vb-doaj"
+                );
+                ?>
+            </p>
+            <?php
+        }
+
+        public function render_update_section($args)
+        {
+            ?>
+            <p id="<?php echo esc_attr($args['id']); ?>">
+                <?php echo __(
+                    'The following options influence how automatic updates are scheduled and performed.',
                     "vb-doaj"
                 );
                 ?>
@@ -375,13 +390,9 @@ if (!class_exists('VB_DOAJ_Submit_Admin')) {
 
         protected function find_example_post()
         {
-            $modified_query = $this->queries->query_posts_that_need_submitting_because_modified(1);
-            if (count($modified_query->posts) > 0) {
-                return $modified_query->posts[0];
-            }
-            $never_submitted_query = $this->queries->query_posts_that_were_not_submitted_yet(1);
-            if (count($never_submitted_query->posts) > 0) {
-                return $never_submitted_query->posts[0];
+            $submit_query = $this->queries->query_posts_that_need_submitting(1);
+            if (count($submit_query->posts) > 0) {
+                return $submit_query->posts[0];
             }
             $identify_query = $this->queries->query_posts_that_need_identifying(1);
             if (count($identify_query->posts) > 0) {
@@ -499,6 +510,7 @@ if (!class_exists('VB_DOAJ_Submit_Admin')) {
             $were_identified = $this->queries->get_number_of_posts_that_were_successfully_identified();
             $need_submitting_never = $this->queries->get_number_of_posts_that_were_not_submitted_yet();
             $need_submitting_modified = $this->queries->get_number_of_posts_that_need_submitting_because_modified();
+            $need_submitting_retry = $this->queries->get_number_of_posts_that_should_be_retried();
             $were_submitted = $this->queries->get_number_of_posts_that_were_successfully_submitted();
             ?>
             <ul>
@@ -508,6 +520,7 @@ if (!class_exists('VB_DOAJ_Submit_Admin')) {
                 <li>Posts that were not identified (no DOAJ article id found): <?php echo ($were_identified - $have_article_id) ?></li>
                 <li>Posts that need submitting because not yet submitted: <?php echo $need_submitting_never; ?></li>
                 <li>Posts that need submitting because modified: <?php echo $need_submitting_modified; ?></li>
+                <li>Posts that need submitting again after error: <?php echo $need_submitting_retry; ?></li>
                 <li>Posts that were successfully submitted: <?php echo $were_submitted; ?></li>
             </ul>
             <hr/>

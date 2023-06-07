@@ -21,10 +21,6 @@ if (!class_exists('VB_DOAJ_Submit_Common')) {
                 $this->setting_field_defaults = array(
                     // general
                     "api_baseurl" => "https://doaj.org/api/",
-                    "auto_update" => false,
-                    "interval" => 1,
-                    "requests_per_second" => 2.0,
-                    "batch" => 1,
                     "eissn" => "2366-7044",
                     "issue" => "2366-7044",
                     "require_doi" => true,
@@ -33,6 +29,13 @@ if (!class_exists('VB_DOAJ_Submit_Common')) {
                     "include_subheadline" => false,
                     "identify_by_permalink" => true,
                     "test_without_apikey" => false,
+                    // automatic update
+                    "auto_update" => false,
+                    "interval" => 10,
+                    "requests_per_second" => 2.0,
+                    "batch" => 1,
+                    "retry_minutes" => 60,
+                    // custom fields
                     "doaj_article_id_meta_key" => "doaj_article_id",
                     "doi_meta_key" => "doi",
                     "subheadline_meta_key" => "subheadline",
@@ -43,15 +46,18 @@ if (!class_exists('VB_DOAJ_Submit_Common')) {
                 $this->setting_field_defaults = array(
                     // general
                     "api_baseurl" => "https://doaj.org/api/",
-                    "auto_update" => false,
-                    "interval" => 1,
-                    "requests_per_second" => 2.0,
-                    "batch" => 1,
                     "require_doi" => true,
                     "include_excerpt" => true,
                     "include_tags" => true,
                     "identify_by_permalink" => true,
                     "test_without_apikey" => false,
+                    // automatic updates
+                    "auto_update" => false,
+                    "interval" => 10,
+                    "requests_per_second" => 2.0,
+                    "batch" => 1,
+                    "retry_minutes" => 60,
+                    // custom fields
                     "doaj_article_id_meta_key" => "doaj_article_id",
                     "doi_meta_key" => "doi",
                     "orcid_meta_key" => "orcid",
