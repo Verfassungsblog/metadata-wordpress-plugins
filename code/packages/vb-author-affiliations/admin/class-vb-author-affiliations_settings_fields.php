@@ -26,7 +26,7 @@ if (!class_exists('VB_Author_Affiliations_Settings_Fields')) {
                     "name" => "autofill",
                     "type" => "boolean",
                     "section" => "general",
-                    "label" => "Automatic Filling",
+                    "label" => "Auto Fill Enabled",
                     "description" => "Whether the author affiliation is automatically copied form user information.",
                 ),
                 array(
