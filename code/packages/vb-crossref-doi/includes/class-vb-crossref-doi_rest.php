@@ -171,7 +171,6 @@ if (!class_exists('VB_CrossRef_DOI_REST')) {
             $doi = $this->common->get_post_meta_field_value("doi_meta_key", $post);
             if (!empty($doi) && !str_starts_with($doi, $doi_prefix)) {
                 // this is some other doi that we can not process
-                // clear needs update status, which is the only way this could have happened
                 $this->status->set_post_submit_status($post, VB_CrossRef_DOI_Status::SUBMIT_NOT_POSSIBLE);
             }
 

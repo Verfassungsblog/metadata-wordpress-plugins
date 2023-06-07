@@ -71,10 +71,15 @@ if (!class_exists('VB_CrossRef_DOI_Queries')) {
                         ),
                     ),
                     array(
-                        'relation' => 'AND',
+                        'relation' => 'OR',
                         array(
-                            'key' => $this->common->get_post_submit_timestamp_meta_key(),
+                            'key' => $this->common->get_post_submit_status_meta_key(),
                             'compare' => "NOT EXISTS",
+                        ),
+                        array(
+                            'key' => $this->common->get_post_submit_status_meta_key(),
+                            'value' => "",
+                            'compare' => "==",
                         ),
                     ),
                 ),
@@ -106,12 +111,12 @@ if (!class_exists('VB_CrossRef_DOI_Queries')) {
                         array(
                             'key' => $this->common->get_post_submit_status_meta_key(),
                             'value' => VB_CrossRef_DOI_Status::SUBMIT_PENDING,
-                            'compare' => "=",
+                            'compare' => "==",
                         ),
                         array(
                             'key' => $this->common->get_post_submit_status_meta_key(),
                             'value' => VB_CrossRef_DOI_Status::SUBMIT_ERROR,
-                            'compare' => "=",
+                            'compare' => "==",
                         )
                     ),
                     array(
@@ -144,7 +149,7 @@ if (!class_exists('VB_CrossRef_DOI_Queries')) {
                     array(
                         'key' => $this->common->get_post_submit_status_meta_key(),
                         'value' => VB_CrossRef_DOI_Status::SUBMIT_MODIFIED,
-                        'compare' => "=",
+                        'compare' => "==",
                     ),
                 )
             );
@@ -196,7 +201,7 @@ if (!class_exists('VB_CrossRef_DOI_Queries')) {
                     array(
                         'key' => $this->common->get_post_submit_status_meta_key(),
                         'value' => VB_CrossRef_DOI_Status::SUBMIT_SUCCESS,
-                        'compare' => "=",
+                        'compare' => "==",
                     ),
                 )
             );
@@ -227,6 +232,14 @@ if (!class_exists('VB_CrossRef_DOI_Queries')) {
                         'inclusive' => false,
                     ),
                 ),
+                'meta_query' => array(
+                    'relation' => 'AND',
+                    array(
+                        'key' => $this->common->get_post_submit_status_meta_key(),
+                        'value' => VB_CrossRef_DOI_Status::SUBMIT_MODIFIED,
+                        'compare' => "!=",
+                    ),
+                ),
             );
 
             $this->add_batch_arguments_to_query($query_args, false);
@@ -253,7 +266,7 @@ if (!class_exists('VB_CrossRef_DOI_Queries')) {
                     array(
                         'key' => $this->common->get_post_submit_status_meta_key(),
                         'value' => VB_CrossRef_DOI_Status::SUBMIT_PENDING,
-                        'compare' => "=",
+                        'compare' => "==",
                     ),
                     array(
                         'key' => $this->common->get_post_submit_timestamp_meta_key(),
@@ -284,7 +297,7 @@ if (!class_exists('VB_CrossRef_DOI_Queries')) {
                     array(
                         'key' => $this->common->get_post_submit_status_meta_key(),
                         'value' => VB_CrossRef_DOI_Status::SUBMIT_ERROR,
-                        'compare' => "=",
+                        'compare' => "==",
                     ),
                     array(
                         'key' => $this->common->get_post_submit_error_meta_key(),
