@@ -66,13 +66,13 @@ if (!class_exists('VB_DOAJ_Submit_REST')) {
                     $msg = $json_data->error;
                     $error = "DOAJ responded with error '" . $msg . "' (status code '" . $status_code . "')";
                 }
-                $this->status->set_post_submit_status($post, VB_CrossRef_DOI_Status::SUBMIT_ERROR);
+                $this->status->set_post_submit_status($post, VB_DOAJ_Submit_Status::SUBMIT_ERROR);
                 $this->status->set_post_submit_error($post, $error);
                 $this->status->set_last_error($error);
                 return false;
             } else if ($status_code !== $expected_status_code) {
                 $this->status->set_last_error("DOAJ responsed with invalid status code '" . $status_code . "'");
-                $this->status->set_post_submit_status($post, VB_CrossRef_DOI_Status::SUBMIT_ERROR);
+                $this->status->set_post_submit_status($post, VB_DOAJ_Submit_Status::SUBMIT_ERROR);
                 return false;
             }
 
@@ -190,11 +190,11 @@ if (!class_exists('VB_DOAJ_Submit_REST')) {
                     // update post status
                     $this->status->set_post_doaj_article_id($post, $article_id);
                     $this->status->set_post_identify_timestamp($post);
-                    $this->status->set_post_submit_status($post, VB_CrossRef_DOI_Status::SUBMIT_SUCCESS);
+                    $this->status->set_post_submit_status($post, VB_DOAJ_Submit_Status::SUBMIT_SUCCESS);
                     return true;
                 } else {
                     // simulate error
-                    $this->status->set_post_submit_status($post, VB_CrossRef_DOI_Status::SUBMIT_ERROR);
+                    $this->status->set_post_submit_status($post, VB_DOAJ_Submit_Status::SUBMIT_ERROR);
                     $this->status->set_post_submit_error($post, "simulated error message");
                     return false;
                 }
@@ -225,7 +225,7 @@ if (!class_exists('VB_DOAJ_Submit_REST')) {
 
             // save submit timestamp
             $this->status->set_post_submit_timestamp($post);
-            $this->status->set_post_submit_status($post, VB_CrossRef_DOI_Status::SUBMIT_PENDING);
+            $this->status->set_post_submit_status($post, VB_DOAJ_Submit_Status::SUBMIT_PENDING);
 
             // do http request
             $response = wp_remote_request($url, array(
@@ -247,7 +247,7 @@ if (!class_exists('VB_DOAJ_Submit_REST')) {
             $json_data = json_decode(wp_remote_retrieve_body($response));
             if (json_last_error() !== JSON_ERROR_NONE) {
                 $this->status->set_last_error("response is invalid json");
-                $this->status->set_post_submit_status($post, VB_CrossRef_DOI_Status::SUBMIT_ERROR);
+                $this->status->set_post_submit_status($post, VB_DOAJ_Submit_Status::SUBMIT_ERROR);
                 return false;
             }
             $article_id = $json_data->id;
@@ -256,7 +256,7 @@ if (!class_exists('VB_DOAJ_Submit_REST')) {
             $this->status->set_post_doaj_article_id($post, $article_id);
             $this->status->set_post_identify_timestamp($post);
             $this->status->clear_post_submit_error($post);
-            $this->status->set_post_submit_status($post, VB_CrossRef_DOI_Status::SUBMIT_SUCCESS);
+            $this->status->set_post_submit_status($post, VB_DOAJ_Submit_Status::SUBMIT_SUCCESS);
             return true;
         }
 
@@ -297,7 +297,7 @@ if (!class_exists('VB_DOAJ_Submit_REST')) {
 
             // save submit timestamp
             $this->status->set_post_submit_timestamp($post);
-            $this->status->set_post_submit_status($post, VB_CrossRef_DOI_Status::SUBMIT_PENDING);
+            $this->status->set_post_submit_status($post, VB_DOAJ_Submit_Status::SUBMIT_PENDING);
 
             $response = wp_remote_request($url, array(
                 "method" => "DELETE",

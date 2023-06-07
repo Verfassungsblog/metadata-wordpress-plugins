@@ -304,7 +304,7 @@ if (!class_exists('VB_DOAJ_Submit_Queries')) {
                     'relation' => 'AND',
                     array(
                         'key' => $this->common->get_post_submit_status_meta_key(),
-                        'value' => VB_CrossRef_DOI_Status::SUBMIT_ERROR,
+                        'value' => VB_DOAJ_Submit_Status::SUBMIT_ERROR,
                         'compare' => "==",
                     ),
                     array(
@@ -340,12 +340,12 @@ if (!class_exists('VB_DOAJ_Submit_Queries')) {
                         'relation' => 'OR',
                         array(
                             'key' => $this->common->get_post_submit_status_meta_key(),
-                            'value' => VB_CrossRef_DOI_Status::SUBMIT_PENDING,
+                            'value' => VB_DOAJ_Submit_Status::SUBMIT_PENDING,
                             'compare' => "==",
                         ),
                         array(
                             'key' => $this->common->get_post_submit_status_meta_key(),
-                            'value' => VB_CrossRef_DOI_Status::SUBMIT_ERROR,
+                            'value' => VB_DOAJ_Submit_Status::SUBMIT_ERROR,
                             'compare' => "==",
                         )
                     ),

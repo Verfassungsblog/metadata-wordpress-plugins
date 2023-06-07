@@ -458,7 +458,7 @@ if (!class_exists('VB_DOAJ_Submit_Admin')) {
                 echo " ";
                 submit_button(__('Manually Identify Now', "vb-doaj-submit"), "secondary", "manual_identify", false);
                 echo " ";
-                submit_button(__('Manually Check for Modified Posts Now', "vb-crossref-doi"), "secondary", "check_modified", false);
+                submit_button(__('Manually Check for Modified Posts Now', "vb-doaj-submit"), "secondary", "check_modified", false);
                 ?>
             </p>
             <p>

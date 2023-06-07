@@ -51,7 +51,7 @@ if (!class_exists('VB_DOAJ_Submit_Update')) {
             foreach ($modified_query->posts as $post_id) {
                 $post = $post = new stdClass();
                 $post->ID = $post_id;
-                $this->status->set_post_submit_status($post, VB_CrossRef_DOI_Status::SUBMIT_MODIFIED);
+                $this->status->set_post_submit_status($post, VB_DOAJ_Submit_Status::SUBMIT_MODIFIED);
             }
             $this->status->set_date_of_last_modified_check();
         }
