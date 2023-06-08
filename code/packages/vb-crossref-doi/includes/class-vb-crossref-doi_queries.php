@@ -30,6 +30,29 @@ if (!class_exists('VB_CrossRef_DOI_Queries')) {
             }
         }
 
+        protected function add_post_selection_arguments_to_query(&$query_args)
+        {
+            $submit_all_posts = $this->common->get_settings_field_value("submit_all_posts");
+            $include_post_category = $this->common->get_settings_field_value("include_post_category");
+
+
+            if ($submit_all_posts) {
+                // exclude posts from the exclude category
+                $exclude_post_category = $this->common->get_settings_field_value("exclude_post_category");
+                if (!empty($exclude_post_category)) {
+                    $exclude_category_id = get_cat_ID($exclude_post_category);
+                    if ($exclude_category_id > 0) {
+                        $query_args["category__not_in"] = array($exclude_category_id);
+                    }
+                }
+            } else {
+                // include posts from the include category
+                $include_post_category = $this->common->get_settings_field_value("include_post_category");
+                $include_category_id = get_cat_ID($include_post_category);
+                $query_args["category__in"] = array($include_category_id);
+            }
+        }
+
         public function query_posts_that_need_submitting($batch)
         {
             $modified = $this->query_posts_that_need_submitting_because_modified($batch);
@@ -86,6 +109,7 @@ if (!class_exists('VB_CrossRef_DOI_Queries')) {
             );
 
             $this->add_batch_arguments_to_query($query_args, $batch);
+            $this->add_post_selection_arguments_to_query($query_args);
             return new WP_Query( $query_args );
         }
 
@@ -128,6 +152,7 @@ if (!class_exists('VB_CrossRef_DOI_Queries')) {
             );
 
             $this->add_batch_arguments_to_query($query_args, $batch);
+            $this->add_post_selection_arguments_to_query($query_args);
             return new WP_Query( $query_args );
         }
 
@@ -155,6 +180,7 @@ if (!class_exists('VB_CrossRef_DOI_Queries')) {
             );
 
             $this->add_batch_arguments_to_query($query_args, $batch);
+            $this->add_post_selection_arguments_to_query($query_args);
             return new WP_Query( $query_args );
         }
 
@@ -243,6 +269,7 @@ if (!class_exists('VB_CrossRef_DOI_Queries')) {
             );
 
             $this->add_batch_arguments_to_query($query_args, false);
+            $this->add_post_selection_arguments_to_query($query_args);
             return new WP_Query( $query_args );
         }
 
@@ -277,6 +304,7 @@ if (!class_exists('VB_CrossRef_DOI_Queries')) {
             );
 
             $this->add_batch_arguments_to_query($query_args, $batch);
+            $this->add_post_selection_arguments_to_query($query_args);
             return new WP_Query( $query_args );
         }
 
@@ -308,6 +336,7 @@ if (!class_exists('VB_CrossRef_DOI_Queries')) {
             );
 
             $this->add_batch_arguments_to_query($query_args, $batch);
+            $this->add_post_selection_arguments_to_query($query_args);
             return new WP_Query( $query_args );
         }
     }

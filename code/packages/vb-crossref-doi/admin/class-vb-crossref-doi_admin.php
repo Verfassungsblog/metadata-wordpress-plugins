@@ -1,6 +1,7 @@
 <?php
 
 require_once plugin_dir_path(__FILE__) . '/class-vb-crossref-doi_setting_fields.php';
+require_once plugin_dir_path(__FILE__) . '/class-vb-crossref-doi_sanitize.php';
 require_once plugin_dir_path(__FILE__) . '../includes/class-vb-crossref-doi_common.php';
 require_once plugin_dir_path(__FILE__) . '../includes/class-vb-crossref-doi_render.php';
 require_once plugin_dir_path(__FILE__) . '../includes/class-vb-crossref-doi_queries.php';
@@ -26,6 +27,8 @@ if (!class_exists('VB_CrossRef_DOI_Admin')) {
 
         protected $update;
 
+        protected $sanitize;
+
         public function __construct($plugin_name)
         {
             $this->common = new VB_CrossRef_DOI_Common($plugin_name);
@@ -33,6 +36,7 @@ if (!class_exists('VB_CrossRef_DOI_Admin')) {
             $this->queries = new VB_CrossRef_DOI_Queries($plugin_name);
             $this->status = new VB_CrossRef_DOI_Status($plugin_name);
             $this->update = new VB_CrossRef_DOI_Update($plugin_name);
+            $this->sanitize = new VB_CrossRef_DOI_Sanitize($plugin_name);
         }
 
         protected function get_tab_labels()
@@ -50,7 +54,9 @@ if (!class_exists('VB_CrossRef_DOI_Admin')) {
         {
             return array(
                 "general" => "General",
+                "meta" => "Meta Data",
                 "institution" => "Institution",
+                "post_selection" => "Post Selection",
                 "update" => "Automatic Updates",
                 "post_meta" => "Custom Fields for Posts",
                 "user_meta" => "Custom Fields for Users",
@@ -61,7 +67,9 @@ if (!class_exists('VB_CrossRef_DOI_Admin')) {
         {
             return array(
                 "general" => "settings",
+                "meta" => "settings",
                 "institution" => "settings",
+                "post_selection" => "settings",
                 "update" => "settings",
                 "post_meta" => "fields",
                 "user_meta" => "fields",
@@ -113,8 +121,8 @@ if (!class_exists('VB_CrossRef_DOI_Admin')) {
                     $field_id,
                     array(
                         "type" => $field["type"],
-                        "default" => $default
-                    )
+                        "default" => $default,
+                    ),
                 );
 
                 add_settings_field(
@@ -128,6 +136,10 @@ if (!class_exists('VB_CrossRef_DOI_Admin')) {
                         "field_name" => $field["name"]
                     )
                 );
+
+                if (isset($field["sanitize"])) {
+                    add_filter( 'sanitize_option_' . $field_id, array($this->sanitize, $field["sanitize"]), 10, 2 );
+                }
             }
 
             // add css
@@ -160,7 +172,20 @@ if (!class_exists('VB_CrossRef_DOI_Admin')) {
             ?>
             <p id="<?php echo esc_attr($args['id']); ?>">
                 <?php echo __(
-                    'The following options influence how metadata is submitted to CrossRef.',
+                    'Please provide the following mandatory information such that posts can be submitted to CrossRef.',
+                    "vb-crossref-doi"
+                );
+                ?>
+            </p>
+            <?php
+        }
+
+        public function render_meta_section($args)
+        {
+            ?>
+            <p id="<?php echo esc_attr($args['id']); ?>">
+                <?php echo __(
+                    'The following options influence what meta data is included when submitting a post to CrossRef.',
                     "vb-crossref-doi"
                 );
                 ?>
@@ -175,6 +200,19 @@ if (!class_exists('VB_CrossRef_DOI_Admin')) {
                 <?php echo __(
                     'The following section allows to specify information about the institution that is publishing
                     articles. If at least one identifier is provided, the information is associated with every post.',
+                    "vb-crossref-doi"
+                );
+                ?>
+            </p>
+            <?php
+        }
+
+        public function render_post_selection_section($args)
+        {
+            ?>
+            <p id="<?php echo esc_attr($args['id']); ?>">
+                <?php echo __(
+                    'The following options influence which posts will be submitted to CrossRef.',
                     "vb-crossref-doi"
                 );
                 ?>
@@ -236,14 +274,22 @@ if (!class_exists('VB_CrossRef_DOI_Admin')) {
             $value = get_option($field_id);
             if ($field["type"] == "boolean") {
                 ?>
-                <input id="<?php echo esc_attr($field_id); ?>" name="<?php echo esc_attr($field_id); ?>" type="checkbox"
+                <input
+                    id="<?php echo esc_attr($field_id); ?>"
+                    name="<?php echo esc_attr($field_id); ?>"
+                    type="checkbox"
                     <?php echo $value ? "checked" : "" ?>
                 >
                 <?php
-            } else if ($field["type"] == "text" || $field["type"] == "password") {
+            } else if ($field["type"] == "string" || $field["type"] == "password") {
                 ?>
-                <input id="<?php echo esc_attr($field_id); ?>" name="<?php echo esc_attr($field_id); ?>" class="regular-text code"
-                    type="<?php echo $field["type"] ?>" value="<?php echo $value ?>" placeholder="<?php echo $field["placeholder"] ?>">
+                <input
+                    id="<?php echo esc_attr($field_id); ?>"
+                    name="<?php echo esc_attr($field_id); ?>"
+                    class="regular-text code"
+                    type="<?php echo $field["type"] == "password" ? "password" : "text" ?>"
+                    value="<?php echo $value ?>"
+                    placeholder="<?php echo $field["placeholder"] ?>">
                 <?php
             } else {
                 ?>

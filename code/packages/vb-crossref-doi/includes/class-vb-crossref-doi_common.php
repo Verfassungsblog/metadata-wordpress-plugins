@@ -33,6 +33,10 @@ if (!class_exists('VB_CrossRef_DOI_Common')) {
                     // institution
                     "institution_name" => $blog_title,
                     "institution_wikidata_id" => "Q97588182",
+                    // post selection
+                    "submit_all_posts" => true,
+                    "include_post_category" => "",
+                    "exclude_post_category" => "No DOI",
                     // update
                     "auto_update" => false,
                     "interval" => 1,
@@ -58,6 +62,10 @@ if (!class_exists('VB_CrossRef_DOI_Common')) {
                     "include_excerpt" => True,
                     // institution
                     "institution_name" => $blog_title,
+                    // post selection
+                    "submit_all_posts" => false,
+                    "include_post_category" => "DOI",
+                    "exclude_post_category" => "No DOI",
                     // update
                     "auto_update" => false,
                     "interval" => 1,
