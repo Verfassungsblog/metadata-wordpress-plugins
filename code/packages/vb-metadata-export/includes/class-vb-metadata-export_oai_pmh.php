@@ -473,7 +473,7 @@ if (!class_exists('VB_Metadata_Export_OAI_PMH')) {
             return $this->render_list_request("ListIdentifiers", $metadataPrefix, $from, $until, $set, $resumptionToken);
         }
 
-        public function action_init() {
+        public function add_rewrite_rules() {
             // write rules for OAI-PMH
             add_rewrite_rule('^oai/repository/?([^/]*)', 'index.php?' . $this->common->plugin_name . '=oai-pmh&$matches[1]', 'top');
             add_rewrite_tag('%verb%', '([^&]+)');
@@ -483,6 +483,10 @@ if (!class_exists('VB_Metadata_Export_OAI_PMH')) {
             add_rewrite_tag('%until%', '([^&]+)');
             add_rewrite_tag('%resumptionToken%', '([^&]+)');
             add_rewrite_tag('%set%', '([^&]+)');
+        }
+
+        public function action_init() {
+            $this->add_rewrite_rules();
         }
 
         public function run() {

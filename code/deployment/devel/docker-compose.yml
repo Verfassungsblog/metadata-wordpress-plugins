@@ -57,11 +57,7 @@ services:
     depends_on:
       - wordpress
     volumes:
-      - ${WORKSPACE_DIR}/code/packages/vb-author-affiliations:/code/vb-author-affiliations:z
-      - ${WORKSPACE_DIR}/code/packages/vb-crossref-doi:/code/vb-crossref-doi:z
-      - ${WORKSPACE_DIR}/code/packages/vb-doaj-submit:/code/vb-doaj-submit:z
-      - ${WORKSPACE_DIR}/code/packages/vb-gnd-taxonomy:/code/vb-gnd-taxonomy:z
-      - ${WORKSPACE_DIR}/code/packages/vb-metadata-export:/code/vb-metadata-export:z
+      - ${WORKSPACE_DIR}:/root/workspace:z
 
   oaipmh-validator:
     build:

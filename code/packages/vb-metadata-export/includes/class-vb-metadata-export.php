@@ -1,88 +1,155 @@
 <?php
+/**
+ * Test
+ *
+ * @package vb-metadata-export
+ */
 
-require_once plugin_dir_path(__FILE__) . '../admin/class-vb-metadata-export_admin.php';
-require_once plugin_dir_path(__FILE__) . '/class-vb-metadata-export_shortcode.php';
+/**
+ * Class imports
+ */
+require_once plugin_dir_path( __FILE__ ) . '../admin/class-vb-metadata-export_admin.php';
+require_once plugin_dir_path( __FILE__ ) . '/class-vb-metadata-export_shortcode.php';
 
-if (!class_exists('VB_Metadata_Export')) {
+if ( ! class_exists( 'VB_Metadata_Export' ) ) {
 
-    class VB_Metadata_Export
-    {
-        protected $common;
+	/**
+	 * Main class of Verfassungsblog Metadata Export plugin.
+	 */
+	class VB_Metadata_Export {
 
-        protected $plugin_version;
+		/**
+		 * Common methods
+		 *
+		 * @var VB_Metadata_Export_Common
+		 */
+		protected $common;
 
-        protected $base_file;
+		/**
+		 * Plugin version string
+		 *
+		 * @var string
+		 */
+		protected $plugin_version;
 
-        protected $admin;
+		/**
+		 * Path to base plugin file
+		 *
+		 * @var string
+		 */
+		protected $base_file;
 
-        protected $shortcode;
+		/**
+		 * Admin class
+		 *
+		 * @var VB_Metadata_Export_Admin
+		 */
+		protected $admin;
 
-        protected $oaipmh;
+		/**
+		 * Shortcode class
+		 *
+		 * @var VB_Metadata_Export_Shortcode
+		 */
+		protected $shortcode;
 
-        public function __construct($base_file, $plugin_name, $plugin_version)
-        {
-            $this->plugin_version = $plugin_version;
-            $this->base_file = $base_file;
-            $this->common = new VB_Metadata_Export_Common($plugin_name);
-            $this->admin = new VB_Metadata_Export_Admin($plugin_name);
-            $this->shortcode = new VB_Metadata_Export_Shortcode($plugin_name);
-            $this->oaipmh = new VB_Metadata_Export_OAI_PMH($plugin_name);
-        }
+		/**
+		 * OAI-PMH class
+		 *
+		 * @var VB_Metadata_Export_OAI_PMH
+		 */
+		protected $oaipmh;
 
-        public function activate()
-        {
-            global $wp_rewrite;
-            $wp_rewrite->flush_rules(false);
-        }
+		/**
+		 * Intialize main class.
+		 *
+		 * @param string $base_file path to plugin base file.
+		 * @param string $plugin_name name of plugin.
+		 * @param string $plugin_version version of plugin.
+		 */
+		public function __construct( $base_file, $plugin_name, $plugin_version ) {
+			$this->plugin_version = $plugin_version;
+			$this->base_file      = $base_file;
+			$this->common         = new VB_Metadata_Export_Common( $plugin_name );
+			$this->admin          = new VB_Metadata_Export_Admin( $plugin_name );
+			$this->shortcode      = new VB_Metadata_Export_Shortcode( $plugin_name );
+			$this->oaipmh         = new VB_Metadata_Export_OAI_PMH( $plugin_name );
+		}
 
-        public function deactivate()
-        {
+		/**
+		 * Add rewrite rules that allow to render xml exports.
+		 */
+		protected function add_rewrite_rules() {
+			// Add rewrite rule to output custom metadata formats instead of html.
+			add_rewrite_tag( '%' . $this->common->plugin_name . '%', '([^&]+)' );
+		}
 
-        }
+		/**
+		 * WordPress plugin activation hook
+		 */
+		public function activate() {
+			$this->add_rewrite_rules();
+			$this->oaipmh->add_rewrite_rules();
+			flush_rewrite_rules();
+		}
 
-        public function action_init()
-        {
-            // add rewrite rule to output custom metadata formats instead of html
-            add_rewrite_tag('%' . $this->common->plugin_name . '%', '([^&]+)');
+		/**
+		 * WordPress plugin deactivation hook
+		 */
+		public function deactivate() {
 
-            load_plugin_textdomain(
-                $this->common->plugin_name,
-                false,
-                dirname(plugin_basename($this->base_file)) . '/languages'
-            );
-        }
+		}
 
-        public function action_template_include($template)
-        {
-            global $wp_query;
-            global $post;
+		/**
+		 * WordPress plugin init action
+		 */
+		public function action_init() {
+			$this->add_rewrite_rules();
 
-            if (isset($wp_query->query_vars[$this->common->plugin_name])) {
-                $format = $wp_query->query_vars[$this->common->plugin_name];
-                if (in_array($format, $this->common->get_available_formats())) {
-                    return dirname($this->base_file) . '/public/' . $format . '.php';
-                }
-            }
+			load_plugin_textdomain(
+				$this->common->plugin_name,
+				false,
+				dirname( plugin_basename( $this->base_file ) ) . '/languages'
+			);
+		}
 
-            return $template;
-        }
+		/**
+		 * WordPress plugin template include action
+		 *
+		 * @param string $template the template that is used to render the current page.
+		 */
+		public function action_template_include( $template ) {
+			global $wp_query;
+			global $post;
 
-        public function run()
-        {
-            register_activation_hook($this->base_file, array($this, 'activate'));
-            register_deactivation_hook($this->base_file, array($this, 'deactivate'));
-            register_uninstall_hook($this->base_file, 'vb_metadata_export_uninstall');
+			if ( isset( $wp_query->query_vars[ $this->common->plugin_name ] ) ) {
+				$format = $wp_query->query_vars[ $this->common->plugin_name ];
+				if ( in_array( $format, $this->common->get_available_formats(), true ) ) {
+					return dirname( $this->base_file ) . '/public/' . $format . '.php';
+				}
+			}
 
-            add_action("init", array($this, 'action_init'));
+			return $template;
+		}
 
-            $template_priority = (int)$this->common->get_settings_field_value("template_priority");
-            add_filter("template_include", array($this, 'action_template_include'), $template_priority, 1);
+		/**
+		 * Main run method.
+		 */
+		public function run() {
+			register_activation_hook( $this->base_file, array( $this, 'activate' ) );
+			register_deactivation_hook( $this->base_file, array( $this, 'deactivate' ) );
+			register_uninstall_hook( $this->base_file, 'vb_metadata_export_uninstall' );
 
-            $this->admin->run();
-            $this->shortcode->run();
-            $this->oaipmh->run();
-        }
+			add_action( 'init', array( $this, 'action_init' ) );
 
-    }
+			$template_priority = (int) $this->common->get_settings_field_value( 'template_priority' );
+			add_filter( 'template_include', array( $this, 'action_template_include' ), $template_priority, 1 );
+
+			$this->admin->run();
+			$this->shortcode->run();
+			$this->oaipmh->run();
+		}
+
+	}
 
 }

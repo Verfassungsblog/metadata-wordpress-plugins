@@ -1,6 +1,10 @@
 <?php
-
 /**
+ * Verfassungsblog Metadata Export
+ *
+ * @package vb-metadata-export
+ *
+ * @wordpress-plugin
  * Plugin Name: Verfassungsblog Metadata Export
  * Plugin URI: https://wordpress.org/plugins/vb-metadata-export/
  * Description: Export post metadata as Marc21 / MODS / OAI
@@ -15,20 +19,23 @@
  * Domain Path: /languages
  */
 
-define('VB_METADATA_EXPORT_VERSION', '0.0.2');
+define( 'VB_METADATA_EXPORT_VERSION', '0.0.2' );
 
-require_once plugin_dir_path(__FILE__) . 'includes/class-vb-metadata-export.php';
+require_once plugin_dir_path( __FILE__ ) . 'includes/class-vb-metadata-export.php';
 
-
+/**
+ * Uninstall hook.
+ */
 function vb_metadata_export_uninstall() {
 
 }
 
-function run_vb_metadata_export()
-{
-    $vb_metadata_export = new VB_Metadata_Export(__FILE__, "vb-metadata-export", "0.0.2");
-    $vb_metadata_export->run();
+/**
+ * Main run method.
+ */
+function run_vb_metadata_export() {
+	$vb_metadata_export = new VB_Metadata_Export( __FILE__, 'vb-metadata-export', '0.0.2' );
+	$vb_metadata_export->run();
 }
 
 run_vb_metadata_export();
-
