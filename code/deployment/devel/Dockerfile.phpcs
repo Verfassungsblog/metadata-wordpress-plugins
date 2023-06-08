@@ -1,0 +1,14 @@
+FROM docker.io/cytopia/phpcs:3-php8.0
+
+RUN apk add git coreutils bash
+
+RUN git clone -b master https://github.com/WordPress/WordPress-Coding-Standards.git /wpcs
+
+RUN phpcs --config-set installed_paths /wpcs
+
+WORKDIR /code
+
+# keep container running for development work
+# (e.g. vscode remote development plugin)
+# don't do this other than for development purposes
+ENTRYPOINT ["tail", "-f", "/dev/null"]
