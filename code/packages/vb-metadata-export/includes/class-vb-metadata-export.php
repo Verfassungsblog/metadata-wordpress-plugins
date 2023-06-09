@@ -8,8 +8,8 @@
 /**
  * Class imports
  */
-require_once plugin_dir_path( __FILE__ ) . '../admin/class-vb-metadata-export_admin.php';
-require_once plugin_dir_path( __FILE__ ) . '/class-vb-metadata-export_shortcode.php';
+require_once plugin_dir_path( __FILE__ ) . '../admin/class-vb-metadata-export-admin.php';
+require_once plugin_dir_path( __FILE__ ) . '/class-vb-metadata-export-shortcode.php';
 
 if ( ! class_exists( 'VB_Metadata_Export' ) ) {
 

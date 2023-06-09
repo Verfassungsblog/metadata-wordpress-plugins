@@ -15,39 +15,39 @@ msgstr ""
 "X-Poedit-KeywordsList: __\n"
 "X-Poedit-SearchPath-0: .\n"
 
-#: includes/class-vb-metadata-export_common.php:24
+#: includes/class-vb-metadata-export-common.php:24
 msgid "Marc21 Leader"
 msgstr "Marc21 Leader"
 
-#: includes/class-vb-metadata-export_common.php:25
+#: includes/class-vb-metadata-export-common.php:25
 msgid "marc21 leader attribute"
 msgstr "Marc21 Leader-Attribut"
 
-#: includes/class-vb-metadata-export_common.php:26
+#: includes/class-vb-metadata-export-common.php:26
 msgid "The Marc21"
 msgstr "Das Marc21"
 
-#: includes/class-vb-metadata-export_common.php:27
+#: includes/class-vb-metadata-export-common.php:27
 msgid "leader attribute"
 msgstr "Leader-Attribut"
 
-#: includes/class-vb-metadata-export_common.php:27
+#: includes/class-vb-metadata-export-common.php:27
 msgid "for example:"
 msgstr "zum Beispiel:"
 
-#: includes/class-vb-metadata-export_common.php:33
+#: includes/class-vb-metadata-export-common.php:33
 msgid "Blog Owner"
 msgstr "Blog  Eigentümer"
 
-#: includes/class-vb-metadata-export_common.php:34
+#: includes/class-vb-metadata-export-common.php:34
 msgid "blog owner"
 msgstr "Blog Eigentümer"
 
-#: includes/class-vb-metadata-export_common.php:41
+#: includes/class-vb-metadata-export-common.php:41
 msgid "Blog Title"
 msgstr "Blog Titel"
 
-#: includes/class-vb-metadata-export_common.php:42
+#: includes/class-vb-metadata-export-common.php:42
 msgid "blog title"
 msgstr "Blog Titel"
 

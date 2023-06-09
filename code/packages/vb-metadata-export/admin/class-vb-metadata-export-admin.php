@@ -1,10 +1,10 @@
 <?php
 
-require_once plugin_dir_path(__FILE__) . '../includes/class-vb-metadata-export_common.php';
-require_once plugin_dir_path(__FILE__) . '../includes/class-vb-metadata-export_converter.php';
-require_once plugin_dir_path(__FILE__) . '../includes/class-vb-metadata-export_marc21xml.php';
-require_once plugin_dir_path(__FILE__) . '../includes/class-vb-metadata-export_oai_pmh.php';
-require_once plugin_dir_path(__FILE__) . '/class-vb-metadata-export_setting_fields.php';
+require_once plugin_dir_path(__FILE__) . '../includes/class-vb-metadata-export-common.php';
+require_once plugin_dir_path(__FILE__) . '../includes/class-vb-metadata-export-converter.php';
+require_once plugin_dir_path(__FILE__) . '../includes/class-vb-metadata-export-marc21xml.php';
+require_once plugin_dir_path(__FILE__) . '../includes/class-vb-metadata-export-oai-pmh.php';
+require_once plugin_dir_path(__FILE__) . '/class-vb-metadata-export-settings-fields.php';
 
 if (!class_exists('VB_Metadata_Export_Admin')) {
 

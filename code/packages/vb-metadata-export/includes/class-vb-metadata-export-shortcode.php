@@ -1,7 +1,7 @@
 <?php
 
-require_once plugin_dir_path(__FILE__) . '/class-vb-metadata-export_common.php';
-require_once plugin_dir_path(__FILE__) . '/class-vb-metadata-export_template.php';
+require_once plugin_dir_path(__FILE__) . '/class-vb-metadata-export-common.php';
+require_once plugin_dir_path(__FILE__) . '/class-vb-metadata-export-template.php';
 
 if (!class_exists('VB_Metadata_Export_Shortcode')) {
 

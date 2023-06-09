@@ -8,11 +8,11 @@
 /**
  * Class imports
  */
-require_once plugin_dir_path( __FILE__ ) . '/class-vb-metadata-export_common.php';
-require_once plugin_dir_path( __FILE__ ) . '/class-vb-metadata-export_marc21xml.php';
-require_once plugin_dir_path( __FILE__ ) . '/class-vb-metadata-export_converter.php';
-require_once plugin_dir_path( __FILE__ ) . '/class-vb-metadata-export_oai_pmh.php';
-require_once plugin_dir_path( __FILE__ ) . '/class-vb-metadata-export_dc.php';
+require_once plugin_dir_path( __FILE__ ) . '/class-vb-metadata-export-common.php';
+require_once plugin_dir_path( __FILE__ ) . '/class-vb-metadata-export-marc21xml.php';
+require_once plugin_dir_path( __FILE__ ) . '/class-vb-metadata-export-converter.php';
+require_once plugin_dir_path( __FILE__ ) . '/class-vb-metadata-export-oai-pmh.php';
+require_once plugin_dir_path( __FILE__ ) . '/class-vb-metadata-export-dc.php';
 
 if ( ! function_exists( 'get_the_vb_metadata_export_permalink' ) ) {
 	/**

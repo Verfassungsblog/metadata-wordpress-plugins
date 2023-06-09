@@ -1,6 +1,6 @@
 <?php
 
-require_once plugin_dir_path(__FILE__) . '/class-vb-metadata-export_oai_pmh.php';
+require_once plugin_dir_path(__FILE__) . '/class-vb-metadata-export-oai-pmh.php';
 
 if (!class_exists('VB_Metadata_Export_Common')) {
 

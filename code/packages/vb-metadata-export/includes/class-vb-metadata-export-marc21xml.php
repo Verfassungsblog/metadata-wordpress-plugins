@@ -1,6 +1,6 @@
 <?php
 
-require_once plugin_dir_path(__FILE__) . '/class-vb-metadata-export_common.php';
+require_once plugin_dir_path(__FILE__) . '/class-vb-metadata-export-common.php';
 
 if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
 
@@ -485,7 +485,7 @@ if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
                 )
             );
 
-            return esc_xml( $this->common->format_xml($xml_str) );
+            return $this->common->format_xml($xml_str);
         }
 
     }
