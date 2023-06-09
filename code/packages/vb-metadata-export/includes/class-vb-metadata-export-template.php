@@ -16,9 +16,11 @@ require_once plugin_dir_path( __FILE__ ) . '/class-vb-metadata-export-dc.php';
 
 if ( ! function_exists( 'get_the_vb_metadata_export_permalink' ) ) {
 	/**
-	 * Return the permalink to the meta data export format.
+	 * Return the permalink to the meta data export format for the current post.
 	 *
+	 * @global WP_Post $post the current post
 	 * @param string $format the format to which the link is pointing to, either "marc21xml", "mods", "dc" or "oaipmh".
+	 * @return string the permalink to the metadata export format for the current post
 	 */
 	function get_the_vb_metadata_export_permalink( $format ) {
 		global $post;
@@ -35,6 +37,7 @@ if ( ! function_exists( 'get_the_vb_metadata_export_link' ) ) {
 	 * @param string $title the link text.
 	 * @param string $extra_class any additional css class tag.
 	 * @param string $unavailable the link text in case the format is not available (e.g. disabled in settings).
+	 * @return string the link as html string
 	 */
 	function get_the_vb_metadata_export_link( $format, $title = '', $extra_class = '', $unavailable = '' ) {
 		global $post;
@@ -80,8 +83,9 @@ if ( ! function_exists( 'the_vb_metadata_export_link' ) ) {
 
 if ( ! function_exists( 'vb_metadata_export_render_format' ) ) {
 	/**
-	 * Render the actual meta data export format as xml output.
+	 * Render the actual meta data export format for the current post as xml output.
 	 *
+	 * @global WP_Post $post the current post
 	 * @param string $format the format to which the link is pointing to, either "marc21xml", "mods" or "dc".
 	 */
 	function vb_metadata_export_render_format( $format ) {
@@ -135,7 +139,6 @@ if ( ! function_exists( 'vb_metadata_export_render_oaipmh' ) ) {
 			global $wp_query;
 			$wp_query->set_404();
 			status_header( 404 );
-			get_template_part( 404 );
 			exit();
 		}
 	}
