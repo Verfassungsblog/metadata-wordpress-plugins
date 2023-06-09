@@ -127,14 +127,14 @@ if ( ! class_exists( 'VB_Metadata_Export' ) ) {
 				if ( $this->common->is_valid_format( $format ) ) {
 					if ( $this->common->is_format_enabled( $format ) ) {
 						return dirname( $this->base_file ) . '/public/' . $format . '.php';
-					} else {
-						// redirect to 404.
-						global $wp_query;
-						$wp_query->set_404();
-						status_header( 404 );
-						return get_query_template( '404' );
 					}
 				}
+
+				// show 404 page if format is incorrect or disabled
+				global $wp_query;
+				$wp_query->set_404();
+				status_header( 404 );
+				return get_query_template( '404' );
 			}
 
 			return $template;
