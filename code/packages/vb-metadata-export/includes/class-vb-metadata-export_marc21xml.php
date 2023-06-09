@@ -485,7 +485,7 @@ if (!class_exists('VB_Metadata_Export_Marc21Xml')) {
                 )
             );
 
-            return $this->common->format_xml($xml_str);
+            return esc_xml( $this->common->format_xml($xml_str) );
         }
 
     }

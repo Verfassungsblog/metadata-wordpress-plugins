@@ -2,11 +2,14 @@
     "editor.rulers": [
         120
     ],
+    "editor.detectIndentation": false,
+    "editor.insertSpaces": false,
     "files.trimTrailingWhitespace": true,
     "[php]" : {
         "editor.formatOnSave": false
     },
     "php.format.codeStyle": "WordPress",
+	"php.format.rules.alignConsecutiveAssignments": true,
     "phpcs.standard": "WordPress",
     "php.version": "7.4",
 }
