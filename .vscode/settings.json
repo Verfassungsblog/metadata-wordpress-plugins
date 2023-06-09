@@ -10,6 +10,7 @@
     },
     "php.format.codeStyle": "WordPress",
 	"php.format.rules.alignConsecutiveAssignments": true,
+	"php.format.rules.arrayInitializersAlignKeyValuePairs": true,
     "phpcs.standard": "WordPress",
     "php.version": "7.4",
 }

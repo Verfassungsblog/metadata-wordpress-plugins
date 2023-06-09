@@ -130,7 +130,7 @@ if ( ! class_exists( 'VB_Metadata_Export' ) ) {
 					}
 				}
 
-				// show 404 page if format is incorrect or disabled
+				// show 404 page if format is incorrect or disabled.
 				global $wp_query;
 				$wp_query->set_404();
 				status_header( 404 );
