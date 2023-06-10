@@ -61,9 +61,9 @@ if ( ! function_exists( 'get_the_vb_metadata_export_link' ) ) {
 		);
 
 		if ( empty( $permalink ) ) {
-			return '<a class=\"' . esc_attr( $classes ) . '\">' . esc_html( $unavailable ) . '</a>';
+			return '<a class="' . esc_attr( $classes ) . '">' . esc_html( $unavailable ) . '</a>';
 		}
-		return '<a class=\"' . esc_attr( $classes ) . '\" href=\"' . esc_url( $permalink ) . '\">' . esc_html( $title ) . '</a>';
+		return '<a class="' . esc_attr( $classes ) . '" href="' . esc_url( $permalink ) . '">' . esc_html( $title ) . '</a>';
 	}
 }
 

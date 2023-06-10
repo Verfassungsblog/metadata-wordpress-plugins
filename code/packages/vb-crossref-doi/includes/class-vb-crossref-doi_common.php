@@ -155,7 +155,7 @@ if (!class_exists('VB_CrossRef_DOI_Common')) {
             return $date;
         }
 
-        public function local_to_utc_iso8601($utc_iso) {
+        public function subtract_timezone_offset_from_utc_iso8601($utc_iso) {
             $local = new Datetime("now", wp_timezone());
             $date = new Datetime("now", new DateTimeZone("UTC"));
             $date->setTimestamp($this->iso8601_to_date($utc_iso)->getTimestamp() - wp_timezone()->getOffset($local));

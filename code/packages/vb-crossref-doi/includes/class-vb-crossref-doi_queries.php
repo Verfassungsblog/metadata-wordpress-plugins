@@ -245,8 +245,8 @@ if (!class_exists('VB_CrossRef_DOI_Queries')) {
         public function query_posts_that_were_modified_since_last_check()
         {
             $last_check_date = $this->status->get_date_of_last_modified_check();
-            $after_utc = $this->common->local_to_utc_iso8601($this->common->date_to_iso8601($last_check_date));
-            $after = $this->common->local_to_utc_iso8601($after_utc);
+            $after_utc = $this->common->subtract_timezone_offset_from_utc_iso8601($this->common->date_to_iso8601($last_check_date));
+            $after = $this->common->subtract_timezone_offset_from_utc_iso8601($after_utc);
             $query_args = array(
                 'post_type' => 'post',
                 'post_status' => array('publish'),
