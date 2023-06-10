@@ -255,7 +255,7 @@ if ( ! class_exists( 'VB_Metadata_Export_OAI_PMH' ) ) {
 				$metadata = $oaidc->render( $post );
 			}
 			if ( 'mods-xml' === $metadata_prefix ) {
-				$metadata = $converter->convertMarc21ToMods( $marc21xml );
+				$metadata = $converter->convert_marc21_xml_to_mods( $marc21xml );
 			}
 			$metadata = str_replace( '<?xml version="1.0" encoding="UTF-8"?>', '', $metadata );
 			$metadata = str_replace( '<?xml version="1.0"?>', '', $metadata );

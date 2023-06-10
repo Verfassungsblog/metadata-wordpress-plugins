@@ -108,7 +108,7 @@ if ( ! function_exists( 'vb_metadata_export_render_format' ) ) {
 		if ( 'mods' === $format ) {
 			$converter = new VB_Metadata_Export_Converter();
 			$marc21xml = new VB_Metadata_Export_Marc21Xml( $common->plugin_name );
-			$mods      = $converter->convertMarc21ToMods( $marc21xml->render( $post ) );
+			$mods      = $converter->convert_marc21_xml_to_mods( $marc21xml->render( $post ) );
 			echo $mods; // phpcs:ignore
 			return;
 		}

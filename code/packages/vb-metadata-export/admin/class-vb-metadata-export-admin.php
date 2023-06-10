@@ -475,7 +475,7 @@ if (!class_exists('VB_Metadata_Export_Admin')) {
                 $converter = new VB_Metadata_Export_Converter();
 
                 $marc21xml = $renderer->render($post);
-                $mods_xml = $converter->convertMarc21ToMods($marc21xml);
+                $mods_xml = $converter->convert_marc21_xml_to_mods($marc21xml);
                 $example_url = $this->common->get_the_permalink("mods", $post);
 
                 ?>
