@@ -50,7 +50,14 @@ if ( ! class_exists( 'VB_Metadata_Export_Converter' ) ) {
 			foreach ( $this->xsl_urls as $xsl_filename => $xsl_url ) {
 				$xsl_filepath = join( $sep, array( $xsl_directory, $xsl_filename ) );
 				if ( ! file_exists( $xsl_filepath ) ) {
-					file_put_contents( $xsl_filepath, file_get_contents( $xsl_url ) );
+					wp_remote_get(
+						$xsl_url,
+						array(
+							'timeout'  => 30,
+							'stream'   => true,
+							'filename' => $xsl_filepath,
+						),
+					);
 				}
 			}
 		}
