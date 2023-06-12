@@ -33,7 +33,7 @@ if ( ! class_exists( 'VB_Metadata_Export_Marc21Xml' ) ) {
 		}
 
 		/**
-		 * Escape function that is used throught Marc21 XML rendering.
+		 * Escape function that is used throughout Marc21 XML rendering.
 		 *
 		 * @param string $str the string that is escaped.
 		 */
@@ -69,105 +69,6 @@ if ( ! class_exists( 'VB_Metadata_Export_Marc21Xml' ) ) {
 		}
 
 		/**
-		 * Return the author name of a post in the format of last name, first name.
-		 *
-		 * @param int $author the id of the user.
-		 * @return string the name of the author
-		 */
-		protected function get_author_name( $author ) {
-			$last_name  = get_the_author_meta( 'last_name', $author );
-			$first_name = get_the_author_meta( 'first_name', $author );
-
-			$author = '';
-			if ( ! empty( $last_name ) && ! empty( $first_name ) ) {
-				$author = $last_name . ', ' . $first_name;
-			} elseif ( ! empty( $last_name ) ) {
-				$author = $last_name;
-			}
-			return $author;
-		}
-
-		/**
-		 * Return coauthor name in the format of last name, first name.
-		 *
-		 * @param mixed $coauthor the coauthor object.
-		 * @return string the name of the coauthor
-		 */
-		protected function get_coauthor_name( $coauthor ) {
-			$last_name  = $coauthor->last_name;
-			$first_name = $coauthor->first_name;
-
-			$author = '';
-			if ( ! empty( $last_name ) && ! empty( $first_name ) ) {
-				$author = $last_name . ', ' . $first_name;
-			} elseif ( ! empty( $last_name ) ) {
-				$author = $last_name;
-			}
-			return $author;
-		}
-
-		/**
-		 * Return name of the post author in the format of last name, first name.
-		 *
-		 * @param WP_Post $post the post.
-		 * @return string the name of the post author
-		 */
-		protected function get_post_author_name( $post ) {
-			return $this->get_author_name( $post->post_author );
-		}
-
-		/**
-		 * Return the name of all coauthors as array.
-		 *
-		 * @param WP_Post $post the post.
-		 * @return array the list of coauthor names
-		 */
-		protected function get_post_coauthors( $post ) {
-			if ( ! function_exists( 'get_coauthors' ) ) {
-				return array();
-			}
-			return array_slice( get_coauthors( $post->ID ), 1 );
-		}
-
-		/**
-		 * Checks whether the post is assigned to a category.
-		 *
-		 * @param WP_Post $post the post to check.
-		 * @param string  $category the name of the category.
-		 * @return bool true if the post is assigned to the category
-		 */
-		protected function is_post_in_category( $post, $category ) {
-			if ( ! empty( $category ) ) {
-				$categories = array_map(
-					function ( $category ) {
-						return $category->name;
-					},
-					get_the_category( $post->ID )
-				);
-				if ( in_array( $category, $categories, true ) ) {
-					return true;
-				}
-			}
-			return false;
-		}
-
-		/**
-		 * Return the post language by checking whether a post is assigned to the alternative language category.
-		 *
-		 * @param WP_Post $post the post.
-		 * @return string the language of the post
-		 */
-		protected function get_post_language( $post ) {
-			$language                    = $this->common->get_settings_field_value( 'language' );
-			$language_alternate_category = $this->common->get_settings_field_value( 'language_alternate_category' );
-			if ( $this->is_post_in_category( $post, $language_alternate_category ) ) {
-				$language_alternate = $this->common->get_settings_field_value( 'language_alternate' );
-				$language           = $language_alternate;
-			}
-			return $language;
-		}
-
-		/**
 		 * Return rendered Marc21 XML leader field.
 		 *
 		 * @param WP_Post $post the post.
@@ -176,7 +77,7 @@ if ( ! class_exists( 'VB_Metadata_Export_Marc21Xml' ) ) {
 		protected function render_leader( $post ) {
 			// leader definition see: https://www.loc.gov/marc/bibliographic/bdleader.html .
 			$podcast_category = $this->common->get_settings_field_value( 'podcast_category' );
-			$podcast_post     = $this->is_post_in_category( $post, $podcast_category );
+			$podcast_post     = $this->common->is_post_in_category( $post, $podcast_category );
 			$leader_field     = $podcast_post ? 'marc21_podcast_leader' : 'marc21_leader';
 			$leader           = str_replace( '_', ' ', $this->common->get_settings_field_value( $leader_field ) );
 			if ( ! empty( $leader ) ) {
@@ -208,7 +109,7 @@ if ( ! class_exists( 'VB_Metadata_Export_Marc21Xml' ) ) {
 		 */
 		protected function render_control_field_physical_description( $post ) {
 			$podcast_category = $this->common->get_settings_field_value( 'podcast_category' );
-			$podcast_post     = $this->is_post_in_category( $post, $podcast_category );
+			$podcast_post     = $this->common->is_post_in_category( $post, $podcast_category );
 			$pd_field         = $podcast_post ? 'marc21_podcast_physical_description' : 'marc21_physical_description';
 			$pd_value         = $this->common->get_settings_field_value( $pd_field );
 
@@ -229,7 +130,7 @@ if ( ! class_exists( 'VB_Metadata_Export_Marc21Xml' ) ) {
 			$date     = empty( $date ) ? '||||||' : $date;
 			$year     = get_the_date( 'Y', $post );
 			$year     = empty( $year ) ? '||||' : $year;
-			$language = $this->get_post_language( $post );
+			$language = $this->common->get_post_language( $post );
 			$language = empty( $language ) ? '|||' : $language;
 			$code     = "{$date}s{$year}||||xx#|||||o|||| ||| 0|{$language}||";
 			return '<marc21:controlfield tag="008">' . $this->escape( $code ) . '</marc21:controlfield>';
@@ -333,7 +234,7 @@ if ( ! class_exists( 'VB_Metadata_Export_Marc21Xml' ) ) {
 		 * @return string the Marc21 XML field 041 as string containing the post language
 		 */
 		public function render_datafield_041( $post ) {
-			$language = $this->get_post_language( $post );
+			$language = $this->common->get_post_language( $post );
 			if ( ! empty( $language ) ) {
 				return '<marc21:datafield tag="041" ind1=" " ind2=" ">' .
 					'<marc21:subfield code="a">' . $this->escape( $language ) . '</marc21:subfield>' .
@@ -370,7 +271,7 @@ if ( ! class_exists( 'VB_Metadata_Export_Marc21Xml' ) ) {
 		 * @return string the Marc21 XML field 100 as string containing post author information
 		 */
 		public function render_datafield_100( $post ) {
-			$post_author = $this->get_post_author_name( $post );
+			$post_author = $this->common->get_post_author_name( $post );
 			if ( ! empty( $post_author ) ) {
 				return implode(
 					'',
@@ -403,7 +304,7 @@ if ( ! class_exists( 'VB_Metadata_Export_Marc21Xml' ) ) {
 				$subheadline = '';
 			}
 
-			$author_name = $this->get_post_author_name( $post );
+			$author_name = $this->common->get_post_author_name( $post );
 
 			$subfields = implode(
 				'',
@@ -452,7 +353,7 @@ if ( ! class_exists( 'VB_Metadata_Export_Marc21Xml' ) ) {
 		 */
 		public function render_datafield_336( $post ) {
 			$podcast_category   = $this->common->get_settings_field_value( 'podcast_category' );
-			$podcast_post       = $this->is_post_in_category( $post, $podcast_category );
+			$podcast_post       = $this->common->is_post_in_category( $post, $podcast_category );
 			$content_type_field = $podcast_post ? 'marc21_podcast_content_type' : 'marc21_content_type';
 			$content_type       = $this->common->get_settings_field_value( $content_type_field );
 			$content_type_array = explode( ',', $content_type );
@@ -599,10 +500,10 @@ if ( ! class_exists( 'VB_Metadata_Export_Marc21Xml' ) ) {
 		 * @return string the Marc21 XML fields 700 as string containing the post coauthor information
 		 */
 		public function render_datafield_700( $post ) {
-			$coauthors = $this->get_post_coauthors( $post );
+			$coauthors = $this->common->get_post_coauthors( $post );
 			$xml       = '';
 			foreach ( $coauthors as $coauthor ) {
-				$coauthor_name = $this->get_coauthor_name( $coauthor );
+				$coauthor_name = $this->common->get_coauthor_name( $coauthor );
 				if ( empty( $coauthor_name ) ) {
 					continue;
 				}

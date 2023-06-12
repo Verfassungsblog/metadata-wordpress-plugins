@@ -1,5 +1,13 @@
 <?php
+/**
+ * Render OAI-PMH 2.0 responses.
+ *
+ * @package vb-metadata-export
+ */
 
-require_once plugin_dir_path(__FILE__) . '../includes/class-vb-metadata-export-template.php';
+/**
+ * Imports.
+ */
+require_once plugin_dir_path( __FILE__ ) . '../includes/vb-metadata-export-template.php';
 
 vb_metadata_export_render_oaipmh();

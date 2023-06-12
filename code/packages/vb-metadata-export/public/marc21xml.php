@@ -1,5 +1,13 @@
 <?php
+/**
+ * Render Marc21 XML for a post.
+ *
+ * @package vb-metadata-export
+ */
 
-require_once plugin_dir_path(__FILE__) . '../includes/class-vb-metadata-export-template.php';
+/**
+ * Imports.
+ */
+require_once plugin_dir_path( __FILE__ ) . '../includes/vb-metadata-export-template.php';
 
-vb_metadata_export_render_format("marc21xml");
+vb_metadata_export_render_format( 'marc21xml' );

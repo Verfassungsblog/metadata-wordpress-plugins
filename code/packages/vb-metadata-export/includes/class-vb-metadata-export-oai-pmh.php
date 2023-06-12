@@ -36,7 +36,7 @@ if ( ! class_exists( 'VB_Metadata_Export_OAI_PMH' ) ) {
 		}
 
 		/**
-		 * Escape function that is used throught OAI-PMH rendering.
+		 * Escape function that is used throughout OAI-PMH rendering.
 		 *
 		 * @param string $str the string that is escaped.
 		 */
