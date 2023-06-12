@@ -1,3 +1,6 @@
 **/.env
 data/*
 !data/README.md
+docs/*
+!docs/README.md
+.phpdoc

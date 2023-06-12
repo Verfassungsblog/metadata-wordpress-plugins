@@ -59,6 +59,15 @@ services:
     volumes:
       - ${WORKSPACE_DIR}:/root/workspace:z
 
+  phpdoc:
+    build:
+      context: .
+      dockerfile: Dockerfile.phpdoc
+    depends_on:
+      - wordpress
+    volumes:
+      - ${WORKSPACE_DIR}:/data:z
+
   oaipmh-validator:
     build:
       context: .

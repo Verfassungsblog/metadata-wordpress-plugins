@@ -549,7 +549,7 @@ if ( ! class_exists( 'VB_Metadata_Export_Admin' ) ) {
 			$require_doi = $this->common->get_settings_field_value( 'require_doi' );
 			if ( $require_doi ) {
 				$doi_meta_key             = $this->common->get_settings_field_value( 'doi_meta_key' );
-				$query_args['meta_query'] = array(
+				$query_args['meta_query'] = array( // phpcs:ignore
 					'relation' => 'AND',
 					array(
 						'key'     => $doi_meta_key,
