@@ -459,14 +459,14 @@ if ( ! class_exists( 'VB_Metadata_Export_Admin' ) ) {
 				return;
 			}
 
-			if ( ! empty( $_POST['reset'] ) ) {
+			if ( ! empty( $_POST['reset'] ) && check_admin_referer( $this->common->plugin_name . '_reset' ) ) {
 				foreach ( $this->settings_fields->get_list() as $field ) {
 					$field_id = $this->common->get_settings_field_id( $field['name'] );
 					delete_option( $field_id );
 				}
 			}
 
-			$current_tab = isset( $_GET['tab'] ) ? $_GET['tab'] : 'general';
+			$current_tab = isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( $_GET['tab'] ) ) : 'general';
 			$current_tab = isset( $this->get_tab_labels()[ $current_tab ] ) ? $current_tab : 'general';
 
 			?>
@@ -518,6 +518,9 @@ if ( ! class_exists( 'VB_Metadata_Export_Admin' ) ) {
 		public function render_general_tab() {
 			?>
 			<form method="post" onsubmit="return confirm('Are you sure?');">
+				<?php
+				wp_nonce_field( $this->common->plugin_name . '_reset' );
+				?>
 				<input type="hidden" name="reset" value="true" />
 				<p>
 					The following action will reset all options of this plugin to their default value
