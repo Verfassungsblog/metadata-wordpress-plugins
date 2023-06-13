@@ -1,8 +1,8 @@
 <?php
 
-if (!class_exists('VB_GND_Taxonomy_Admin_Setting_Fields')) {
+if (!class_exists('VB_GND_Taxonomy_Admin_Settings_Fields')) {
 
-    class VB_GND_Taxonomy_Admin_Setting_Fields
+    class VB_GND_Taxonomy_Admin_Settings_Fields
     {
 
         protected $settings_fields;

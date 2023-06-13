@@ -1,7 +1,7 @@
 <?php
 
-require_once plugin_dir_path(__FILE__) . '../includes/class-vb-gnd-taxonomy_common.php';
-require_once plugin_dir_path(__FILE__) . './class-vb-gnd-taxonomy_admin_setting_fields.php';
+require_once plugin_dir_path(__FILE__) . '../includes/class-vb-gnd-taxonomy-common.php';
+require_once plugin_dir_path(__FILE__) . './class-vb-gnd-taxonomy-admin-settings-fields.php';
 
 if (!class_exists('VB_GND_Taxonomy_Admin_Settings')) {
 
@@ -14,7 +14,7 @@ if (!class_exists('VB_GND_Taxonomy_Admin_Settings')) {
         public function __construct($plugin_name)
         {
             $this->common = new VB_GND_Taxonomy_Common($plugin_name);
-            $this->setting_fields = new VB_GND_Taxonomy_Admin_Setting_Fields();
+            $this->setting_fields = new VB_GND_Taxonomy_Admin_Settings_Fields();
         }
 
         protected function get_tab_labels()

@@ -8,9 +8,9 @@
 /**
  * Class imports
  */
-require_once plugin_dir_path( __FILE__ ) . './class-vb-gnd-taxonomy_common.php';
-require_once plugin_dir_path( __FILE__ ) . '../admin/class-vb-gnd-taxonomy_admin_settings.php';
-require_once plugin_dir_path( __FILE__ ) . '../admin/class-vb-gnd-taxonomy_admin_edit.php';
+require_once plugin_dir_path( __FILE__ ) . './class-vb-gnd-taxonomy-common.php';
+require_once plugin_dir_path( __FILE__ ) . '../admin/class-vb-gnd-taxonomy-admin-settings.php';
+require_once plugin_dir_path( __FILE__ ) . '../admin/class-vb-gnd-taxonomy-admin-edit.php';
 
 if ( ! class_exists( 'VB_GND_Taxonomy' ) ) {
 

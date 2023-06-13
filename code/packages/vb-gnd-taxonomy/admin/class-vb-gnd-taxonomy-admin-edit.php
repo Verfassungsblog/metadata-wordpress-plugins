@@ -1,7 +1,7 @@
 <?php
 
-require_once plugin_dir_path(__FILE__) . '../includes/class-vb-gnd-taxonomy_common.php';
-require_once plugin_dir_path(__FILE__) . '../includes/class-vb-gnd-taxonomy_lobid.php';
+require_once plugin_dir_path(__FILE__) . '../includes/class-vb-gnd-taxonomy-common.php';
+require_once plugin_dir_path(__FILE__) . '../includes/class-vb-gnd-taxonomy-lobid.php';
 
 if (!class_exists('VB_GND_Taxonomy_Admin_Edit')) {
 
