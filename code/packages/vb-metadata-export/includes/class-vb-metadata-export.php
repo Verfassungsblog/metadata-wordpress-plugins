@@ -60,11 +60,11 @@ if ( ! class_exists( 'VB_Metadata_Export' ) ) {
 		 * @param string $plugin_name name of plugin.
 		 */
 		public function __construct( $base_file, $plugin_name ) {
-			$this->base_file      = $base_file;
-			$this->common         = new VB_Metadata_Export_Common( $plugin_name );
-			$this->admin          = new VB_Metadata_Export_Admin( $plugin_name );
-			$this->shortcode      = new VB_Metadata_Export_Shortcode( $plugin_name );
-			$this->oaipmh         = new VB_Metadata_Export_OAI_PMH( $plugin_name );
+			$this->base_file = $base_file;
+			$this->common    = new VB_Metadata_Export_Common( $plugin_name );
+			$this->admin     = new VB_Metadata_Export_Admin( $plugin_name );
+			$this->shortcode = new VB_Metadata_Export_Shortcode( $plugin_name );
+			$this->oaipmh    = new VB_Metadata_Export_OAI_PMH( $plugin_name );
 		}
 
 		/**
