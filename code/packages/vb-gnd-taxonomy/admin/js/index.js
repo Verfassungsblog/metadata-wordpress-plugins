@@ -1,3 +1,6 @@
+/**
+ * Adds autocomplete functionality to GND taxonomy meta box and taxonomy edit page via jquery-ui and lobid.org.
+ */
 
 jQuery( document ).ready( function( $ ) {
 

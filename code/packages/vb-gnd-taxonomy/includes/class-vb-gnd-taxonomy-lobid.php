@@ -85,7 +85,7 @@ if ( ! class_exists( 'VB_GND_Taxonomy_Lobid' ) ) {
 		/**
 		 * Checks whether a GND ID is a known entity in lobid.org.
 		 *
-		 * @param string $gnd_id the ID of the GND entity
+		 * @param string $gnd_id the ID of the GND entity.
 		 * @return bool true, if a GND entity with that ID exists in lobid.org
 		 */
 		public function check_gnd_entity_exists( $gnd_id ) {
