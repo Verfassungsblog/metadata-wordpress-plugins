@@ -7,8 +7,8 @@
  * @wordpress-plugin
  * Plugin Name: Verfassungsblog GND Taxonomy
  * Plugin URI: https://wordpress.org/plugins/vb-gnd-taxonomy/
- * Description: GND taxonomy for posts including autocomplete suggestions
- * Version: 0.0.1
+ * Description: GND taxonomy for posts including autocomplete suggestions based on lobid.org
+ * Version: 0.1.0
  * Requires at least: 5.9.3
  * Requires PHP: 7.4.29
  * License: GPL v2 or later
@@ -33,7 +33,7 @@ function vb_gnd_taxonomy_uninstall() {
  * Main run method.
  */
 function run_vb_gnd_taxonomy() {
-	$vb_gnd_taxonomy = new VB_GND_Taxonomy( __FILE__, 'vb-gnd-taxonomy', '0.0.1' );
+	$vb_gnd_taxonomy = new VB_GND_Taxonomy( __FILE__, 'vb-gnd-taxonomy' );
 	$vb_gnd_taxonomy->run();
 }
 
