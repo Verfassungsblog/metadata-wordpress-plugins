@@ -1,6 +1,10 @@
 <?php
-
 /**
+ * Verfassungsblog GND Taxonomy
+ *
+ * @package vb-gnd-taxonomy
+ *
+ * @wordpress-plugin
  * Plugin Name: Verfassungsblog GND Taxonomy
  * Plugin URI: https://wordpress.org/plugins/vb-gnd-taxonomy/
  * Description: GND taxonomy for posts including autocomplete suggestions
@@ -13,20 +17,24 @@
  * Author URI: https://verfassungsblog.de/
  */
 
-define('VB_GND_TAXONOMY_VERSION', '0.0.1');
+/**
+ * Class imports.
+ */
+require_once plugin_dir_path( __FILE__ ) . 'includes/class-vb-gnd-taxonomy.php';
 
-require_once plugin_dir_path(__FILE__) . 'includes/class-vb-gnd-taxonomy.php';
-
-
+/**
+ * Uninstall hook.
+ */
 function vb_gnd_taxonomy_uninstall() {
-
+	// empty.
 }
 
-function run_vb_gnd_taxonomy()
-{
-    $vb_gnd_taxonomy = new VB_GND_Taxonomy(__FILE__, "vb-gnd-taxonomy", "0.0.1");
-    $vb_gnd_taxonomy->run();
+/**
+ * Main run method.
+ */
+function run_vb_gnd_taxonomy() {
+	$vb_gnd_taxonomy = new VB_GND_Taxonomy( __FILE__, 'vb-gnd-taxonomy', '0.0.1' );
+	$vb_gnd_taxonomy->run();
 }
 
 run_vb_gnd_taxonomy();
-

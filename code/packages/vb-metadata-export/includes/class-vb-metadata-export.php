@@ -26,13 +26,6 @@ if ( ! class_exists( 'VB_Metadata_Export' ) ) {
 		protected $common;
 
 		/**
-		 * Plugin version string
-		 *
-		 * @var string
-		 */
-		protected $plugin_version;
-
-		/**
 		 * Path to base plugin file
 		 *
 		 * @var string
@@ -65,10 +58,8 @@ if ( ! class_exists( 'VB_Metadata_Export' ) ) {
 		 *
 		 * @param string $base_file path to plugin base file.
 		 * @param string $plugin_name name of plugin.
-		 * @param string $plugin_version version of plugin.
 		 */
-		public function __construct( $base_file, $plugin_name, $plugin_version ) {
-			$this->plugin_version = $plugin_version;
+		public function __construct( $base_file, $plugin_name ) {
 			$this->base_file      = $base_file;
 			$this->common         = new VB_Metadata_Export_Common( $plugin_name );
 			$this->admin          = new VB_Metadata_Export_Admin( $plugin_name );

@@ -1,1 +1,0 @@
-# Verfassungsblog Metadata Export Plugin

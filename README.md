@@ -1,3 +1,2 @@
-# Verfassungsblog: Metadata Wordpress Plugins
+# Verfassungsblog Wordpress Plugins
 
-Todo
