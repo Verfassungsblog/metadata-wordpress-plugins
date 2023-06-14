@@ -308,9 +308,9 @@ if ( ! class_exists( 'VB_Metadata_Export_Common' ) ) {
 
 			// transform permalink.
 			if ( strpos( $permalink, '?' ) !== false ) {
-				return $permalink . '&' . $this->plugin_name . '={$format}';
+				return $permalink . '&' . $this->plugin_name . '=' . $format;
 			}
-			return $permalink . '?' . $this->plugin_name . '={$format}';
+			return $permalink . '?' . $this->plugin_name . '=' . $format;
 		}
 
 		/**
