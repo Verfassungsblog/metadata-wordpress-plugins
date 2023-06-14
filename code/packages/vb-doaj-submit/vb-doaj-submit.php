@@ -1,34 +1,42 @@
 <?php
-
 /**
+ * Verfassungsblog DOAJ Submit
+ *
+ * @package vb-doaj-submit
+ *
+ * @wordpress-plugin
  * Plugin Name: Verfassungsblog DOAJ Submit
  * Plugin URI: https://wordpress.org/plugins/vb-doaj-submit/
- * Description: Submit posts to the DOAJ
- * Version: 0.0.1
+ * Description: Automates the submission of posts to the DOAJ
+ * Version: 0.1.0
  * Requires at least: 5.9.3
  * Requires PHP: 7.4.29
- * License: GPL v2 or later
- * License URI: https://www.gnu.org/licenses/gpl-2.0.html
+ * License: GPL v3
+ * License URI: https://www.gnu.org/licenses/gpl-3.0.html
  * Author: Verfassungsblog
  * Author URI: https://verfassungsblog.de/
  * Text Domain: vb-doaj-submit
  * Domain Path: /languages
  */
 
-define('VB_DOAJ_SUBMIT_VERSION', '0.0.1');
+/**
+ * Class imports
+ */
+require_once plugin_dir_path( __FILE__ ) . 'includes/class-vb-doaj-submit.php';
 
-require_once plugin_dir_path(__FILE__) . 'includes/class-vb-doaj-submit.php';
-
-
+/**
+ * WordPress uninstall hook
+ */
 function vb_doaj_submit_uninstall() {
-
+	// empty.
 }
 
-function run_vb_doaj_submit()
-{
-    $vb_doaj_submit = new VB_DOAJ_Submit(__FILE__, "vb-doaj-submit");
-    $vb_doaj_submit->run();
+/**
+ * Main run method.
+ */
+function run_vb_doaj_submit() {
+	$vb_doaj_submit = new VB_DOAJ_Submit( __FILE__, 'vb-doaj-submit' );
+	$vb_doaj_submit->run();
 }
 
 run_vb_doaj_submit();
-

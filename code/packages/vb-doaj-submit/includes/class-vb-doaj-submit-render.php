@@ -9,7 +9,7 @@
  * - DOAJ Journal Metadata Code: https://github.com/DOAJ/doaj/blob/bc9187c6dfaf4c4ad552baac1c874cd257ca1468/portality/models/article.py#L247
  */
 
-require_once plugin_dir_path(__FILE__) . './class-vb-doaj-submit_common.php';
+require_once plugin_dir_path(__FILE__) . './class-vb-doaj-submit-common.php';
 
 if (!class_exists('VB_DOAJ_Submit_Render')) {
 

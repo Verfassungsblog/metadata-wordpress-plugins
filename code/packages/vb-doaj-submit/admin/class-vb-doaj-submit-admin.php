@@ -1,12 +1,12 @@
 <?php
 
-require_once plugin_dir_path(__FILE__) . '/class-vb-doaj-submit_setting_fields.php';
+require_once plugin_dir_path(__FILE__) . '/class-vb-doaj-submit-settings-fields.php';
 
-require_once plugin_dir_path(__FILE__) . '../includes/class-vb-doaj-submit_common.php';
-require_once plugin_dir_path(__FILE__) . '../includes/class-vb-doaj-submit_render.php';
-require_once plugin_dir_path(__FILE__) . '../includes/class-vb-doaj-submit_status.php';
-require_once plugin_dir_path(__FILE__) . '../includes/class-vb-doaj-submit_queries.php';
-require_once plugin_dir_path(__FILE__) . '../includes/class-vb-doaj-submit_update.php';
+require_once plugin_dir_path(__FILE__) . '../includes/class-vb-doaj-submit-common.php';
+require_once plugin_dir_path(__FILE__) . '../includes/class-vb-doaj-submit-render.php';
+require_once plugin_dir_path(__FILE__) . '../includes/class-vb-doaj-submit-status.php';
+require_once plugin_dir_path(__FILE__) . '../includes/class-vb-doaj-submit-queries.php';
+require_once plugin_dir_path(__FILE__) . '../includes/class-vb-doaj-submit-update.php';
 
 if (!class_exists('VB_DOAJ_Submit_Admin')) {
 
@@ -34,7 +34,7 @@ if (!class_exists('VB_DOAJ_Submit_Admin')) {
             $this->status = new VB_DOAJ_Submit_Status($plugin_name);
             $this->queries = new VB_DOAJ_Submit_Queries($plugin_name);
             $this->update = new VB_DOAJ_Submit_Update($plugin_name);
-            $this->setting_fields = new VB_DOAJ_Submit_Setting_Fields();
+            $this->setting_fields = new VB_DOAJ_Submit_Settings_Fields();
         }
 
         protected function get_tab_labels()

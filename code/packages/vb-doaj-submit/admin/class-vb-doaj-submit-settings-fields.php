@@ -1,8 +1,8 @@
 <?php
 
-if (!class_exists('VB_DOAJ_Submit_Setting_Fields')) {
+if (!class_exists('VB_DOAJ_Submit_Settings_Fields')) {
 
-    class VB_DOAJ_Submit_Setting_Fields
+    class VB_DOAJ_Submit_Settings_Fields
     {
 
         protected $settings_fields;

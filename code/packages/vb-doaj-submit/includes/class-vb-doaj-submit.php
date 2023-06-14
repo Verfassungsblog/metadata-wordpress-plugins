@@ -1,8 +1,8 @@
 <?php
 
-require_once plugin_dir_path(__FILE__) . './class-vb-doaj-submit_common.php';
-require_once plugin_dir_path(__FILE__) . './class-vb-doaj-submit_update.php';
-require_once plugin_dir_path(__FILE__) . '../admin/class-vb-doaj-submit_admin.php';
+require_once plugin_dir_path(__FILE__) . './class-vb-doaj-submit-common.php';
+require_once plugin_dir_path(__FILE__) . './class-vb-doaj-submit-update.php';
+require_once plugin_dir_path(__FILE__) . '../admin/class-vb-doaj-submit-admin.php';
 
 if (!class_exists('VB_DOAJ_Submit')) {
 

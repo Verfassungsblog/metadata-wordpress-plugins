@@ -1,6 +1,6 @@
 <?php
 
-require_once plugin_dir_path(__FILE__) . './class-vb-doaj-submit_common.php';
+require_once plugin_dir_path(__FILE__) . './class-vb-doaj-submit-common.php';
 
 if (!class_exists('VB_DOAJ_Submit_Status')) {
 
