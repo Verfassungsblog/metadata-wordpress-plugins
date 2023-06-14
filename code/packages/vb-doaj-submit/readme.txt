@@ -1,7 +1,7 @@
-=== Verfassungsblog GND Taxonomy ===
+=== Verfassungsblog DOAJ Submit ===
 Contributors: thomaslow
 Donate link: https://verfassungsblog.de/support/
-Tags: gnd, taxonomy, subjects, suggest, lobid
+Tags: doaj, export
 Requires at least: 5.9.3
 Tested up to: 6.2.0
 Stable tag: 0.1.0
@@ -9,7 +9,7 @@ Requires PHP: 7.4.29
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
-GND taxonomy for posts including autocomplete suggestions based on lobid.org
+Automates the submission of posts to the Directory of Open Access Journals (DOAJ)
 
 == Description ==
 

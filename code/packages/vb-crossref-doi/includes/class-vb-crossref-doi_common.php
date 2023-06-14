@@ -23,7 +23,7 @@ if (!class_exists('VB_CrossRef_DOI_Common')) {
                     "api_url_deposit" => "https://api.crossref.org/v2/deposits",
                     "api_url_submission" => "https://doi.crossref.org/servlet/submissionDownload",
                     "depositor_name" => "Wordpress Plugin " . $this->plugin_name,
-                    "depositor_email" => "crossref@verfassungsblog.de",
+                    "depositor_email" => "info@verfassungsblog.de",
                     "registrant" => $blog_title,
                     "doi_prefix" => "example-prefix",
                     "doi_suffix_length" => 16,
