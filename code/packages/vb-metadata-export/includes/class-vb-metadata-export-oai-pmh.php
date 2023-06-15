@@ -61,7 +61,7 @@ if ( ! class_exists( 'VB_Metadata_Export_OAI_PMH' ) ) {
 		 * @return DateTimeImmutable datetime with UTC timezone
 		 */
 		protected function iso8601_to_date( $iso ) {
-			$date = date_create_immutable_from_format( 'Y-m-d\\TH:i:s\\Z', $iso, new DateTimeZone( 'UTC' ) );
+			$date = date_create_immutable_from_format( 'Y-m-d\TH:i:s\Z', $iso, new DateTimeZone( 'UTC' ) );
 			if ( ! $date ) {
 				$date = date_create_immutable_from_format( 'Y-m-d', $iso, new DateTimeZone( 'UTC' ) );
 			}
