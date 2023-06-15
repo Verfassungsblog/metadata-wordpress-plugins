@@ -39,10 +39,10 @@ if (!class_exists('VB_CrossRef_DOI_Common')) {
                     "exclude_post_category" => "No DOI",
                     // update
                     "auto_update" => false,
-                    "interval" => 1,
+                    "interval" => 5,
                     "batch" => 1,
                     "requests_per_second" => 2.0,
-                    "timeout_minutes" => 10,
+                    "timeout_minutes" => 20,
                     "retry_minutes" => 60,
                     // post meta
                     "doi_meta_key" => "doi",
@@ -68,10 +68,10 @@ if (!class_exists('VB_CrossRef_DOI_Common')) {
                     "exclude_post_category" => "No DOI",
                     // update
                     "auto_update" => false,
-                    "interval" => 1,
+                    "interval" => 5,
                     "batch" => 1,
                     "requests_per_second" => 2.0,
-                    "timeout_minutes" => 10,
+                    "timeout_minutes" => 20,
                     "retry_minutes" => 60,
                     // post meta
                     "doi_meta_key" => "doi",
