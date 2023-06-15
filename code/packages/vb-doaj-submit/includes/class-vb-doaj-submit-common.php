@@ -28,14 +28,15 @@ if (!class_exists('VB_DOAJ_Submit_Common')) {
                     "include_tags" => true,
                     "include_subheadline" => false,
                     "identify_by_permalink" => true,
-                    "test_without_apikey" => false,
+                    "delete_if_permalink_changed" => false,
+					"test_without_apikey" => false,
 					// post selection
                     "submit_all_posts" => true,
                     "include_post_category" => "DOAJ",
                     "exclude_post_category" => "No DOAJ",
                     // automatic update
                     "auto_update" => false,
-                    "interval" => 10,
+                    "interval" => 5,
                     "requests_per_second" => 2.0,
                     "batch" => 1,
                     "retry_minutes" => 60,
@@ -54,6 +55,7 @@ if (!class_exists('VB_DOAJ_Submit_Common')) {
                     "include_excerpt" => true,
                     "include_tags" => true,
                     "identify_by_permalink" => true,
+					"delete_if_permalink_changed" => false,
                     "test_without_apikey" => false,
 					// post selection
                     "submit_all_posts" => false,
@@ -61,7 +63,7 @@ if (!class_exists('VB_DOAJ_Submit_Common')) {
                     "exclude_post_category" => "No DOAJ",
                     // automatic updates
                     "auto_update" => false,
-                    "interval" => 10,
+                    "interval" => 5,
                     "requests_per_second" => 2.0,
                     "batch" => 1,
                     "retry_minutes" => 60,

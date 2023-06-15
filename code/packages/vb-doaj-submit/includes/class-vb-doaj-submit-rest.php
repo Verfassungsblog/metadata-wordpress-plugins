@@ -106,7 +106,8 @@ if ( ! class_exists( 'VB_DOAJ_Submit_REST' ) ) {
 					$error = 'DOAJ responded with unknown error (status code "' . $status_code . '")';
 				} else {
 					$msg   = $json_data->error;
-					$error = 'DOAJ responded with error "' . $msg . '" (status code "' . $status_code . '")';
+
+
 				}
 				$this->status->set_post_submit_status( $post, VB_DOAJ_Submit_Status::SUBMIT_ERROR );
 				$this->status->set_post_submit_error( $post, $error );
@@ -119,6 +120,32 @@ if ( ! class_exists( 'VB_DOAJ_Submit_REST' ) ) {
 			}
 
 			return true;
+		}
+
+		/**
+		 * Checks whether during submission of a post the error message "DOI or Fulltext URL have been changed"
+		 * was returned by the DOAJ. In this case, the post can only be submitted by deleting the current DOAJ
+		 * article and adding a new DOAJ article for this post.
+		 */
+		protected function check_if_post_needs_to_be_deleted_and_added_again($post, $response)
+		{
+			$delete_if_permalink_changed = $this->common->get_settings_field_value('delete_if_permalink_changed');
+			if (!$delete_if_permalink_changed) {
+				return false;
+			}
+
+			$json_data = json_decode( wp_remote_retrieve_body( $response ) );
+			if ( json_last_error() !== JSON_ERROR_NONE ) {
+				// json not an error message
+				return false;
+			}
+
+			if ( false !== strpos($json_data->error, 'DOI or Fulltext URL have been changed')) {
+				// error message is correct
+				return true;
+			}
+
+			return false;
 		}
 
 		/**
@@ -295,6 +322,11 @@ if ( ! class_exists( 'VB_DOAJ_Submit_REST' ) ) {
 					'body'    => $json,
 				),
 			);
+
+			// check if post needs to be deleted and added again
+			if ( $this->check_if_post_needs_to_be_deleted_and_added_again($post, $response) ) {
+				return $this->submit_trashed_post($post);
+			}
 
 			if ( ! $this->parse_repones_for_error( $post, $response, empty( $article_id ) ? 201 : 204 ) ) {
 				return false;

@@ -117,6 +117,15 @@ if (!class_exists('VB_DOAJ_Submit_Settings_Fields')) {
                         permalink (recommended). If not checked, the post title is used instead. Using the post title
                         would be problematic if there are multiple articles with the same title.",
                 ),
+				array(
+                    "name" => "delete_if_permalink_changed",
+                    "type" => "boolean",
+                    "section" => "general",
+                    "label" => __("Delete and Add Post If<br>Permalink or DOI Changed", "vb-doaj-submit"),
+                    "description" => "If enabled, an existing DOAJ article is deleted and added again if the
+						corresponding post permalink or DOI has changed. This is neccessary because the DOAJ does not
+						allow to modify	the permalink or DOI of a registered DOAJ article.",
+                ),
                 array(
                     "name" => "test_without_api_key",
                     "type" => "boolean",
