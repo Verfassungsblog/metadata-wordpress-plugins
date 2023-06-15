@@ -716,8 +716,8 @@ if ( ! class_exists( 'VB_DOAJ_Submit_Admin' ) ) {
 			$error_count = $this->queries->get_number_of_posts_with_submit_error();
 			$error_query = $this->queries->query_posts_with_submit_error( 5 );
 			?>
-			<h3>Posts with Errors (
-				<?php echo esc_html( $error_count ); ?>)
+			<h3>
+				Posts with Errors (<?php echo esc_html( $error_count ); ?>)
 			</h3>
 			<ul>
 				<?php
