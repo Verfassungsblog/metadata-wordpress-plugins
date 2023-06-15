@@ -30,7 +30,7 @@ Please add a GitHub issue for any questions or feedback.
 
 ## Funding
 
-This work was funded by the German "Federal Ministry of Education and Research" (ger: Bundesministerium für Bildung und Forschung, BMBF) in context of the "Open Access to Public Law" project (ger: Offener Zugang zu Öffentlichem Recht, OZOR).
+This work was funded by the German "Federal Ministry of Education and Research" (ger: Bundesministerium für Bildung und Forschung, BMBF) in context of the "Open Access to Public Law" project (ger: Offener Zugang zu Öffentlichem Recht, OZOR, Förderkennzeichen 16TOA045).
 
 The project is managed and supervised by the [Verfassungsblog](https://verfassungsblog.de/), a journalistic and academic forum of debate on topical events and developments in constitutional law and politics in Germany.
 
