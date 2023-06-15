@@ -131,17 +131,24 @@ if ( ! class_exists( 'VB_DOAJ_Submit_REST' ) ) {
 		{
 			$delete_if_permalink_changed = $this->common->get_settings_field_value('delete_if_permalink_changed');
 			if (!$delete_if_permalink_changed) {
+				// delete action is not requested according to the admin settings
+				return false;
+			}
+
+			$status_code = wp_remote_retrieve_response_code( $response );
+			if ( 400 !== $status_code && 401 !== $status_code && 403 !== $status_code ) {
+				// response is not an error
 				return false;
 			}
 
 			$json_data = json_decode( wp_remote_retrieve_body( $response ) );
 			if ( json_last_error() !== JSON_ERROR_NONE ) {
-				// json not an error message
+				// json is not an error message
 				return false;
 			}
 
 			if ( false !== strpos($json_data->error, 'DOI or Fulltext URL have been changed')) {
-				// error message is correct
+				// error is the excepted message, trigger delete
 				return true;
 			}
 
