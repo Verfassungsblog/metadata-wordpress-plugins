@@ -1,7 +1,7 @@
 <?php
 
-require_once plugin_dir_path(__FILE__) . './class-vb-crossref-doi_common.php';
-require_once plugin_dir_path(__FILE__) . './class-vb-crossref-doi_status.php';
+require_once plugin_dir_path(__FILE__) . './class-vb-crossref-doi-common.php';
+require_once plugin_dir_path(__FILE__) . './class-vb-crossref-doi-status.php';
 
 if (!class_exists('VB_CrossRef_DOI_Queries')) {
 

@@ -1,6 +1,6 @@
 <?php
 
-require_once plugin_dir_path(__FILE__) . './class-vb-crossref-doi_common.php';
+require_once plugin_dir_path(__FILE__) . './class-vb-crossref-doi-common.php';
 
 if (!class_exists('VB_CrossRef_DOI_Status')) {
 

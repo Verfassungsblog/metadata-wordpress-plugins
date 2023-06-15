@@ -8,9 +8,9 @@
 /**
  * Class imports
  */
-require_once plugin_dir_path( __FILE__ ) . './class-vb-crossref-doi_common.php';
-require_once plugin_dir_path( __FILE__ ) . './class-vb-crossref-doi_update.php';
-require_once plugin_dir_path( __FILE__ ) . '../admin/class-vb-crossref-doi_admin.php';
+require_once plugin_dir_path( __FILE__ ) . './class-vb-crossref-doi-common.php';
+require_once plugin_dir_path( __FILE__ ) . './class-vb-crossref-doi-update.php';
+require_once plugin_dir_path( __FILE__ ) . '../admin/class-vb-crossref-doi-admin.php';
 
 if ( ! class_exists( 'VB_CrossRef_DOI' ) ) {
 

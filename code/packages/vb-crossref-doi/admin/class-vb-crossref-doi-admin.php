@@ -1,17 +1,17 @@
 <?php
 
-require_once plugin_dir_path(__FILE__) . '/class-vb-crossref-doi_setting_fields.php';
-require_once plugin_dir_path(__FILE__) . '/class-vb-crossref-doi_sanitize.php';
-require_once plugin_dir_path(__FILE__) . '../includes/class-vb-crossref-doi_common.php';
-require_once plugin_dir_path(__FILE__) . '../includes/class-vb-crossref-doi_render.php';
-require_once plugin_dir_path(__FILE__) . '../includes/class-vb-crossref-doi_queries.php';
+require_once plugin_dir_path(__FILE__) . '/class-vb-crossref-doi-settings-fields.php';
+require_once plugin_dir_path(__FILE__) . '/class-vb-crossref-doi-sanitize.php';
+require_once plugin_dir_path(__FILE__) . '../includes/class-vb-crossref-doi-common.php';
+require_once plugin_dir_path(__FILE__) . '../includes/class-vb-crossref-doi-render.php';
+require_once plugin_dir_path(__FILE__) . '../includes/class-vb-crossref-doi-queries.php';
 
 
 if (!class_exists('VB_CrossRef_DOI_Admin')) {
 
     class VB_CrossRef_DOI_Admin
     {
-        protected $setting_fields;
+        protected $settings_fields;
 
         protected $setting_pages_by_tab;
 
@@ -32,7 +32,7 @@ if (!class_exists('VB_CrossRef_DOI_Admin')) {
         public function __construct($plugin_name)
         {
             $this->common = new VB_CrossRef_DOI_Common($plugin_name);
-            $this->setting_fields = new VB_CrossRef_DOI_Setting_Fields();
+            $this->settings_fields = new VB_CrossRef_DOI_Settings_Fields();
             $this->queries = new VB_CrossRef_DOI_Queries($plugin_name);
             $this->status = new VB_CrossRef_DOI_Status($plugin_name);
             $this->update = new VB_CrossRef_DOI_Update($plugin_name);
@@ -111,7 +111,7 @@ if (!class_exists('VB_CrossRef_DOI_Admin')) {
             }
 
             // create fields
-            foreach ($this->setting_fields->get_list() as $field) {
+            foreach ($this->settings_fields->get_list() as $field) {
                 $field_id = $this->common->get_settings_field_id($field["name"]);
                 $default = $this->common->get_settings_field_default_value($field["name"]);
                 $settings_page_id = $this->get_setting_page_id_by_tab($tab_by_section[$field["section"]]);
@@ -270,7 +270,7 @@ if (!class_exists('VB_CrossRef_DOI_Admin')) {
         {
             $field_id = $args['label_for'];
             $field_name = $args["field_name"];
-            $field = $this->setting_fields->get_field($field_name);
+            $field = $this->settings_fields->get_field($field_name);
             $value = get_option($field_id);
             if ($field["type"] == "boolean") {
                 ?>
@@ -347,7 +347,7 @@ if (!class_exists('VB_CrossRef_DOI_Admin')) {
             }
 
             if (!empty($_POST["reset_settings"])) {
-                foreach ($this->setting_fields->get_list() as $field) {
+                foreach ($this->settings_fields->get_list() as $field) {
                     $field_id = $this->common->get_settings_field_id($field["name"]);
                     delete_option($field_id);
                 }

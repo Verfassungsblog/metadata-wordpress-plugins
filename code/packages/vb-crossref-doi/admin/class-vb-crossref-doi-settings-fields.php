@@ -1,8 +1,8 @@
 <?php
 
-if (!class_exists('VB_CrossRef_DOI_Setting_Fields')) {
+if (!class_exists('VB_CrossRef_DOI_Settings_Fields')) {
 
-    class VB_CrossRef_DOI_Setting_Fields
+    class VB_CrossRef_DOI_Settings_Fields
     {
 
         protected $settings_fields;

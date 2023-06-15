@@ -1,9 +1,9 @@
 <?php
 
-require_once plugin_dir_path(__FILE__) . './class-vb-crossref-doi_common.php';
-require_once plugin_dir_path(__FILE__) . './class-vb-crossref-doi_rest.php';
-require_once plugin_dir_path(__FILE__) . './class-vb-crossref-doi_status.php';
-require_once plugin_dir_path(__FILE__) . './class-vb-crossref-doi_queries.php';
+require_once plugin_dir_path(__FILE__) . './class-vb-crossref-doi-common.php';
+require_once plugin_dir_path(__FILE__) . './class-vb-crossref-doi-rest.php';
+require_once plugin_dir_path(__FILE__) . './class-vb-crossref-doi-status.php';
+require_once plugin_dir_path(__FILE__) . './class-vb-crossref-doi-queries.php';
 
 if (!class_exists('VB_CrossRef_DOI_Update')) {
 

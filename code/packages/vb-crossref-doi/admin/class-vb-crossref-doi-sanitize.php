@@ -1,7 +1,7 @@
 <?php
 
-require_once plugin_dir_path(__FILE__) . '/class-vb-crossref-doi_setting_fields.php';
-require_once plugin_dir_path(__FILE__) . '../includes/class-vb-crossref-doi_common.php';
+require_once plugin_dir_path(__FILE__) . '/class-vb-crossref-doi-settings-fields.php';
+require_once plugin_dir_path(__FILE__) . '../includes/class-vb-crossref-doi-common.php';
 
 if (!class_exists('VB_CrossRef_DOI_Sanitize')) {
 
@@ -13,7 +13,7 @@ if (!class_exists('VB_CrossRef_DOI_Sanitize')) {
         public function __construct($plugin_name)
         {
             $this->common = new VB_CrossRef_DOI_Common($plugin_name);
-            $this->settings_fields = new VB_CrossRef_DOI_Setting_Fields();
+            $this->settings_fields = new VB_CrossRef_DOI_Settings_Fields();
         }
 
         protected function get_field_from_option($option) {
