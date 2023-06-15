@@ -125,6 +125,37 @@ if (!class_exists('VB_DOAJ_Submit_Settings_Fields')) {
                     "description" => "If checked, articles are not submitted to the DOAJ for testing purposes.",
                 ),
 
+				// ----------------- post selection ------------------
+
+                array(
+                    "name" => "submit_all_posts",
+                    "type" => "boolean",
+                    "section" => "post_selection",
+                    "label" => "Submit all Published Posts",
+                    "description" => "Whether to submit all published posts. If enabled, any published post that is
+                        not assigned to the \"exclude\" category (see below) will be submitted to CrossRef. If disabled,
+                        only posts that are assigned to the \"include\" category (see below) will be submitted to
+                        CrossRef, and the \"exclude\" category is ignored.",
+                ),
+                array(
+                    "name" => "include_post_category",
+                    "type" => "string",
+                    "section" => "post_selection",
+                    "label" => "Include Category",
+                    "placeholder" => "category name",
+                    "description" => "The name of a category of posts that will be submitted.<br>
+                        For example: <code>Posts with DOI</code>",
+                ),
+                array(
+                    "name" => "exclude_post_category",
+                    "type" => "string",
+                    "section" => "post_selection",
+                    "label" => "Exclude Category",
+                    "placeholder" => "category name",
+                    "description" => "The name of a category of posts that will not be submitted.<br>
+                        For example: <code>No DOI</code>",
+                ),
+
                 // ---------------------- automatic update settings
 
                 array(

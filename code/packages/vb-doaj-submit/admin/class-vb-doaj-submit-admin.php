@@ -52,6 +52,7 @@ if (!class_exists('VB_DOAJ_Submit_Admin')) {
         {
             return array(
                 "general" => "General",
+				"post_selection" => "Post Selection",
                 "update" => "Automatic Updates",
                 "post_meta" => "Custom Fields for Posts",
                 "user_meta" => "Custom Fields for Users",
@@ -62,6 +63,7 @@ if (!class_exists('VB_DOAJ_Submit_Admin')) {
         {
             return array(
                 "general" => "settings",
+				"post_selection" => "settings",
                 "update" => "settings",
                 "post_meta" => "fields",
                 "user_meta" => "fields",
@@ -162,6 +164,19 @@ if (!class_exists('VB_DOAJ_Submit_Admin')) {
                 <?php echo __(
                     'The following options influence how metadata is submitted to the DOAJ.',
                     "vb-doaj"
+                );
+                ?>
+            </p>
+            <?php
+        }
+
+		public function render_post_selection_section($args)
+        {
+            ?>
+            <p id="<?php echo esc_attr($args['id']); ?>">
+                <?php echo __(
+                    'The following options influence which posts will be submitted to the DOAJ.',
+                    "vb-doaj-submit"
                 );
                 ?>
             </p>

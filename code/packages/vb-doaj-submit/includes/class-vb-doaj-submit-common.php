@@ -29,6 +29,10 @@ if (!class_exists('VB_DOAJ_Submit_Common')) {
                     "include_subheadline" => false,
                     "identify_by_permalink" => true,
                     "test_without_apikey" => false,
+					// post selection
+                    "submit_all_posts" => true,
+                    "include_post_category" => "DOAJ",
+                    "exclude_post_category" => "No DOAJ",
                     // automatic update
                     "auto_update" => false,
                     "interval" => 10,
@@ -51,6 +55,10 @@ if (!class_exists('VB_DOAJ_Submit_Common')) {
                     "include_tags" => true,
                     "identify_by_permalink" => true,
                     "test_without_apikey" => false,
+					// post selection
+                    "submit_all_posts" => false,
+                    "include_post_category" => "DOAJ",
+                    "exclude_post_category" => "No DOAJ",
                     // automatic updates
                     "auto_update" => false,
                     "interval" => 10,
