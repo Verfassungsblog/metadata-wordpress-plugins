@@ -129,6 +129,8 @@ if ( ! class_exists( 'VB_DOAJ_Submit_Status' ) ) {
 
 		/**
 		 * Returns a human readable time reporting when the update method was last called.
+		 *
+		 * @return string human readable time difference relative to now
 		 */
 		public function get_last_update_text() {
 			$date = $this->get_last_update_date();

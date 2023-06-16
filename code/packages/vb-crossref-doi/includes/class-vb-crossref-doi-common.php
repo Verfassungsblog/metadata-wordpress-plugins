@@ -162,6 +162,18 @@ if (!class_exists('VB_CrossRef_DOI_Common')) {
             return $this->date_to_iso8601($date);
         }
 
+		/**
+		 * Checks whether a string starts with another string.
+		 *
+		 * @param string $haystack the string whose beginning is checked.
+		 * @param string $needle the string that is excpected to be the beginnign of haystack.
+		 * @return bool true if haystack starts with needle
+		 */
+		public function starts_with( $haystack, $needle ) {
+			$length = strlen( $needle );
+			return substr( $haystack, 0, $length ) === $needle;
+		}
+
         public function format_xml($xml_str)
         {
             $dom = new DOMDocument("1.0");
