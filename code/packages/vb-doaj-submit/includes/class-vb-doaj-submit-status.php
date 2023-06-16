@@ -213,8 +213,8 @@ if ( ! class_exists( 'VB_DOAJ_Submit_Status' ) ) {
 		/**
 		 * Sets the post submit status (success, pending, error, modified).
 		 *
-		 * @param WP_Post $post the post.
-		 * @param string  $status the status, which should be one of the constants provided by this class.
+		 * @param WP_Post|stdClass $post the post.
+		 * @param string           $status the status, which should be one of the constants provided by this class.
 		 */
 		public function set_post_submit_status( $post, $status ) {
 			update_post_meta(
