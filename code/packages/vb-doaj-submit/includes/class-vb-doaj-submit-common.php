@@ -169,7 +169,7 @@ if ( ! class_exists( 'VB_DOAJ_Submit_Common' ) ) {
 		}
 
 		/**
-		 * Return meta key that stored the timestamp when a post was identified with the DOAJ.
+		 * Return meta key that stores the timestamp when a post was identified with the DOAJ.
 		 *
 		 * @return string the meta key
 		 */
@@ -178,7 +178,7 @@ if ( ! class_exists( 'VB_DOAJ_Submit_Common' ) ) {
 		}
 
 		/**
-		 * Return meta key that stored the submit status of a post.
+		 * Return meta key that stores the submit status of a post.
 		 *
 		 * @return string the meta key
 		 */
@@ -187,7 +187,7 @@ if ( ! class_exists( 'VB_DOAJ_Submit_Common' ) ) {
 		}
 
 		/**
-		 * Return meta key that stored the timestamp when a post was submitted to the DOAJ.
+		 * Return meta key that stores the timestamp when a post was submitted to the DOAJ.
 		 *
 		 * @return string the meta key
 		 */
@@ -196,7 +196,7 @@ if ( ! class_exists( 'VB_DOAJ_Submit_Common' ) ) {
 		}
 
 		/**
-		 * Return meta key that stored the submit error of a post.
+		 * Return meta key that stores the submit error of a post.
 		 *
 		 * @return string the meta key
 		 */

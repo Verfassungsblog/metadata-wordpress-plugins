@@ -92,7 +92,7 @@ if ( ! class_exists( 'VB_DOAJ_Submit_Queries' ) ) {
 		}
 
 		/**
-		 * Adds multipe query arguments depending on whether a all posts are supposed to be returned (e.g. for
+		 * Adds multipe query arguments depending on whether all posts are supposed to be returned (e.g. for
 		 * counting), or a specific number of posts are requested (batch size).
 		 *
 		 * @param array $query_args the query arguments to be extended depending on the batch parameter.
@@ -193,7 +193,7 @@ if ( ! class_exists( 'VB_DOAJ_Submit_Queries' ) ) {
 		}
 
 		/**
-		 * Return the number of posts that need submitting because they were modified since the last submission.
+		 * Return posts that need submitting because they were modified since the last submission.
 		 *
 		 * @param int $batch the batch size (0 means all posts, >0 means a maximum limit).
 		 * @return WP_Query the query object containing posts that need submitting because they were modified

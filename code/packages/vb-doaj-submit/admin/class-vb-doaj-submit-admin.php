@@ -356,7 +356,7 @@ if ( ! class_exists( 'VB_DOAJ_Submit_Admin' ) ) {
 			}
 			?>
 			<p class="description">
-				<?php echo esc_html( $field['description'] ); ?>
+				<?php echo $field['description']; // phpcs:ignore ?>
 			</p>
 			<?php
 		}
