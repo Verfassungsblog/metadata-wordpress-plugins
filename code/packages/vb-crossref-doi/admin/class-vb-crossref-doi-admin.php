@@ -158,6 +158,66 @@ if ( ! class_exists( 'VB_CrossRef_DOI_Admin' ) ) {
 		}
 
 		/**
+		 * Checks whether a submit button was clicked (other than "save settings") and if nonce is correct.
+		 * perform corresponding action.
+		 */
+		protected function check_and_process_submit_buttons() {
+			if ( ! empty( $_POST['reset_settings'] ) &&
+					check_admin_referer( $this->common->plugin_name . '_reset' ) ) {
+				foreach ( $this->settings_fields->get_list() as $field ) {
+					$field_id = $this->common->get_settings_field_id( $field['name'] );
+					delete_option( $field_id );
+				}
+			}
+
+			if ( ! empty( $_POST['reset_last_error'] ) &&
+					check_admin_referer( $this->common->plugin_name . '_reset_last_error' ) ) {
+				$this->status->clear_last_error();
+			}
+
+			if ( ! empty( $_POST['manual_update'] ) &&
+					check_admin_referer( $this->common->plugin_name . '_update' ) ) {
+				$this->update->do_update();
+			}
+
+			if ( ! empty( $_POST['check_modified'] ) &&
+					check_admin_referer( $this->common->plugin_name . '_update' ) ) {
+				$this->update->check_for_modified_posts();
+			}
+
+			if ( ! empty( $_POST['add_include_category'] ) &&
+					check_admin_referer( $this->common->plugin_name . '_include_exclude' ) ) {
+				$this->update->add_include_category_to_posts_with_doi();
+			}
+
+			if ( ! empty( $_POST['remove_include_category'] ) &&
+					check_admin_referer( $this->common->plugin_name . '_include_exclude' ) ) {
+				$this->update->remove_include_category_from_all_posts();
+			}
+
+			if ( ! empty( $_POST['add_exclude_category'] ) &&
+					check_admin_referer( $this->common->plugin_name . '_include_exclude' ) ) {
+				$this->update->add_exclude_category_to_posts_without_doi();
+			}
+
+			if ( ! empty( $_POST['remove_exclude_category'] ) &&
+					check_admin_referer( $this->common->plugin_name . '_include_exclude' ) ) {
+				$this->update->remove_exclude_category_from_all_posts();
+			}
+
+			if ( ! empty( $_POST['mark_all_posts_as_modified'] ) &&
+					check_admin_referer( $this->common->plugin_name . '_mark_all_posts_as_modified' ) ) {
+				$this->update->mark_all_posts_as_modified();
+			}
+
+			if ( ! empty( $_POST['reset_status'] ) &&
+					check_admin_referer( $this->common->plugin_name . '_reset_status' ) ) {
+				$this->status->reset_status();
+			}
+
+		}
+
+		/**
 		 * WordPress init action hook.
 		 */
 		public function action_admin_init() {
@@ -466,40 +526,9 @@ if ( ! class_exists( 'VB_CrossRef_DOI_Admin' ) ) {
 				return;
 			}
 
-			if ( ! empty( $_POST['reset_settings'] ) &&
-					check_admin_referer( $this->common->plugin_name . '_reset' ) ) {
-				foreach ( $this->settings_fields->get_list() as $field ) {
-					$field_id = $this->common->get_settings_field_id( $field['name'] );
-					delete_option( $field_id );
-				}
-			}
+			$this->check_and_process_submit_buttons();
 
-			if ( ! empty( $_POST['reset_status'] ) &&
-					check_admin_referer( $this->common->plugin_name . '_reset_status' ) ) {
-				$this->status->reset_status();
-			}
-
-			if ( ! empty( $_POST['manual_update'] ) &&
-					check_admin_referer( $this->common->plugin_name . '_update' ) ) {
-				$this->update->do_update();
-			}
-
-			if ( ! empty( $_POST['check_modified'] ) &&
-					check_admin_referer( $this->common->plugin_name . '_update' ) ) {
-				$this->update->check_for_modified_posts();
-			}
-
-			if ( ! empty( $_POST['mark_all_posts_as_modified'] ) &&
-					check_admin_referer( $this->common->plugin_name . '_mark_all_posts_as_modified' ) ) {
-				$this->update->mark_all_posts_as_modified();
-			}
-
-			if ( ! empty( $_POST['reset_last_error'] ) &&
-					check_admin_referer( $this->common->plugin_name . '_update' ) ) {
-				$this->status->clear_last_error();
-			}
-
-			$current_tab = isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( $_GET['tab'] ) ) : 'settings';
+			$current_tab = isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( $_GET['tab'] ) ) : 'settings'; // phpcs:ignore
 			$current_tab = isset( $this->get_tab_labels()[ $current_tab ] ) ? $current_tab : 'settings';
 
 			?>
@@ -649,25 +678,80 @@ if ( ! class_exists( 'VB_CrossRef_DOI_Admin' ) ) {
 			</ul>
 			<form method="post" onsubmit="return;">
 				<?php
+				wp_nonce_field( $this->common->plugin_name . '_reset_last_error' );
+				?>
+				<p>
+					<?php
+					submit_button( __( 'Reset Last Error', 'vb-crossref-doi' ), 'secondary', 'reset_last_error', false );
+					?>
+				</p>
+				</form>
+			<hr />
+			<h2>Manual Update</h2>
+			<p>
+				The following buttons allows to trigger a manual update or partial updates. An update will check the
+				database for new or modified posts and, if neccessary, submit them to CrossRef. If automatic updates
+				are enabled, the same update process is performed.
+			</p>
+			<form method="post" onsubmit="return;">
+				<?php
 				wp_nonce_field( $this->common->plugin_name . '_update' );
 				?>
 				<p>
 					<?php
 					submit_button( __( 'Manually Update Now', 'vb-crossref-doi' ), 'primary', 'manual_update', false );
 					echo ' ';
-					submit_button( __( 'Manually Check for Modified Posts Now', 'vb-crossref-doi' ), 'secondary', 'check_modified', false );
+					submit_button( __( 'Only Check for Modified Posts Now', 'vb-crossref-doi' ), 'secondary', 'check_modified', false );
 					?>
 				</p>
+			</form>
+			<hr />
+			<h2>Include and Exclude Posts</h2>
+			<p>
+				The following buttons allow to included or exclude posts with or without a DOI by assigning them the
+				corresponding categories defined in the "settings" tab. Depending on the number of posts in the
+				database, this might take a long time.
+			</p>
+			<form method="post" onsubmit="return confirm('Are you sure?');">
+				<?php
+				wp_nonce_field( $this->common->plugin_name . '_include_exclude' );
+				?>
 				<p>
 					<?php
-					submit_button( __( 'Reset Last Error', 'vb-crossref-doi' ), 'secondary', 'reset_last_error', false );
+					submit_button(
+						__( 'Add Include Category to Posts with a DOI', 'vb-crossref-doi' ),
+						'secondary',
+						'add_include_category',
+						false,
+					);
+					echo ' ';
+					submit_button(
+						__( 'Remove Include Category from all Posts', 'vb-crossref-doi' ),
+						'secondary',
+						'remove_include_category',
+						false
+					);
+					echo '</p><p>';
+					submit_button(
+						__( 'Add Exclude Category to Posts without a DOI', 'vb-crossref-doi' ),
+						'secondary',
+						'add_exclude_category',
+						false
+					);
+					echo ' ';
+					submit_button(
+						__( 'Remove Exclude Category from all Posts', 'vb-crossref-doi' ),
+						'secondary',
+						'remove_exclude_category',
+						false
+					);
 					?>
 				</p>
 			</form>
 			<hr />
 			<h2>Resubmit all Posts</h2>
 			<p>
-				Clicking the following button will schedule all published posts to be re-submitted to CrossRef.
+				Clicking the following button will schedule all eligible posts to be re-submitted to CrossRef.
 				This could take a very long time.
 			</p>
 			<form method="post" onsubmit="return confirm('Are you sure?');">
@@ -721,14 +805,36 @@ if ( ! class_exists( 'VB_CrossRef_DOI_Admin' ) ) {
 			$were_submitted           = $this->queries->get_number_of_posts_that_were_successfully_submitted();
 			$pending                  = $this->queries->get_number_of_posts_that_have_pending_submissions();
 			$were_modified            = $this->queries->get_number_of_posts_that_were_modified_since_last_check();
+			$add_include              = $this->queries->get_number_of_posts_that_can_be_added_to_include_category();
+			$remove_include           = $this->queries->get_number_of_posts_that_have_include_category();
+			$add_exclude              = $this->queries->get_number_of_posts_that_can_be_added_to_exclude_category();
+			$remove_exclude           = $this->queries->get_number_of_posts_that_have_exclude_category();
 			?>
 			<ul>
 				<li>Posts that have a DOI:
 					<?php echo esc_html( $have_doi ); ?>
 				</li>
+			</ul>
+			<ul>
+				<li>Posts that are assigned to include category:
+					<?php echo esc_html( $remove_include ); ?>
+				</li>
+				<li>Posts that would be added to the include category (published, have DOI, not already included):
+					<?php echo esc_html( $add_include ); ?>
+				</li>
+				<li>Posts that are assigned to exclude category:
+					<?php echo esc_html( $remove_exclude ); ?>
+				</li>
+				<li>Posts that would be added to the exclude category (published, no DOI, not already excluded):
+					<?php echo esc_html( $add_exclude ); ?>
+				</li>
+			</ul>
+			<ul>
 				<li>Posts that were modified since last update:
 					<?php echo esc_html( $were_modified ); ?>
 				</li>
+			</ul>
+			<ul>
 				<li>Posts that need submitting because no DOI yet:
 					<?php echo esc_html( $need_submitting_never ); ?>
 				</li>
@@ -738,6 +844,8 @@ if ( ! class_exists( 'VB_CrossRef_DOI_Admin' ) ) {
 				<li>Posts that need submitting again after error:
 					<?php echo esc_html( $need_submitting_retry ); ?>
 				</li>
+			</ul>
+			<ul>
 				<li>Posts that have pending submission:
 					<?php echo esc_html( $pending ); ?>
 				</li>
