@@ -636,9 +636,14 @@ if ( ! class_exists( 'VB_CrossRef_DOI_Admin' ) ) {
 			if ( $post ) {
 				$renderer  = new VB_CrossRef_DOI_Render( $this->common->plugin_name );
 				$json_text = $renderer->render( $post, $this->common->get_current_utc_timestamp() );
-
 				?>
-				<h2>Example</h2>
+				<h2>
+					Example for Post
+					<a href="<?php echo esc_attr( get_edit_post_link( $post ) ); ?>">
+						<?php echo esc_html( $post->ID ); ?>
+					</a>
+				</h2>
+				<p>The following XML document would be submitted to CrossRef.
 				<?php
 
 				if ( ! empty( $json_text ) ) {
@@ -689,7 +694,7 @@ if ( ! class_exists( 'VB_CrossRef_DOI_Admin' ) ) {
 			<hr />
 			<h2>Manual Update</h2>
 			<p>
-				The following buttons allows to trigger a manual update or partial updates. An update will check the
+				The following buttons allow to trigger a manual update or partial updates. An update will check the
 				database for new or modified posts and, if neccessary, submit them to CrossRef. If automatic updates
 				are enabled, the same update process is performed.
 			</p>

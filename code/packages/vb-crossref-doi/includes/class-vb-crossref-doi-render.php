@@ -150,7 +150,7 @@ if ( ! class_exists( 'VB_CrossRef_DOI_Render' ) ) {
 				'',
 				array(
 					'<head>',
-					'<doi_batch_id>' . $this->escape( $post->ID . $submit_timestamp ) . '</doi_batch_id>',
+					'<doi_batch_id>' . $this->escape( $post->ID . '.' . $submit_timestamp ) . '</doi_batch_id>',
 					'<timestamp>' . $this->escape( $timestamp ) . '</timestamp>',
 					'<depositor>',
 					'<depositor_name>' . $this->escape( $depositor_name ) . '</depositor_name>',
