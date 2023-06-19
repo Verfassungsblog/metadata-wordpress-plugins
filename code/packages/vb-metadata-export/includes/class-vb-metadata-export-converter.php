@@ -38,6 +38,15 @@ if ( ! class_exists( 'VB_Metadata_Export_Converter' ) ) {
 		}
 
 		/**
+		 * Checks whether PHP XSL extension is available and can be used to convert Marc21 XML to MODS XML.
+		 *
+		 * @return bool true if XSL extension is available
+		 */
+		protected function is_xsl_extension_available() {
+			return extension_loaded( 'xsl' );
+		}
+
+		/**
 		 * Downloads all required XSL files.
 		 */
 		protected function download_all_xsl_files() {
@@ -70,6 +79,10 @@ if ( ! class_exists( 'VB_Metadata_Export_Converter' ) ) {
 		 * @return string the converted xml as string
 		 */
 		protected function convert_from_marc21_xml( $input, $xsl_filenames ) {
+			if ( ! $this->is_xsl_extension_available() ) {
+				return 'Error: PHP XSL extension not available!';
+			}
+
 			$sep      = DIRECTORY_SEPARATOR;
 			$xsltproc = new XSLTProcessor();
 			foreach ( $xsl_filenames as $xsl_filename ) {
@@ -122,6 +135,8 @@ if ( ! class_exists( 'VB_Metadata_Export_Converter' ) ) {
 			$mods = $this->convert_marc21_xml_to_mods( $marc21xml );
 			return $this->convert_from_marc21_xml( $mods, array( 'MODS3-7_DC_XSLT1-0.xsl' ) );
 		}
+
+
 
 	}
 
