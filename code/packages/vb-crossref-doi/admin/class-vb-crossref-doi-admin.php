@@ -643,7 +643,6 @@ if ( ! class_exists( 'VB_CrossRef_DOI_Admin' ) ) {
 			if ( ! empty( $user_post ) ) {
 				return $user_post;
 			}
-
 			$submit_query = $this->queries->query_posts_that_need_submitting( 1 );
 			if ( count( $submit_query->posts ) > 0 ) {
 				return $submit_query->posts[0];
@@ -687,7 +686,7 @@ if ( ! class_exists( 'VB_CrossRef_DOI_Admin' ) ) {
 					?>
 					</p>
 				</form>
-				<p>The following XML document would be submitted to CrossRef.
+				<p>The following XML document would be submitted to CrossRef.</p>
 				<?php
 
 				if ( ! empty( $json_text ) ) {
@@ -738,9 +737,9 @@ if ( ! class_exists( 'VB_CrossRef_DOI_Admin' ) ) {
 			<hr />
 			<h2>Manual Update</h2>
 			<p>
-				The following buttons allow to trigger a manual update or partial updates. An update will check the
+				The following buttons allow to trigger a manual update or partial update. An update will check the
 				database for new or modified posts and, if neccessary, submit them to CrossRef. If automatic updates
-				are enabled, the same update process is performed.
+				are enabled, the same update process is performed as per schedule.
 			</p>
 			<form method="post" onsubmit="return;">
 				<?php
@@ -748,9 +747,9 @@ if ( ! class_exists( 'VB_CrossRef_DOI_Admin' ) ) {
 				?>
 				<p>
 					<?php
-					submit_button( __( 'Manually Update Now', 'vb-crossref-doi' ), 'primary', 'manual_update', false );
+					submit_button( __( 'Manually Update', 'vb-crossref-doi' ), 'primary', 'manual_update', false );
 					echo ' ';
-					submit_button( __( 'Only Check for Modified Posts Now', 'vb-crossref-doi' ), 'secondary', 'check_modified', false );
+					submit_button( __( 'Only Check for Modified Posts', 'vb-crossref-doi' ), 'secondary', 'check_modified', false );
 					?>
 				</p>
 			</form>
@@ -865,13 +864,13 @@ if ( ! class_exists( 'VB_CrossRef_DOI_Admin' ) ) {
 				</li>
 			</ul>
 			<ul>
-				<li>Posts that are assigned to include category:
+				<li>Posts that are assigned to the include category:
 					<?php echo esc_html( $remove_include ); ?>
 				</li>
 				<li>Posts that would be added to the include category (published, have DOI, not already included):
 					<?php echo esc_html( $add_include ); ?>
 				</li>
-				<li>Posts that are assigned to exclude category:
+				<li>Posts that are assigned to the exclude category:
 					<?php echo esc_html( $remove_exclude ); ?>
 				</li>
 				<li>Posts that would be added to the exclude category (published, no DOI, not already excluded):
