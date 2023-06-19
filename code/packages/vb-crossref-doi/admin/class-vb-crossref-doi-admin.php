@@ -611,11 +611,39 @@ if ( ! class_exists( 'VB_CrossRef_DOI_Admin' ) ) {
 		}
 
 		/**
+		 * Return the post in case a user provided a specific post id in the example tab.
+		 *
+		 * @return WP_Post|false $post the selected post
+		 */
+		protected function find_example_post_from_user_input() {
+			if ( ! empty( $_POST['example_post'] ) && isset( $_POST[ $this->common->plugin_name . '_example-post' ] ) &&
+					check_admin_referer( $this->common->plugin_name . '_example_post' ) ) {
+				$post_id = (int) $_POST[ $this->common->plugin_name . '_example-post' ];
+				$posts   = get_posts(
+					array(
+						'numberposts' => 1,
+						'p'           => $post_id,
+					),
+				);
+				if ( count( $posts ) > 0 ) {
+					return $posts[0];
+				}
+			}
+
+			return false;
+		}
+
+		/**
 		 * Returns a appropriate example post that is used to render metadata.
 		 *
 		 * @return WP_Post|bool the example post
 		 */
 		protected function find_example_post() {
+			$user_post = $this->find_example_post_from_user_input();
+			if ( ! empty( $user_post ) ) {
+				return $user_post;
+			}
+
 			$submit_query = $this->queries->query_posts_that_need_submitting( 1 );
 			if ( count( $submit_query->posts ) > 0 ) {
 				return $submit_query->posts[0];
@@ -637,12 +665,23 @@ if ( ! class_exists( 'VB_CrossRef_DOI_Admin' ) ) {
 				$renderer  = new VB_CrossRef_DOI_Render( $this->common->plugin_name );
 				$json_text = $renderer->render( $post, $this->common->get_current_utc_timestamp() );
 				?>
-				<h2>
-					Example for Post
-					<a href="<?php echo esc_attr( get_edit_post_link( $post ) ); ?>">
-						<?php echo esc_html( $post->ID ); ?>
-					</a>
-				</h2>
+				<h2>Example</h2>
+				<form method="post" onsubmit="return;">
+					<?php
+					wp_nonce_field( $this->common->plugin_name . '_example_post' );
+					?>
+					<p>
+					Show Post with ID
+						<input
+							type="text"
+							name="<?php echo esc_attr( $this->common->plugin_name . '_example-post' ); ?>"
+							value="<?php echo esc_attr( $post->ID ); ?>"
+						/>
+					<?php
+					submit_button( __( 'Select', 'vb-crossref-doi' ), 'secondary', 'example_post', false );
+					?>
+					</p>
+				</form>
 				<p>The following XML document would be submitted to CrossRef.
 				<?php
 
