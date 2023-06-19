@@ -665,7 +665,12 @@ if ( ! class_exists( 'VB_CrossRef_DOI_Admin' ) ) {
 				$renderer  = new VB_CrossRef_DOI_Render( $this->common->plugin_name );
 				$json_text = $renderer->render( $post, $this->common->get_current_utc_timestamp() );
 				?>
-				<h2>Example</h2>
+				<h2>
+					Example:
+					<a href="<?php echo esc_attr( get_edit_post_link( $post ) ); ?>">
+							<?php echo esc_html( get_the_title( $post ) ); ?>
+					</a>
+				</h2>
 				<form method="post" onsubmit="return;">
 					<?php
 					wp_nonce_field( $this->common->plugin_name . '_example_post' );
