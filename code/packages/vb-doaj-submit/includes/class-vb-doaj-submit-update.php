@@ -110,6 +110,78 @@ if ( ! class_exists( 'VB_DOAJ_Submit_Update' ) ) {
 		}
 
 		/**
+		 * Adds the include category to all posts that have a DOAJ article id available.
+		 */
+		public function add_include_category_to_posts_with_doaj_article_id() {
+			$include_post_category = $this->common->get_settings_field_value( 'include_post_category' );
+			$include_category_id   = get_cat_ID( $include_post_category );
+
+			if ( empty( $include_category_id ) ) {
+				$this->status->set_last_error( 'Can not add posts to include category. Category name not found.' );
+				return;
+			}
+
+			$include_query = $this->queries->query_posts_that_can_be_added_to_include_category( false );
+
+			foreach ( $include_query->posts as $post_id ) {
+				wp_set_object_terms( $post_id, $include_category_id, 'category', true );
+			}
+		}
+
+		/** Remove include category from all posts */
+		public function remove_include_category_from_all_posts() {
+			$include_post_category = $this->common->get_settings_field_value( 'include_post_category' );
+			$include_category_id   = get_cat_ID( $include_post_category );
+
+			if ( empty( $include_category_id ) ) {
+				$this->status->set_last_error( 'Can not remove posts from include category. Category name not found.' );
+				return;
+			}
+
+			$include_query = $this->queries->query_posts_that_have_include_category( false );
+
+			foreach ( $include_query->posts as $post_id ) {
+				wp_remove_object_terms( $post_id, $include_category_id, 'category' );
+			}
+		}
+
+		/**
+		 * Adds the exclude category to all posts that have no DOAJ article id available.
+		 */
+		public function add_exclude_category_to_posts_without_doaj_article_id() {
+			$exclude_post_category = $this->common->get_settings_field_value( 'exclude_post_category' );
+			$exclude_category_id   = get_cat_ID( $exclude_post_category );
+
+			if ( empty( $exclude_category_id ) ) {
+				$this->status->set_last_error( 'Can not add posts to exclude category. Category name not found.' );
+				return;
+			}
+
+			$exclude_query = $this->queries->query_posts_that_can_be_added_to_exclude_category( false );
+
+			foreach ( $exclude_query->posts as $post_id ) {
+				wp_set_object_terms( $post_id, $exclude_category_id, 'category', true );
+			}
+		}
+
+		/** Remove exclude category from all posts */
+		public function remove_exclude_category_from_all_posts() {
+			$exclude_post_category = $this->common->get_settings_field_value( 'exclude_post_category' );
+			$exclude_category_id   = get_cat_ID( $exclude_post_category );
+
+			if ( empty( $exclude_category_id ) ) {
+				$this->status->set_last_error( 'Can not remove posts from exclude category. Category name not found.' );
+				return;
+			}
+
+			$exclude_query = $this->queries->query_posts_that_have_exclude_category( false );
+
+			foreach ( $exclude_query->posts as $post_id ) {
+				wp_remove_object_terms( $post_id, $exclude_category_id, 'category' );
+			}
+		}
+
+		/**
 		 * Update function that is called by the cron scheduler or manually upon user input.
 		 */
 		public function do_update() {

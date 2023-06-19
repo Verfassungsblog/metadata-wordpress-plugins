@@ -146,6 +146,71 @@ if ( ! class_exists( 'VB_DOAJ_Submit_Admin' ) ) {
 		}
 
 		/**
+		 * Checks whether a submit button was clicked (other than "save settings") and if nonce is correct.
+		 * perform corresponding action.
+		 */
+		protected function check_and_process_submit_buttons() {
+			if ( ! empty( $_POST['reset_settings'] ) &&
+					check_admin_referer( $this->common->plugin_name . '_reset' ) ) {
+				foreach ( $this->settings_fields->get_list() as $field ) {
+					$field_id = $this->common->get_settings_field_id( $field['name'] );
+					delete_option( $field_id );
+				}
+			}
+
+			if ( ! empty( $_POST['reset_last_error'] ) &&
+					check_admin_referer( $this->common->plugin_name . '_reset_last_error' ) ) {
+				$this->status->clear_last_error();
+			}
+
+			if ( ! empty( $_POST['manual_update'] ) &&
+					check_admin_referer( $this->common->plugin_name . '_update' ) ) {
+				$this->update->do_update();
+			}
+
+			if ( ! empty( $_POST['manual_identify'] ) &&
+					check_admin_referer( $this->common->plugin_name . '_update' ) ) {
+				$this->update->do_identify();
+			}
+
+			if ( ! empty( $_POST['check_modified'] ) &&
+					check_admin_referer( $this->common->plugin_name . '_update' ) ) {
+				$this->update->check_for_modified_posts();
+			}
+
+			if ( ! empty( $_POST['add_include_category'] ) &&
+					check_admin_referer( $this->common->plugin_name . '_include_exclude' ) ) {
+				$this->update->add_include_category_to_posts_with_doaj_article_id();
+			}
+
+			if ( ! empty( $_POST['remove_include_category'] ) &&
+					check_admin_referer( $this->common->plugin_name . '_include_exclude' ) ) {
+				$this->update->remove_include_category_from_all_posts();
+			}
+
+			if ( ! empty( $_POST['add_exclude_category'] ) &&
+					check_admin_referer( $this->common->plugin_name . '_include_exclude' ) ) {
+				$this->update->add_exclude_category_to_posts_without_doaj_article_id();
+			}
+
+			if ( ! empty( $_POST['remove_exclude_category'] ) &&
+					check_admin_referer( $this->common->plugin_name . '_include_exclude' ) ) {
+				$this->update->remove_exclude_category_from_all_posts();
+			}
+
+			if ( ! empty( $_POST['mark_all_posts_as_modified'] ) &&
+					check_admin_referer( $this->common->plugin_name . '_mark_all_posts_as_modified' ) ) {
+				$this->update->mark_all_posts_as_modified();
+			}
+
+			if ( ! empty( $_POST['reset_status'] ) &&
+					check_admin_referer( $this->common->plugin_name . '_reset_status' ) ) {
+				$this->status->reset_status();
+			}
+
+		}
+
+		/**
 		 * WordPress init action hook.
 		 */
 		public function action_admin_init() {
@@ -412,45 +477,9 @@ if ( ! class_exists( 'VB_DOAJ_Submit_Admin' ) ) {
 				return;
 			}
 
-			if ( ! empty( $_POST['reset_settings'] ) &&
-					check_admin_referer( $this->common->plugin_name . '_reset' ) ) {
-				foreach ( $this->settings_fields->get_list() as $field ) {
-					$field_id = $this->common->get_settings_field_id( $field['name'] );
-					delete_option( $field_id );
-				}
-			}
+			$this->check_and_process_submit_buttons();
 
-			if ( ! empty( $_POST['reset_status'] ) &&
-					check_admin_referer( $this->common->plugin_name . '_reset_status' ) ) {
-				$this->status->reset_status();
-			}
-
-			if ( ! empty( $_POST['manual_update'] ) &&
-					check_admin_referer( $this->common->plugin_name . '_update' ) ) {
-				$this->update->do_update();
-			}
-
-			if ( ! empty( $_POST['manual_identify'] ) &&
-					check_admin_referer( $this->common->plugin_name . '_update' ) ) {
-				$this->update->do_identify();
-			}
-
-			if ( ! empty( $_POST['check_modified'] ) &&
-					check_admin_referer( $this->common->plugin_name . '_update' ) ) {
-				$this->update->check_for_modified_posts();
-			}
-
-			if ( ! empty( $_POST['mark_all_posts_as_modified'] ) &&
-					check_admin_referer( $this->common->plugin_name . '_mark_all_posts_as_modified' ) ) {
-				$this->update->mark_all_posts_as_modified();
-			}
-
-			if ( ! empty( $_POST['reset_last_error'] ) &&
-					check_admin_referer( $this->common->plugin_name . '_update' ) ) {
-				$this->status->clear_last_error();
-			}
-
-			$current_tab = isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( $_GET['tab'] ) ) : 'settings';
+			$current_tab = isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( $_GET['tab'] ) ) : 'settings'; // phpcs:ignore
 			$current_tab = isset( $this->get_tab_labels()[ $current_tab ] ) ? $current_tab : 'settings';
 
 			?>
@@ -533,11 +562,38 @@ if ( ! class_exists( 'VB_DOAJ_Submit_Admin' ) ) {
 		}
 
 		/**
+		 * Return the post in case a user provided a specific post id in the example tab.
+		 *
+		 * @return WP_Post|false $post the selected post
+		 */
+		protected function find_example_post_from_user_input() {
+			if ( ! empty( $_POST['example_post'] ) && isset( $_POST[ $this->common->plugin_name . '_example-post' ] ) &&
+					check_admin_referer( $this->common->plugin_name . '_example_post' ) ) {
+				$post_id = (int) $_POST[ $this->common->plugin_name . '_example-post' ];
+				$posts   = get_posts(
+					array(
+						'numberposts' => 1,
+						'p'           => $post_id,
+					),
+				);
+				if ( count( $posts ) > 0 ) {
+					return $posts[0];
+				}
+			}
+
+			return false;
+		}
+
+		/**
 		 * Returns a appropriate example post that is used to render metadata.
 		 *
 		 * @return WP_Post|bool the example post
 		 */
 		protected function find_example_post() {
+			$user_post = $this->find_example_post_from_user_input();
+			if ( ! empty( $user_post ) ) {
+				return $user_post;
+			}
 			$submit_query = $this->queries->query_posts_that_need_submitting( 1 );
 			if ( count( $submit_query->posts ) > 0 ) {
 				return $submit_query->posts[0];
@@ -565,18 +621,38 @@ if ( ! class_exists( 'VB_DOAJ_Submit_Admin' ) ) {
 				$renderer        = new VB_DOAJ_Submit_Render( $this->common->plugin_name );
 				$json_text       = $renderer->render( $post );
 
-				if ( empty( $doaj_article_id ) ) {
+				?>
+				<h2>
+					Example: <a href="<?php echo esc_attr( get_edit_post_link( $post ) ); ?>">
+					<?php echo esc_html( get_the_title( $post ) ); ?>
+				</a>
+				<?php
+				if ( ! empty( $doaj_article_id ) ) {
 					?>
-					<h2>Example</h2>
-					<?php
-				} else {
-					?>
-					<h2>
-						<a href="https://doaj.org/article/<?php echo esc_attr( $doaj_article_id ); ?>">Example</a>
-						(<a href="<?php echo esc_attr( $doaj_baseurl . 'articles/' . $doaj_article_id ); ?>">JSON</a>)
-					</h2>
+						(DOAJ <a href="https://doaj.org/article/<?php echo esc_attr( $doaj_article_id ); ?>">Article</a>
+						and <a href="<?php echo esc_attr( $doaj_baseurl . 'articles/' . $doaj_article_id ); ?>">JSON</a>)
 					<?php
 				}
+				?>
+				</h2>
+				<form method="post" onsubmit="return;">
+					<?php
+					wp_nonce_field( $this->common->plugin_name . '_example_post' );
+					?>
+					<p>
+					Show Post with ID
+						<input
+							type="text"
+							name="<?php echo esc_attr( $this->common->plugin_name . '_example-post' ); ?>"
+							value="<?php echo esc_attr( $post->ID ); ?>"
+						/>
+					<?php
+					submit_button( __( 'Select', 'vb-crossref-doi' ), 'secondary', 'example_post', false );
+					?>
+					</p>
+				</form>
+				<p>The following JSON document would be submitted to the DOAJ.</p>
+				<?php
 				if ( ! empty( $json_text ) ) {
 					?>
 					<pre><?php echo htmlspecialchars( $json_text ); // phpcs:ignore ?></pre>
@@ -614,20 +690,80 @@ if ( ! class_exists( 'VB_DOAJ_Submit_Admin' ) ) {
 			</ul>
 			<form method="post" onsubmit="return;">
 				<?php
+				wp_nonce_field( $this->common->plugin_name . '_reset_last_error' );
+				?>
+				<p>
+					<?php
+					submit_button( __( 'Reset Last Error', 'vb-doaj-submit' ), 'secondary', 'reset_last_error', false );
+					?>
+				</p>
+			</form>
+			<hr />
+			<h2>Manual Update</h2>
+			<p>
+				The following buttons allow to trigger a manual or partial update. The update process consists of the following steps:</p>
+			<ol>
+				<li>Check the database for new or modified posts.</li>
+				<li>Search for posts in the DOAJ in order to identify their corresponding DOAJ article entries in case they are already registered.</li>
+				<li>Submits the meta data of modified or not yet registered posts to the DOAJ.</li>
+			</ol>
+			<p>
+				If automatic updates are enabled, the same steps are performed ony a regular basis.
+			</p>
+			<form method="post" onsubmit="return;">
+				<?php
 				wp_nonce_field( $this->common->plugin_name . '_update' );
 				?>
 				<p>
 					<?php
-					submit_button( __( 'Manually Update Now', 'vb-doaj-submit' ), 'primary', 'manual_update', false );
+					submit_button( __( 'Manually Update', 'vb-doaj-submit' ), 'primary', 'manual_update', false );
 					echo ' ';
-					submit_button( __( 'Manually Identify Now', 'vb-doaj-submit' ), 'secondary', 'manual_identify', false );
+					submit_button( __( 'Only Identify Posts', 'vb-doaj-submit' ), 'secondary', 'manual_identify', false );
 					echo ' ';
-					submit_button( __( 'Manually Check for Modified Posts Now', 'vb-doaj-submit' ), 'secondary', 'check_modified', false );
+					submit_button( __( 'Only Check for Modified Posts', 'vb-doaj-submit' ), 'secondary', 'check_modified', false );
 					?>
 				</p>
+			</form>
+			<hr />
+			<h2>Include and Exclude Posts</h2>
+			<p>
+				The following buttons allow to included or exclude posts with or without a DOAJ Article ID by assigning
+				them the corresponding categories defined in the "settings" tab. Depending on the number of posts in the
+				database, this might take a long time.
+			</p>
+			<form method="post" onsubmit="return confirm('Are you sure?');">
+				<?php
+				wp_nonce_field( $this->common->plugin_name . '_include_exclude' );
+				?>
 				<p>
 					<?php
-					submit_button( __( 'Reset Last Error', 'vb-doaj-submit' ), 'secondary', 'reset_last_error', false );
+					submit_button(
+						__( 'Add Include Category to Posts with DOAJ Article ID', 'vb-crossref-doi' ),
+						'secondary',
+						'add_include_category',
+						false,
+					);
+					echo ' ';
+					submit_button(
+						__( 'Remove Include Category from all Posts', 'vb-crossref-doi' ),
+						'secondary',
+						'remove_include_category',
+						false
+					);
+					echo '</p><p>';
+					submit_button(
+						__( 'Add Exclude Category to Posts without DOAJ Article ID', 'vb-crossref-doi' ),
+						'secondary',
+						'add_exclude_category',
+						false
+					);
+					echo ' ';
+					submit_button(
+						__( 'Remove Exclude Category from all Posts', 'vb-crossref-doi' ),
+						'secondary',
+						'remove_exclude_category',
+						false
+					);
 					?>
 				</p>
 			</form>
@@ -684,11 +820,31 @@ if ( ! class_exists( 'VB_DOAJ_Submit_Admin' ) ) {
 			$need_submitting_modified = $this->queries->get_number_of_posts_that_need_submitting_because_modified();
 			$need_submitting_retry    = $this->queries->get_number_of_posts_that_should_be_retried();
 			$were_submitted           = $this->queries->get_number_of_posts_that_were_successfully_submitted();
+			$add_include              = $this->queries->get_number_of_posts_that_can_be_added_to_include_category();
+			$remove_include           = $this->queries->get_number_of_posts_that_have_include_category();
+			$add_exclude              = $this->queries->get_number_of_posts_that_can_be_added_to_exclude_category();
+			$remove_exclude           = $this->queries->get_number_of_posts_that_have_exclude_category();
 			?>
 			<ul>
 				<li>Posts that were modified since last update:
 					<?php echo esc_html( $were_modified ); ?>
 				</li>
+			</ul>
+			<ul>
+				<li>Posts that are assigned to the include category:
+					<?php echo esc_html( $remove_include ); ?>
+				</li>
+				<li>Posts that would be added to the include category (published, have DOAJ article id, not already included):
+					<?php echo esc_html( $add_include ); ?>
+				</li>
+				<li>Posts that are assigned to the exclude category:
+					<?php echo esc_html( $remove_exclude ); ?>
+				</li>
+				<li>Posts that would be added to the exclude category (published, no DOAJ article id, not already excluded):
+					<?php echo esc_html( $add_exclude ); ?>
+				</li>
+			</ul>
+			<ul>
 				<li>Posts that need identifying (unknown DOAJ article id):
 					<?php echo esc_html( $need_identifying ); ?>
 				</li>
@@ -698,6 +854,8 @@ if ( ! class_exists( 'VB_DOAJ_Submit_Admin' ) ) {
 				<li>Posts that were not identified (no DOAJ article id found):
 					<?php echo esc_html( $were_identified - $have_article_id ); ?>
 				</li>
+			</ul>
+			<ul>
 				<li>Posts that need submitting because not yet submitted:
 					<?php echo esc_html( $need_submitting_never ); ?>
 				</li>
@@ -707,6 +865,8 @@ if ( ! class_exists( 'VB_DOAJ_Submit_Admin' ) ) {
 				<li>Posts that need submitting again after error:
 					<?php echo esc_html( $need_submitting_retry ); ?>
 				</li>
+			</ul>
+			<ul>
 				<li>Posts that were successfully submitted:
 					<?php echo esc_html( $were_submitted ); ?>
 				</li>

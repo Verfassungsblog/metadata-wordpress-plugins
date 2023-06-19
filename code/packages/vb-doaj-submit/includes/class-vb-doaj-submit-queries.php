@@ -527,6 +527,154 @@ if ( ! class_exists( 'VB_DOAJ_Submit_Queries' ) ) {
 			return new WP_Query( $query_args );
 		}
 
+		/**
+		 * Return the number of posts that are assigned to the include category.
+		 *
+		 * @return int the number of posts
+		 */
+		public function get_number_of_posts_that_have_include_category() {
+			$query = $this->query_posts_that_have_include_category( false );
+			return $query->post_count;
+		}
+
+		/**
+		 * Return posts that are assigned to the include category.
+		 *
+		 * @param int $batch the batch size (0 means all posts, >0 means a maximum limit).
+		 * @return WP_Query the query that contains posts that are assigned to the include category
+		 */
+		public function query_posts_that_have_include_category( $batch ) {
+			$include_post_category = $this->common->get_settings_field_value( 'include_post_category' );
+			$include_category_id   = get_cat_ID( $include_post_category );
+
+			$query_args = array(
+				'post_type'           => 'post',
+				'post_status'         => array( 'publish' ),
+				'ignore_sticky_posts' => true,
+				'category__in'        => array( $include_category_id ),
+			);
+
+			$this->add_batch_arguments_to_query( $query_args, $batch );
+			return new WP_Query( $query_args );
+		}
+
+		/**
+		 * Return the number of posts that can be added to the include category, meaning they have a DOAJ article id
+		 * and are not already in the include category.
+		 *
+		 * @return int the number of posts
+		 */
+		public function get_number_of_posts_that_can_be_added_to_include_category() {
+			$query = $this->query_posts_that_can_be_added_to_include_category( false );
+			return $query->post_count;
+		}
+
+		/**
+		 * Return posts that can be added to the include category, meaning they have a DOAJ article id and are not
+		 * already in the include category.
+		 *
+		 * @param int $batch the batch size (0 means all posts, >0 means a maximum limit).
+		 * @return WP_Query the query that contains posts that can be added to the include category
+		 */
+		public function query_posts_that_can_be_added_to_include_category( $batch ) {
+			$include_post_category = $this->common->get_settings_field_value( 'include_post_category' );
+			$include_category_id   = get_cat_ID( $include_post_category );
+
+			$query_args = array(
+				'post_type'           => 'post',
+				'post_status'         => array( 'publish' ),
+				'ignore_sticky_posts' => true,
+				'category__not_in'    => array( $include_category_id ),
+				'meta_query'          => array( // phpcs:ignore
+					'relation' => 'AND',
+					array(
+						'key'     => $this->common->get_doaj_article_id_meta_key(),
+						'value'   => '',
+						'compare' => '!=',
+					),
+				),
+			);
+
+			$this->add_batch_arguments_to_query( $query_args, $batch );
+			return new WP_Query( $query_args );
+		}
+
+		/**
+		 * Return the number of posts that are assigned to the exclude category.
+		 *
+		 * @return int the number of posts
+		 */
+		public function get_number_of_posts_that_have_exclude_category() {
+			$query = $this->query_posts_that_have_exclude_category( false );
+			return $query->post_count;
+		}
+
+		/**
+		 * Return posts that are assigned to the exclude category.
+		 *
+		 * @param int $batch the batch size (0 means all posts, >0 means a maximum limit).
+		 * @return WP_Query the query that contains posts that are assigned to the exclude category
+		 */
+		public function query_posts_that_have_exclude_category( $batch ) {
+			$exclude_post_category = $this->common->get_settings_field_value( 'exclude_post_category' );
+			$exclude_category_id   = get_cat_ID( $exclude_post_category );
+
+			$query_args = array(
+				'post_type'           => 'post',
+				'post_status'         => array( 'publish' ),
+				'ignore_sticky_posts' => true,
+				'category__in'        => array( $exclude_category_id ),
+			);
+
+			$this->add_batch_arguments_to_query( $query_args, $batch );
+			return new WP_Query( $query_args );
+		}
+
+		/**
+		 * Return the number of posts that can be added to the exclude category, meaning they have no DOAJ article id
+		 * and are not already in the exclude category.
+		 *
+		 * @return int the number of posts
+		 */
+		public function get_number_of_posts_that_can_be_added_to_exclude_category() {
+			$query = $this->query_posts_that_can_be_added_to_exclude_category( false );
+			return $query->post_count;
+		}
+
+		/**
+		 * Return posts that can be added to the exclude category, meaning they have no DOAJ article id and are not
+		 * already in the exclude category.
+		 *
+		 * @param int $batch the batch size (0 means all posts, >0 means a maximum limit).
+		 * @return WP_Query the query that contains posts that can be added to the exclude category
+		 */
+		public function query_posts_that_can_be_added_to_exclude_category( $batch ) {
+			$exclude_post_category = $this->common->get_settings_field_value( 'exclude_post_category' );
+			$exclude_category_id   = get_cat_ID( $exclude_post_category );
+
+			$query_args = array(
+				'post_type'           => 'post',
+				'post_status'         => array( 'publish' ),
+				'ignore_sticky_posts' => true,
+				'category__not_in'    => array( $exclude_category_id ),
+				'meta_query'          => array( // phpcs:ignore
+					'relation' => 'OR',
+					array(
+						'key'     => $this->common->get_doaj_article_id_meta_key(),
+						'compare' => 'NOT EXISTS',
+					),
+					array(
+						'key'     => $this->common->get_doaj_article_id_meta_key(),
+						'value'   => '',
+						'compare' => '==',
+					),
+				),
+			);
+
+			$this->add_batch_arguments_to_query( $query_args, $batch );
+			return new WP_Query( $query_args );
+		}
+
 	}
 
 }
