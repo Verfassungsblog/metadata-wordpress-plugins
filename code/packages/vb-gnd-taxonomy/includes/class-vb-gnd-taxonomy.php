@@ -152,7 +152,7 @@ if ( ! class_exists( 'VB_GND_Taxonomy' ) ) {
 		public function run() {
 			register_activation_hook( $this->base_file, array( $this, 'activate' ) );
 			register_deactivation_hook( $this->base_file, array( $this, 'deactivate' ) );
-			register_uninstall_hook( $this->base_file, 'vb_doaj_submit_uninstall' );
+			register_uninstall_hook( $this->base_file, 'vb_gnd_taxonomy_uninstall' );
 
 			add_action( 'init', array( $this, 'action_init' ) );
 
