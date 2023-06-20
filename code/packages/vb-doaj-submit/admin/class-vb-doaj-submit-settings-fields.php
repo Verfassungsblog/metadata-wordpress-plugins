@@ -232,7 +232,7 @@ if ( ! class_exists( 'VB_DOAJ_Submit_Settings_Fields' ) ) {
 				),
 				array(
 					'name'        => 'retry_minutes',
-					'type'        => 'text',
+					'type'        => 'string',
 					'section'     => 'update',
 					'label'       => 'Retry Minutes',
 					'placeholder' => 'number of minutes',
