@@ -57,3 +57,8 @@ Other WordPress methods that can be used are:
 
 You can also use custom templates as described in the WordPress [documentation](https://developer.wordpress.org/themes/template-files-section/taxonomy-templates/#custom-taxonomy).
 
+## Changelog
+
+### v0.1.0
+
+Initial release
