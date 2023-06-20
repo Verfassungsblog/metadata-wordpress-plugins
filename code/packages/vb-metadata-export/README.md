@@ -74,7 +74,7 @@ There are a number of plugins that allow to manage custom fields for posts and u
 
 In order for this plugin to be able to access information from a custom field, its "field name" or "meta key" needs to be configured in the "Custom Fields" tab.
 
-**TODO**: Insert video
+https://github.com/Verfassungsblog/metadata-wordpress-plugins/assets/6214043/301464e4-5f21-4ee0-991c-51d168a7c922
 
 ## Theme Integration
 
