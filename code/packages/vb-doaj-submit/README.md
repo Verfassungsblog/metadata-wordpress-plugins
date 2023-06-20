@@ -24,6 +24,7 @@ Mandatory Requirements:
 - Wordpress >= 5
 - PHP >= 7.4
 - DOAJ API Key and ISSN
+- A plugin to edit custom fields for posts and users (see blow)
 
 Optional Dependencies:
 - [co-authors-plus](https://de.wordpress.org/plugins/co-authors-plus/) plugin to add more than one author to a post
