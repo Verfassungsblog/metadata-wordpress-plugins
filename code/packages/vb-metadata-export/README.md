@@ -19,7 +19,7 @@ The plugin supports to export the following metadata:
 - Language
 - Blog name, blog owner, publisher name
 - Tags
-- Dewey Decimal Classificataion (DDC) subjects
+- Dewey Decimal Classification (DDC) subjects
 - GND (ger: Gemeinsame Normdatei) subjects, see [vb-gnd-taxonomy](https://github.com/Verfassungsblog/metadata-wordpress-plugins/tree/main/code/packages/vb-gnd-taxonomy)
 - International Standard Serial Number (ISSN)
 - Digital Object Identifier (DOI), see plugin
@@ -115,7 +115,7 @@ Lastly, the permalink can be generated via the following PHP template functions.
 
 Returns the permalink to the metadata export format for the current global post.
 
-Paramters:
+Parameters:
 - `$format: string` \
   the format to which the link is pointing to, either `marc21xml`, `mods`, `dc` or `oai-pmh`
 
@@ -123,7 +123,7 @@ Paramters:
 
 Return a a-tag link to the metadata export format for the current global post as string.
 
-Paramters
+Parameters:
 - `$format : string` \
   the format to which the link is pointing to, either `marc21xml`, `mods`, `dc` or `oai-pmh`.
 - `$title : string = ''` \

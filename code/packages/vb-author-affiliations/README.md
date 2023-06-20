@@ -1,6 +1,6 @@
 # Verfassungsblog Author Affiliations
 
-This WordPress plugin allows to store author affiliations for each post individually. This is necessary in case the affiliation of an author changes over time. This plugin allows to preseve the original affiliation (at publication time).
+This WordPress plugin allows to store author affiliations for each post individually. This is necessary in case the affiliation of an author changes over time. This plugin allows to preserve the original affiliation (at publication time).
 
 The post-specific author affiliation is supported by both the [vb-doaj-submit](https://github.com/Verfassungsblog/metadata-wordpress-plugins/tree/main/code/packages/vb-doaj-submit) and [vb-crossref-doi](https://github.com/Verfassungsblog/metadata-wordpress-plugins/tree/main/code/packages/vb-crossref-doi) plugin.
 
