@@ -34,7 +34,7 @@ The plugin is currently not yet available in the official WordPress plugin direc
 
 The Zip file can be installed via the "Upload Plugin" button on the "Add Plugins" page in the WordPress admin interface.
 
-**TODO**: Insert video
+https://github.com/Verfassungsblog/metadata-wordpress-plugins/assets/6214043/d6ccf1c7-3e0c-4040-9b7e-60e0512c9d75
 
 Mandatory Requirements:
 - Wordpress >= 5
