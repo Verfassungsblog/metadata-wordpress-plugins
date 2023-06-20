@@ -20,6 +20,8 @@ The plugin is currently not yet available in the official WordPress plugin direc
 
 The Zip file can be installed via the "Upload Plugin" button on the "Add Plugins" page in the WordPress admin interface.
 
+https://github.com/Verfassungsblog/metadata-wordpress-plugins/assets/6214043/d9f2bc97-42e1-4c08-aee1-6facb6d01e2d
+
 Mandatory Requirements:
 - Wordpress >= 5
 - PHP >= 7.4
@@ -31,10 +33,14 @@ Currently, GND entities can only be assigned in the classic editor mode.
 
 GND entities can be added the same way as regular tags. The only difference is that GND entities are suggested based on [lobig.org](http://lobid.org/gnd), and that the GND entity id is used as "slug".
 
+https://github.com/Verfassungsblog/metadata-wordpress-plugins/assets/6214043/93ab1793-a284-4e4a-b52d-b1fe25a2322d
+
 ## Configuration
 
 The plugin adds a custom settings page to the WordPress admin interface. It can be accessed from the "Settings" menu, option "VB GND Taxonomy".
 The available options allow to influence how GND entities are suggested and visualized.
+
+https://github.com/Verfassungsblog/metadata-wordpress-plugins/assets/6214043/adcee321-2ab9-4fa1-bc9f-4a703456f134
 
 ## Theme Integration
 
