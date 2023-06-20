@@ -2,15 +2,20 @@
 
 This repository contains multiple WordPress plugins that help to manage and export metadata using bibliographic standards.
 
-- [vb-metadata-export](https://github.com/Verfassungsblog/metadata-wordpress-plugins/tree/main/code/packages/vb-metadata-export): Exports post metadata as Marc21 XML, MODS 3.7 XML, Dublin Core XML and via OAI-PMH 2.0
+- [vb-metadata-export](https://github.com/Verfassungsblog/metadata-wordpress-plugins/tree/main/code/packages/vb-metadata-export) \
+  Exports post metadata as Marc21 XML, MODS 3.7 XML, Dublin Core XML and via OAI-PMH 2.0
 
-- [vb-gnd-taxonomy](https://github.com/Verfassungsblog/metadata-wordpress-plugins/tree/main/code/packages/vb-gnd-taxonomy): Adds a GND taxonomy for posts including autocomplete suggestions based on [lobid.org](http://lobid.org/gnd)
+- [vb-gnd-taxonomy](https://github.com/Verfassungsblog/metadata-wordpress-plugins/tree/main/code/packages/vb-gnd-taxonomy) \
+  Adds a GND taxonomy for posts including autocomplete suggestions based on [lobid.org](http://lobid.org/gnd)
 
-- [vb-author-affiliations](https://github.com/Verfassungsblog/metadata-wordpress-plugins/tree/main/code/packages/vb-author-affiliations): Saves author affiliations and ROR-ID as post metadata (since affiliations may change over time)
+- [vb-author-affiliations](https://github.com/Verfassungsblog/metadata-wordpress-plugins/tree/main/code/packages/vb-author-affiliations) \
+  Saves author affiliations and ROR-ID as post metadata (since affiliations may change over time)
 
-- [vb-doaj-submit](https://github.com/Verfassungsblog/metadata-wordpress-plugins/tree/main/code/packages/vb-doaj-submit): Automates the submission of post metadata to the [Directory of Open Access Journals](https://doaj.org/) (DOAJ)
+- [vb-doaj-submit](https://github.com/Verfassungsblog/metadata-wordpress-plugins/tree/main/code/packages/vb-doaj-submit) \
+  Automates the submission of post metadata to the [Directory of Open Access Journals](https://doaj.org/) (DOAJ)
 
-- [vb-crossref-doi](https://github.com/Verfassungsblog/metadata-wordpress-plugins/blob/main/code/packages/vb-crossref-doi/vb-crossref-doi.php): Automates the registration of DOIs for posts via [CrossRef](https://www.crossref.org/)
+- [vb-crossref-doi](https://github.com/Verfassungsblog/metadata-wordpress-plugins/blob/main/code/packages/vb-crossref-doi/vb-crossref-doi.php) \
+  Automates the registration of DOIs for posts via [CrossRef](https://www.crossref.org/)
 
 ## Installation
 
