@@ -90,7 +90,7 @@ Available formats are `marc21xml`, `mods`, `dc`. For example, a custom permalink
 
 The permalinks can be embedded via the shortcode `vb-metadata-export-link`. The shortcode supports the following options:
 
-- `format` - either `marc21`, `mods`, `dc` or `oai-pmh`
+- `format` - either `marc21xml`, `mods`, `dc` or `oai-pmh`
 - `title` - the title of the link
 - `unavailable` - the title of the link in case the export format is not available
 - `class` - any additional css classes
@@ -98,13 +98,13 @@ The permalinks can be embedded via the shortcode `vb-metadata-export-link`. The 
 For example, a shortcode could look like this:
 
 ```
-[vb-metadata-export-link format="marc21" title="Marc21"]
+[vb-metadata-export-link format="marc21xml" title="Marc21 XML"]
 ```
 
 The output for that shortcode would be:
 
 ```
-<a href="https://example.com/some-post/?vb-metadata-export=marc21">Marc21</a>
+<a href="https://example.com/some-post/?vb-metadata-export=marc21xml">Marc21 XML</a>
 ```
 
 ### Template Functions
