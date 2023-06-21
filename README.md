@@ -14,7 +14,7 @@ This repository contains multiple WordPress plugins that help to manage and expo
 - [vb-doaj-submit](https://github.com/Verfassungsblog/metadata-wordpress-plugins/tree/main/code/packages/vb-doaj-submit) \
   Automates the submission of post metadata to the [Directory of Open Access Journals](https://doaj.org/) (DOAJ)
 
-- [vb-crossref-doi](https://github.com/Verfassungsblog/metadata-wordpress-plugins/blob/main/code/packages/vb-crossref-doi/vb-crossref-doi.php) \
+- [vb-crossref-doi](https://github.com/Verfassungsblog/metadata-wordpress-plugins/tree/main/code/packages/vb-crossref-doi) \
   Automates the registration of DOIs for posts via [CrossRef](https://www.crossref.org/)
 
 ## Installation
