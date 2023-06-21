@@ -88,11 +88,14 @@ if ( ! class_exists( 'VB_Metadata_Export_Converter' ) ) {
 			foreach ( $xsl_filenames as $xsl_filename ) {
 				$xsl          = new DOMDocument();
 				$xsl_filepath = realpath( plugin_dir_path( __FILE__ ) . $sep . '..' . $sep . 'xsl' . $sep . $xsl_filename );
+				if ( empty( $xsl_filepath ) ) {
+					return 'Error: Could not find XSL file "' . $xsl_filename . '" (maybe file persmissions do not allow to write to the plugin directory)';
+				}
 				if ( ! $xsl->load( $xsl_filepath ) ) {
-					return '';
+					return 'Error: Could not load XSL file "' . $xsl_filename . '"';
 				}
 				if ( ! $xsltproc->importStylesheet( $xsl ) ) {
-					return '';
+					return 'Error: Could not import XSL file "' . $xsl_filename . '"';
 				}
 			}
 
