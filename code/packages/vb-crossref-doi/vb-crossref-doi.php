@@ -8,7 +8,7 @@
  * Plugin Name: Verfassungsblog CrossRef DOI
  * Plugin URI: https://wordpress.org/plugins/vb-crossref-doi/
  * Description: Automates the registration of DOIs for posts using CrossRef
- * Version: 0.1.0
+ * Version: 0.2.0
  * Requires at least: 5.9.3
  * Requires PHP: 7.4.29
  * License: GPL v3

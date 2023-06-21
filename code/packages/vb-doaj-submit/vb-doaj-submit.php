@@ -8,7 +8,7 @@
  * Plugin Name: Verfassungsblog DOAJ Submit
  * Plugin URI: https://wordpress.org/plugins/vb-doaj-submit/
  * Description: Automates the submission of posts to the DOAJ
- * Version: 0.1.0
+ * Version: 0.2.0
  * Requires at least: 5.9.3
  * Requires PHP: 7.4.29
  * License: GPL v3
