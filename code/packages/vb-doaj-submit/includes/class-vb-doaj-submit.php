@@ -85,6 +85,27 @@ if ( ! class_exists( 'VB_DOAJ_Submit' ) ) {
 		}
 
 		/**
+		 * WordPress plugin row meta filter hook.
+		 *
+		 * Adds a link to the plugin list about who developed this plugin.
+		 *
+		 * @param array  $plugin_meta array of meta data information shown for each plugin.
+		 * @param string $plugin_file the main plugin file whose meta data information is filtered.
+		 * @param array  $plugin_data information about the plugin.
+		 * @param mixed  $status unknown.
+		 */
+		public function filter_plugin_row_meta( $plugin_meta, $plugin_file, $plugin_data, $status ) {
+			if ( strpos( $plugin_file, plugin_basename( $this->base_file ) ) !== false ) {
+				$developed_by = array(
+					'Developed by <a href="https://knopflogik.de/" target="_blank">knopflogik GmbH</a>',
+				);
+
+				$plugin_meta = array_merge( $plugin_meta, $developed_by );
+			}
+			return $plugin_meta;
+		}
+
+		/**
 		 * Run method that is called from plugin base file.
 		 */
 		public function run() {
@@ -93,6 +114,7 @@ if ( ! class_exists( 'VB_DOAJ_Submit' ) ) {
 			register_uninstall_hook( $this->base_file, 'vb_doaj_submit_uninstall' );
 
 			add_action( 'init', array( $this, 'action_init' ) );
+			add_filter( 'plugin_row_meta', array( $this, 'filter_plugin_row_meta' ), 10, 4 );
 
 			$this->admin->run();
 			$this->update->run();
