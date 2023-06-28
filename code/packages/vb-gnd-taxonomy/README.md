@@ -59,6 +59,12 @@ You can also use custom templates as described in the WordPress [documentation](
 
 ## Changelog
 
+### v0.2.0
+
+- Fixed error that prevents uninstall
+- Added this readme file
+- Added link to this GitHub readme file to help section in admin settings page
+
 ### v0.1.0
 
 Initial release

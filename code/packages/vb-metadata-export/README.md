@@ -141,6 +141,11 @@ The OAI-PMH 2.0 base URL is `https://example.com/oai/repository/`. There is no o
 
 ## Changelog
 
+### v0.2.0
+
+- Show error message in case XSL files can not be downloaded
+- Added link to this GitHub readme file to help section in admin settings page
+
 ### v0.1.0
 
 Initial release

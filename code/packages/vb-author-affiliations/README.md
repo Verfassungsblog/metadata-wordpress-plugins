@@ -51,6 +51,11 @@ Returns:
 
 ## Changelog
 
+### v0.2.0
+
+- Added this readme file
+- Added link to this GitHub readme file to help section in admin settings page
+
 ### v0.1.0
 
 Initial release

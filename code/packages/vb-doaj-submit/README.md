@@ -72,6 +72,12 @@ The plugin does not support any theme integration.
 
 ## Changelog
 
+### v0.2.0
+
+- Fix admin setting option "retry minutes" is not rendered
+- Added this readme file
+- Added link to this GitHub readme file to help section in admin settings page
+
 ### v0.1.0
 
 Initial release
