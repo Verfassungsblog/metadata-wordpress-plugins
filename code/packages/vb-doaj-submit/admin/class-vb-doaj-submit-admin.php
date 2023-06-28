@@ -464,7 +464,12 @@ if ( ! class_exists( 'VB_DOAJ_Submit_Admin' ) ) {
 				array(
 					'id'      => $this->common->plugin_name . '_help_tab',
 					'title'   => __( 'Help' ),
-					'content' => '<h2>Verfassungsblog DOAJ Submit</h2>',
+					'content' => '
+						<h2>Verfassungsblog DOAJ Submit</h2>
+						<p>More information about this plugin can be found on the
+						<a href="https://github.com/Verfassungsblog/metadata-wordpress-plugins/tree/main/code/packages/vb-doaj-submit" target="_blank">GitHub</a>
+						page.
+					',
 				)
 			);
 		}

@@ -446,7 +446,12 @@ if ( ! class_exists( 'VB_Metadata_Export_Admin' ) ) {
 				array(
 					'id'      => $this->common->plugin_name . '_help_tab',
 					'title'   => __( 'Help' ),
-					'content' => '<h2>Verfassungsblog Metadata Export</h2>',
+					'content' => '
+						<h2>Verfassungsblog Metadata Export</h2>
+						<p>More information about this plugin can be found on the
+						<a href="https://github.com/Verfassungsblog/metadata-wordpress-plugins/tree/main/code/packages/vb-metadata-export" target="_blank">GitHub</a>
+						page.
+					',
 				)
 			);
 		}

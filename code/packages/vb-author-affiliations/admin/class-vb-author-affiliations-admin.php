@@ -306,7 +306,12 @@ if ( ! class_exists( 'VB_Author_Affiliations_Admin' ) ) {
 				array(
 					'id'      => $this->common->plugin_name . '_help_tab',
 					'title'   => __( 'Help' ),
-					'content' => '<h2>Verfassungsblog Author Affiliations</h2>',
+					'content' => '
+						<h2>Verfassungsblog Author Affiliations</h2>
+						<p>More information about this plugin can be found on the
+						<a href="https://github.com/Verfassungsblog/metadata-wordpress-plugins/tree/main/code/packages/vb-author-affiliations" target="_blank">GitHub</a>
+						page.
+					',
 				)
 			);
 		}
