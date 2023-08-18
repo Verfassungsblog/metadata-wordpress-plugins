@@ -141,6 +141,11 @@ The OAI-PMH 2.0 base URL is `https://example.com/oai/repository/`. There is no o
 
 ## Changelog
 
+### v0.2.1
+
+- Fix resumption token error due to missing required options that were not encoded
+- Fix problem that unavailable class is always added to metadata export links
+
 ### v0.2.0
 
 - Show error message in case XSL files can not be downloaded
