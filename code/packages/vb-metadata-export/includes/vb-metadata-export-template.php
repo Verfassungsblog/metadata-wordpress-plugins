@@ -55,7 +55,7 @@ if ( ! function_exists( 'get_the_vb_metadata_export_link' ) ) {
 			array(
 				$common->plugin_name . '-link',
 				$common->plugin_name . '-' . $format . '-link',
-				empty( $marc21_permalink ) ? $common->plugin_name . '-unavailable' : '',
+				empty( $permalink ) ? $common->plugin_name . '-unavailable' : '',
 				$extra_class,
 			)
 		);
