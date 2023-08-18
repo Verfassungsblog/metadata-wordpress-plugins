@@ -169,13 +169,6 @@ if ( ! class_exists( 'VB_Metadata_Export_OAI_PMH' ) ) {
 					'both from and until date should have same granularity'
 				);
 			}
-			if ( ! empty( $resumption_token ) && ( ! empty( $from ) || ! empty( $until ) ) ) {
-				return $this->render_error(
-					$verb,
-					'badArgument',
-					'date not allowed in combination with resumptionToken'
-				);
-			}
 			return false;
 		}
 
@@ -384,15 +377,14 @@ if ( ! class_exists( 'VB_Metadata_Export_OAI_PMH' ) ) {
 		 * @return string xml as string of the resumption token
 		 */
 		protected function build_resumption_token( $offset, $list_count, $total_count, $from, $until, $prefix, $set ) {
+			$now         = $this->date_to_iso8601( new DateTime( 'now', new DateTimeZone( 'UTC' ) ) );
 			$next_offset = $offset + $list_count;
-			$options     = array_filter(
-				array(
-					'offset'         => $next_offset,
-					'from'           => $from,
-					'until'          => $until,
-					'metadataPrefix' => $prefix,
-					'set'            => $set,
-				),
+			$options     = array(
+				'offset'         => $next_offset,
+				'from'           => empty( $from ) ? $this->get_earliest_post_modified_date() : $from,
+				'until'          => empty ( $until ) ? $now : $until,
+				'metadataPrefix' => $prefix,
+				'set'            => empty ( $set ) ? "posts" : $set,
 			);
 			$token       = http_build_query( $options );
 			return implode(
@@ -429,6 +421,14 @@ if ( ! class_exists( 'VB_Metadata_Export_OAI_PMH' ) ) {
 					'resumptionToken' => $resumption_token,
 				),
 			);
+
+			if ( ! empty( $resumption_token ) && ( ! empty( $from ) || ! empty( $until ) ) ) {
+				return $this->render_error(
+					$verb,
+					'badArgument',
+					'date not allowed in combination with resumptionToken'
+				);
+			}
 
 			$resumption_options = $this->parse_resumption_token( $resumption_token );
 			if ( ! empty( $resumption_token ) && empty( $resumption_options ) ) {
