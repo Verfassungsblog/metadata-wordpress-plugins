@@ -69,6 +69,8 @@ if ( ! class_exists( 'VB_Author_Affiliations_Meta_Box' ) ) {
 				$author = $first_name . ' ' . $last_name;
 			} elseif ( ! empty( $last_name ) ) {
 				$author = $last_name;
+			} elseif ( ! empty( $first_name ) ) {
+				$author = $first_name;
 			}
 			return $author;
 		}
@@ -88,6 +90,8 @@ if ( ! class_exists( 'VB_Author_Affiliations_Meta_Box' ) ) {
 				$author = $first_name . ' ' . $last_name;
 			} elseif ( ! empty( $last_name ) ) {
 				$author = $last_name;
+			} elseif ( ! empty( $first_name ) ) {
+				$author = $first_name;
 			}
 			return $author;
 		}
