@@ -51,6 +51,11 @@ Returns:
 
 ## Changelog
 
+### v0.2.1
+
+- Add link to GitHub as plugin website
+- Detect and ignore `https://ror.org` prefix in case a user accidentally added it to the metadata
+
 ### v0.2.0
 
 - Added this readme file

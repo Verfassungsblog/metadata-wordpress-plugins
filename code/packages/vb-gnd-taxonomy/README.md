@@ -59,6 +59,10 @@ You can also use custom templates as described in the WordPress [documentation](
 
 ## Changelog
 
+### v0.2.1
+
+- Add link to GitHub as plugin website
+
 ### v0.2.0
 
 - Fixed error that prevents uninstall

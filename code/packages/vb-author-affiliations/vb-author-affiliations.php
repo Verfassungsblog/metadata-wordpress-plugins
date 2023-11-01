@@ -6,9 +6,9 @@
  *
  * @wordpress-plugin
  * Plugin Name: Verfassungsblog Author Affiliations
- * Plugin URI: https://wordpress.org/plugins/vb-author-affiliations/
+ * Plugin URI: https://github.com/Verfassungsblog/metadata-wordpress-plugins
  * Description: Saves author affiliations and ROR-ID as post metadata
- * Version: 0.2.0
+ * Version: 0.2.1
  * Requires at least: 5.9.3
  * Requires PHP: 7.4.29
  * License: GPL v3

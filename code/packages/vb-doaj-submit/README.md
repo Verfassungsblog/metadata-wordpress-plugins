@@ -72,6 +72,13 @@ The plugin does not support any theme integration.
 
 ## Changelog
 
+### v0.2.1
+
+- Add link to GitHub as plugin website
+- Use first name as author name in case only first name is available
+- Fix incorrect error message "response is invalid json" in case of successful article update
+- Include post id in error messages to better track which post caused which error
+
 ### v0.2.0
 
 - Fix admin setting option "retry minutes" is not rendered

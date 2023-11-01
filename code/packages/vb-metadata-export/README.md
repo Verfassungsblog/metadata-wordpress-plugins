@@ -141,6 +141,11 @@ The OAI-PMH 2.0 base URL is `https://example.com/oai/repository/`. There is no o
 
 ## Changelog
 
+### v0.2.2
+
+- Add link to GitHub as plugin website
+- Use first name as author name in case only first name is available
+
 ### v0.2.1
 
 - Fix resumption token error due to missing required options that were not encoded

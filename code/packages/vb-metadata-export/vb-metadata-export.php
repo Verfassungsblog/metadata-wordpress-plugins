@@ -6,9 +6,9 @@
  *
  * @wordpress-plugin
  * Plugin Name: Verfassungsblog Metadata Export
- * Plugin URI: https://wordpress.org/plugins/vb-metadata-export/
+ * Plugin URI: https://github.com/Verfassungsblog/metadata-wordpress-plugins
  * Description: Export post metadata as Marc21 XML, MODS 3.7 XML, Dublin Core XML and via OAI-PMH 2.0
- * Version: 0.2.1
+ * Version: 0.2.2
  * Requires at least: 5.9.3
  * Requires PHP: 7.4.29
  * License: GPL v3
