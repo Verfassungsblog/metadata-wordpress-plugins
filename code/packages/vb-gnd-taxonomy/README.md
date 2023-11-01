@@ -59,7 +59,7 @@ You can also use custom templates as described in the WordPress [documentation](
 
 ## Changelog
 
-### v0.2.1
+### v0.2.2
 
 - Add link to GitHub as plugin website
 

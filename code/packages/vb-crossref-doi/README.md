@@ -50,7 +50,7 @@ The plugin does not support any theme integration.
 
 ## Changelog
 
-### v0.2.1
+### v0.2.2
 
 - Add link to GitHub as plugin website
 - Include post id in error messages to better track which post caused which error
