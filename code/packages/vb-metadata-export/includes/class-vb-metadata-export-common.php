@@ -330,10 +330,11 @@ if ( ! class_exists( 'VB_Metadata_Export_Common' ) ) {
 		}
 
 		/**
-		 * Return the author name of a post in the format of last name, first name.
+		 * Return the name of the post author in the format of last name, first name. 
+		 * In case only a first name or last name is available, return that.
 		 *
-		 * @param int $author the id of the user.
-		 * @return string the name of the author
+		 * @param int $author user id of the post author.
+		 * @return string the name of the post author
 		 */
 		public function get_author_name( $author ) {
 			$last_name  = get_the_author_meta( 'last_name', $author );
@@ -344,6 +345,8 @@ if ( ! class_exists( 'VB_Metadata_Export_Common' ) ) {
 				$author = $last_name . ', ' . $first_name;
 			} elseif ( ! empty( $last_name ) ) {
 				$author = $last_name;
+			} elseif ( ! empty( $first_name ) ) {
+				$author = $first_name;
 			}
 			return $author;
 		}

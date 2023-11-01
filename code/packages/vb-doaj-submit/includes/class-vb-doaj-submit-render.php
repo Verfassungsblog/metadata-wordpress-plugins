@@ -66,7 +66,8 @@ if ( ! class_exists( 'VB_DOAJ_Submit_Render' ) ) {
 		}
 
 		/**
-		 * Return the name of the post author in the format of first name last name.
+		 * Return the name of the post author in the format of first name last name. 
+		 * In case only a first name or last name is available, return that. 
 		 *
 		 * @param int $author user id of the post author.
 		 * @return string the name of the post author
@@ -80,6 +81,8 @@ if ( ! class_exists( 'VB_DOAJ_Submit_Render' ) ) {
 				$author = $first_name . ' ' . $last_name;
 			} elseif ( ! empty( $last_name ) ) {
 				$author = $last_name;
+			} elseif ( ! empty( $first_name ) ) {
+				$author = $first_name;
 			}
 			return $author;
 		}
