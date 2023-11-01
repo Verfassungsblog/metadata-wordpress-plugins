@@ -51,6 +51,7 @@ if ( ! class_exists( 'VB_Author_Affiliations_REST' ) ) {
 		 */
 		protected function get_affiliation_from_rorid( $user_id ) {
 			$rorid = trim( $this->common->get_user_meta_field_value( 'rorid_meta_key', $user_id ) );
+			$rorid = str_replace("https://ror.org", "", $rorid);
 			if ( empty( $rorid ) ) {
 				return false;
 			}
