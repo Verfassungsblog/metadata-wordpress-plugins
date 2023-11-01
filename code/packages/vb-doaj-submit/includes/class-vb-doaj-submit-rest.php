@@ -343,13 +343,17 @@ if ( ! class_exists( 'VB_DOAJ_Submit_REST' ) ) {
 			}
 
 			// parse success response.
-			$json_data = json_decode( wp_remote_retrieve_body( $response ) );
-			if ( json_last_error() !== JSON_ERROR_NONE ) {
-				$this->status->set_last_error( 'response is invalid json' );
-				$this->status->set_post_submit_status( $post, VB_DOAJ_Submit_Status::SUBMIT_ERROR );
-				return false;
+			if ( empty( $article_id ) ) {
+				// only parse response as json if new article is submitted
+				// otherwise, updates to articles will have empty body as response
+				$json_data = json_decode( wp_remote_retrieve_body( $response ) );
+				if ( json_last_error() !== JSON_ERROR_NONE ) {
+					$this->status->set_last_error( 'response is invalid json' );
+					$this->status->set_post_submit_status( $post, VB_DOAJ_Submit_Status::SUBMIT_ERROR );
+					return false;
+				}
+				$article_id = $json_data->id;
 			}
-			$article_id = $json_data->id;
 
 			// update post status.
 			$this->status->set_post_doaj_article_id( $post, $article_id );
