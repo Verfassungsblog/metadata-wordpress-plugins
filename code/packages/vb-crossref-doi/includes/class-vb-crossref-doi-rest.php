@@ -175,16 +175,22 @@ if ( ! class_exists( 'VB_CrossRef_DOI_REST' ) ) {
 				$error_message = $response->get_error_message();
 				$error_code    = $response->get_error_code();
 				if ( strpos( $error_message, 'Operation timed out' ) === false ) {
-					$this->status->set_last_error( '[Request Error "' . $error_code . '"] ' . $error_message );
+					$this->status->set_last_error( 
+						'[ Post id=' . $post->ID . '] request error "' . $error_code . '" ' . $error_message 
+					);
 				}
 				return false;
 			}
 			$status_code = wp_remote_retrieve_response_code( $response );
 			if ( 401 === $status_code ) {
-				$this->status->set_last_error( 'CrossRef API Key not correct (status code "' . $status_code . '")' );
+				$this->status->set_last_error( 
+					'[ Post id=' . $post->ID . '] CrossRef API Key not correct (status code "' . $status_code . '")' 
+				);
 				return false;
 			} elseif ( 200 !== $status_code && 403 !== $status_code ) {
-				$this->status->set_last_error( 'CrossRef request has invalid status code "' . $status_code . '"' );
+				$this->status->set_last_error( 
+					'[ Post id=' . $post->ID . '] CrossRef request has invalid status code "' . $status_code . '"' 
+				);
 				return false;
 			}
 
@@ -211,7 +217,7 @@ if ( ! class_exists( 'VB_CrossRef_DOI_REST' ) ) {
 				$this->status->set_post_submit_error( $post, $msg );
 				$this->status->set_post_submit_status( $post, VB_CrossRef_DOI_Status::SUBMIT_ERROR );
 				$this->status->set_last_error(
-					'CrossRef request failed with status code "' . $status_code . '" and
+					'[ Post id=' . $post->ID . '] Submission failed with status code "' . $status_code . '" and
                     message "' . $msg . '" (batch id "' . $batch_id . '", submission id "' . $submission_id . '")'
 				);
 				return false;
