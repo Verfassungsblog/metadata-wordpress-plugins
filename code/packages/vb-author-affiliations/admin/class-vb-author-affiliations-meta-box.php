@@ -163,7 +163,7 @@ if ( ! class_exists( 'VB_Author_Affiliations_Meta_Box' ) ) {
 				if ( ! array_key_exists( $author_id, $author_affiliations ) && $autofill ) {
 					$affiliation = $this->rest->retrieve_author_affiliation( $author_id );
 					$rorid       = trim( $this->common->get_user_meta_field_value( 'rorid_meta_key', $author_id ) );
-					$rorid       = str_replace("https://ror.org", "", $rorid);
+					$rorid       = str_replace("https://ror.org/", "", $rorid);
 
 					$author_affiliations[ $author_id ] = array(
 						'name'  => $affiliation,
