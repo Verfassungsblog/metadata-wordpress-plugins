@@ -3,5 +3,5 @@
 cd "$(dirname "$0")"
 source ./common.sh
 
-rm -rf ../../../data/wordpress
-rm -rf ../../../data/mysql
+rm -rf ${DATA_DIR}/wordpress
+rm -rf ${DATA_DIR}/database

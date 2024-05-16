@@ -2,7 +2,7 @@ FROM docker.io/cytopia/phpcs:3-php7.4
 
 RUN apk add git coreutils bash
 
-RUN git clone -b master https://github.com/WordPress/WordPress-Coding-Standards.git /wpcs
+RUN git clone -b main https://github.com/WordPress/WordPress-Coding-Standards.git /wpcs
 
 RUN phpcs --config-set installed_paths /wpcs
 

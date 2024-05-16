@@ -5,7 +5,7 @@ services:
   database:
     build:
       context: .
-      dockerfile: Dockerfile.mysql
+      dockerfile: Dockerfile.mariadb
     restart: always
     environment:
       MYSQL_DATABASE: ${MYSQL_DATABASE:-wordpress}
@@ -13,7 +13,8 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-wordpress}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-wordpress}
     volumes:
-      - ${DATA_DIR}/mysql:/var/lib/mysql:z
+      - ${DATA_DIR}/database:/var/lib/mysql:z
+    userns_mode: "keep-id:uid=999,gid=999"
 
   wordpress:
     build:
@@ -37,6 +38,7 @@ services:
       - ${WORKSPACE_DIR}/code/packages/vb-doaj-submit:/var/www/html/wp-content/plugins/vb-doaj-submit:z
       - ${WORKSPACE_DIR}/code/packages/vb-gnd-taxonomy:/var/www/html/wp-content/plugins/vb-gnd-taxonomy:z
       - ${WORKSPACE_DIR}/code/packages/vb-metadata-export:/var/www/html/wp-content/plugins/vb-metadata-export:z
+    userns_mode: "keep-id:uid=33,gid=33"
     depends_on:
       - database
 

@@ -1,3 +1,0 @@
-FROM docker.io/library/mysql:8
-
-USER root

@@ -13,7 +13,7 @@ wp-cli () {
 EOF
 }
 
-wp-cli core install --url=localhost:8080 --title="Verfassungsblog" --admin_user=user --admin_password=test --admin_email=user@test.com
+wp-cli core install --url=localhost:8080 --title="Verfassungsblog" --admin_user=admin --admin_password=password --admin_email=user@test.com
 wp-cli plugin install advanced-custom-fields classic-editor co-authors-plus debug-bar query-monitor wp-crontrol
 wp-cli plugin update --all
 wp-cli theme update --all
