@@ -1,0 +1,14 @@
+.vb-gnd-taxonomy-autosuggest-item {
+	display: flex;
+	flex-direction: column;
+}
+
+.vb-gnd-taxonomy-autosuggest-label {
+	display: flex;
+	justify-content: space-between;
+
+}
+
+.vb-gnd-taxonomy-autosuggest-label-text {
+	font-weight: 700;
+}

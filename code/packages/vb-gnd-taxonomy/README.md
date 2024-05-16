@@ -59,6 +59,13 @@ You can also use custom templates as described in the WordPress [documentation](
 
 ## Changelog
 
+### v0.3
+
+- Improve GND autosuggestion visualization to include the term category
+- Make GND autosuggestion list flip its position if there is not enough screen space available
+- Fix GND autosuggestion highlighting on taxonomy edit page
+- Update GND entity description autofill to include more fallbacks for various descriptions
+
 ### v0.2.2
 
 - Add link to GitHub as plugin website

@@ -245,10 +245,26 @@ if ( ! class_exists( 'VB_GND_Taxonomy_Admin_Edit' ) ) {
 		}
 
 		/**
+		 * WordPress admin print styles hook.
+		 */
+		public function action_admin_print_styles() {
+			wp_enqueue_style( $this->common->plugin_name . '-admin-autosuggest-styles' );
+		}
+
+		/**
 		 * WordPress admin init action hook.
 		 */
 		public function action_admin_init() {
 			add_action( 'admin_notices', array( $this, 'admin_notices' ) );
+
+			// add css.
+			wp_register_style(
+				$this->common->plugin_name . '-admin-autosuggest-styles',
+				plugins_url( 'css/autosuggest.css', __FILE__ ),
+				array(),
+				filemtime( realpath( plugin_dir_path( __FILE__ ) . 'css/autosuggest.css' ) ),
+				'screen'
+			);
 		}
 
 		/**
@@ -279,6 +295,7 @@ if ( ! class_exists( 'VB_GND_Taxonomy_Admin_Edit' ) ) {
 
 			add_action( 'admin_init', array( $this, 'action_admin_init' ) );
 			add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
+			add_action( 'admin_print_styles', array( $this, 'action_admin_print_styles' ) );
 			add_filter( 'pre_insert_term', array( $this, 'filter_pre_insert_term' ), 10, 3 );
 
 		}
