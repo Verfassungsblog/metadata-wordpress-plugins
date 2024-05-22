@@ -75,7 +75,7 @@ if ( ! class_exists( 'VB_Metadata_Export_Common' ) ) {
 					'copyright_meta_key'                  => 'copyright',
 					'funding_meta_key'                    => 'funding',
 
-					// meta tags
+					// meta tags.
 					'metatags_enabled'                    => true,
 					'metatags_dc_enabled'                 => true,
 					'metatags_hw_enabled'                 => true,
@@ -116,7 +116,7 @@ if ( ! class_exists( 'VB_Metadata_Export_Common' ) ) {
 					// theme.
 					'template_priority'                   => 10,
 
-					// meta tags
+					// meta tags.
 					'metatags_enabled'                    => true,
 					'metatags_dc_enabled'                 => true,
 					'metatags_hw_enabled'                 => true,
@@ -346,12 +346,12 @@ if ( ! class_exists( 'VB_Metadata_Export_Common' ) ) {
 		 * @return string the first available doi for the post or false
 		 */
 		public function get_post_doi( $post ) {
-			$doi_meta_keys = explode(",", $this->get_settings_field_value( 'doi_meta_key' ), 2);
-			$doi_meta_keys = array_filter(array_map('trim', $doi_meta_keys));
+			$doi_meta_keys = explode( ',', $this->get_settings_field_value( 'doi_meta_key' ), 2 );
+			$doi_meta_keys = array_filter( array_map( 'trim', $doi_meta_keys ) );
 
 			foreach ( $doi_meta_keys as $meta_key ) {
 				$doi = get_post_meta( $post->ID, $meta_key, true );
-				if ( !empty($doi) ) {
+				if ( ! empty( $doi ) ) {
 					return $doi;
 				}
 			}

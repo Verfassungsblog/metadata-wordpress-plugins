@@ -327,8 +327,9 @@ if ( ! class_exists( 'VB_Metadata_Export_OAI_PMH' ) ) {
 
 			$require_doi = $this->common->get_settings_field_value( 'require_doi' );
 			if ( $require_doi ) {
-				$doi_meta_keys = explode(",", $this->common->get_settings_field_value( 'doi_meta_key' ), 2);
-				$doi_meta_keys = array_filter(array_map('trim', $doi_meta_keys));
+				$doi_meta_keys            = $this->common->get_settings_field_value( 'doi_meta_key' );
+				$doi_meta_keys            = explode( ',', $doi_meta_keys, 2 );
+				$doi_meta_keys            = array_filter( array_map( 'trim', $doi_meta_keys ) );
 				$query_args['meta_query'] = array( // phpcs:ignore
 					'relation' => 'OR',
 					array(
@@ -337,8 +338,9 @@ if ( ! class_exists( 'VB_Metadata_Export_OAI_PMH' ) ) {
 						'compare' => '!=',
 					),
 				);
-				if ( count($doi_meta_keys) == 2 ) {
-					array_push($query_args['meta_query'],
+				if ( count( $doi_meta_keys ) === 2 ) {
+					array_push(
+						$query_args['meta_query'],
 						array(
 							'key'     => $doi_meta_keys[1],
 							'value'   => '',
@@ -392,9 +394,9 @@ if ( ! class_exists( 'VB_Metadata_Export_OAI_PMH' ) ) {
 			$options     = array(
 				'offset'         => $next_offset,
 				'from'           => empty( $from ) ? $this->get_earliest_post_modified_date() : $from,
-				'until'          => empty ( $until ) ? $now : $until,
+				'until'          => empty( $until ) ? $now : $until,
 				'metadataPrefix' => $prefix,
-				'set'            => empty ( $set ) ? "posts" : $set,
+				'set'            => empty( $set ) ? 'posts' : $set,
 			);
 			$token       = http_build_query( $options );
 			return implode(
