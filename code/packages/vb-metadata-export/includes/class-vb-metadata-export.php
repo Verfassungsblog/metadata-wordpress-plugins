@@ -10,6 +10,7 @@
  */
 require_once plugin_dir_path( __FILE__ ) . '../admin/class-vb-metadata-export-admin.php';
 require_once plugin_dir_path( __FILE__ ) . '/class-vb-metadata-export-shortcode.php';
+require_once plugin_dir_path( __FILE__ ) . '/class-vb-metadata-export-metatags.php';
 
 if ( ! class_exists( 'VB_Metadata_Export' ) ) {
 
@@ -54,6 +55,13 @@ if ( ! class_exists( 'VB_Metadata_Export' ) ) {
 		protected $oaipmh;
 
 		/**
+		 * Metatags class
+		 *
+		 * @var VB_Metadata_Export_Metatags
+		 */
+		protected $metatags;
+
+		/**
 		 * Intialize main class.
 		 *
 		 * @param string $base_file path to plugin base file.
@@ -65,6 +73,7 @@ if ( ! class_exists( 'VB_Metadata_Export' ) ) {
 			$this->admin     = new VB_Metadata_Export_Admin( $plugin_name );
 			$this->shortcode = new VB_Metadata_Export_Shortcode( $plugin_name );
 			$this->oaipmh    = new VB_Metadata_Export_OAI_PMH( $plugin_name );
+			$this->metatags  = new VB_Metadata_Export_Metatags( $plugin_name );
 		}
 
 		/**
@@ -169,6 +178,7 @@ if ( ! class_exists( 'VB_Metadata_Export' ) ) {
 			$this->admin->run();
 			$this->shortcode->run();
 			$this->oaipmh->run();
+			$this->metatags->run();
 		}
 
 	}

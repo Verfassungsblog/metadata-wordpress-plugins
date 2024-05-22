@@ -75,6 +75,11 @@ if ( ! class_exists( 'VB_Metadata_Export_Common' ) ) {
 					'copyright_meta_key'                  => 'copyright',
 					'funding_meta_key'                    => 'funding',
 
+					// meta tags
+					'metatags_enabled'                    => true,
+					'metatags_dc_enabled'                 => true,
+					'metatags_hw_enabled'                 => true,
+
 					// marc21xml.
 					'marc21xml_enabled'                   => true,
 					'marc21_doi_as_control_number'        => true,
@@ -110,6 +115,11 @@ if ( ! class_exists( 'VB_Metadata_Export_Common' ) ) {
 
 					// theme.
 					'template_priority'                   => 10,
+
+					// meta tags
+					'metatags_enabled'                    => true,
+					'metatags_dc_enabled'                 => true,
+					'metatags_hw_enabled'                 => true,
 
 					// marc21xml.
 					'marc21xml_enabled'                   => true,
@@ -206,7 +216,7 @@ if ( ! class_exists( 'VB_Metadata_Export_Common' ) ) {
 				return false;
 			}
 			if ( $this->is_format_requiring_doi( $format ) ) {
-				$doi = $this->get_post_meta_field_value( 'doi_meta_key', $post );
+				$doi = $this->get_post_doi( $post );
 				if ( empty( $doi ) ) {
 					return false;
 				}
@@ -330,7 +340,27 @@ if ( ! class_exists( 'VB_Metadata_Export_Common' ) ) {
 		}
 
 		/**
-		 * Return the name of the post author in the format of last name, first name. 
+		 * Return doi from the first doi meta field that is not empty.
+		 *
+		 * @param WP_Post $post the post whose doi is supposed to be returned.
+		 * @return string the first available doi for the post or false
+		 */
+		public function get_post_doi( $post ) {
+			$doi_meta_keys = explode(",", $this->get_settings_field_value( 'doi_meta_key' ), 2);
+			$doi_meta_keys = array_filter(array_map('trim', $doi_meta_keys));
+
+			foreach ( $doi_meta_keys as $meta_key ) {
+				$doi = get_post_meta( $post->ID, $meta_key, true );
+				if ( !empty($doi) ) {
+					return $doi;
+				}
+			}
+
+			return false;
+		}
+
+		/**
+		 * Return the name of the post author in the format of last name, first name.
 		 * In case only a first name or last name is available, return that.
 		 *
 		 * @param int $author user id of the post author.

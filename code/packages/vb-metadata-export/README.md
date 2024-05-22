@@ -141,6 +141,11 @@ The OAI-PMH 2.0 base URL is `https://example.com/oai/repository/`. There is no o
 
 ## Changelog
 
+### v0.3.0
+
+- Allow to export meta data es HTML meta tags in Dublin Core and Highwire format
+- Allow to specify as second custom meta field that contains the DOI of a post
+
 ### v0.2.2
 
 - Add link to GitHub as plugin website

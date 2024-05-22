@@ -48,7 +48,7 @@ if ( ! class_exists( 'VB_Metadata_Export_DC' ) ) {
 		 * @return string the rendered Dublin Core identifier tags as string
 		 */
 		public function render_identifier( $post ) {
-			$doi      = $this->common->get_post_meta_field_value( 'doi_meta_key', $post );
+			$doi      = $this->common->get_post_doi( $post );
 			$post_url = get_the_permalink( $post );
 
 			$xml = implode(

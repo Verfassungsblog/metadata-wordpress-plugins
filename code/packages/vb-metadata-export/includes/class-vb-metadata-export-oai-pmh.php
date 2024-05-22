@@ -327,15 +327,25 @@ if ( ! class_exists( 'VB_Metadata_Export_OAI_PMH' ) ) {
 
 			$require_doi = $this->common->get_settings_field_value( 'require_doi' );
 			if ( $require_doi ) {
-				$doi_meta_key             = $this->common->get_settings_field_value( 'doi_meta_key' );
+				$doi_meta_keys = explode(",", $this->common->get_settings_field_value( 'doi_meta_key' ), 2);
+				$doi_meta_keys = array_filter(array_map('trim', $doi_meta_keys));
 				$query_args['meta_query'] = array( // phpcs:ignore
 					'relation' => 'OR',
 					array(
-						'key'     => $doi_meta_key,
+						'key'     => $doi_meta_keys[0],
 						'value'   => '',
 						'compare' => '!=',
 					),
 				);
+				if ( count($doi_meta_keys) == 2 ) {
+					array_push($query_args['meta_query'],
+						array(
+							'key'     => $doi_meta_keys[1],
+							'value'   => '',
+							'compare' => '!=',
+						),
+					);
+				}
 			}
 
 			return new WP_Query( $query_args );
@@ -713,7 +723,7 @@ if ( ! class_exists( 'VB_Metadata_Export_OAI_PMH' ) ) {
 
 			$require_doi = $this->common->get_settings_field_value( 'require_doi' );
 			if ( $require_doi ) {
-				$doi = $this->common->get_post_meta_field_value( 'doi_meta_key', $post );
+				$doi = $this->common->get_post_doi( $post );
 				if ( empty( $doi ) ) {
 					return $this->render_error( 'GetRecord', 'idDoesNotExist', 'invalid identifier' );
 				}

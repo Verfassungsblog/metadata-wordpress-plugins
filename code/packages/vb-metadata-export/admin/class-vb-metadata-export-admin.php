@@ -10,6 +10,7 @@
  */
 require_once plugin_dir_path( __FILE__ ) . '../includes/class-vb-metadata-export-common.php';
 require_once plugin_dir_path( __FILE__ ) . '../includes/class-vb-metadata-export-converter.php';
+require_once plugin_dir_path( __FILE__ ) . '../includes/class-vb-metadata-export-metatags.php';
 require_once plugin_dir_path( __FILE__ ) . '../includes/class-vb-metadata-export-marc21xml.php';
 require_once plugin_dir_path( __FILE__ ) . '../includes/class-vb-metadata-export-oai-pmh.php';
 require_once plugin_dir_path( __FILE__ ) . '/class-vb-metadata-export-settings-fields.php';
@@ -51,12 +52,13 @@ if ( ! class_exists( 'VB_Metadata_Export_Admin' ) ) {
 		 */
 		protected function get_tab_labels() {
 			return array(
-				'general' => 'General',
-				'fields'  => 'Custom Fields',
-				'marc21'  => 'Marc21 XML',
-				'mods'    => 'MODS',
-				'dc'      => 'Dublin Core',
-				'oai_pmh' => 'OAI-PMH',
+				'general'  => 'General',
+				'fields'   => 'Custom Fields',
+				'metatags' => 'HTML Meta Tags',
+				'marc21'   => 'Marc21 XML',
+				'mods'     => 'MODS',
+				'dc'       => 'Dublin Core',
+				'oai_pmh'  => 'OAI-PMH',
 			);
 		}
 
@@ -73,6 +75,7 @@ if ( ! class_exists( 'VB_Metadata_Export_Admin' ) ) {
 				'theme'        => 'Theme Settings',
 				'post_meta'    => 'Custom Fields for Posts',
 				'user_meta'    => 'Custom Fields for Users',
+				'metatags'     => 'HTML Meta Tags',
 				'marc21'       => 'Marc21 XML Settings',
 				'mods'         => 'MODS Settings',
 				'oai_pmh'      => 'OAI-PMH Settings',
@@ -93,6 +96,7 @@ if ( ! class_exists( 'VB_Metadata_Export_Admin' ) ) {
 				'theme'        => 'general',
 				'post_meta'    => 'fields',
 				'user_meta'    => 'fields',
+				'metatags'     => 'metatags',
 				'marc21'       => 'marc21',
 				'mods'         => 'mods',
 				'oai_pmh'      => 'oai_pmh',
@@ -291,6 +295,24 @@ if ( ! class_exists( 'VB_Metadata_Export_Admin' ) ) {
                     Fields (ACF) plugin. Each option may specify the ACF field key that contains the relevant information.
                     The corresponding ACF field needs to be assigned to users instead of posts. This can be achieved by
                     an ACF "location rule" for the field group: <code>User Role : is equal to : All</code>.',
+					'vb-metadata-export'
+				);
+				?>
+			</p>
+			<?php
+		}
+
+		/**
+		 * Renders the metatags section description.
+		 *
+		 * @param array $args the section arguments.
+		 */
+		public function render_metatags_section( $args ) {
+			?>
+			<p id="<?php echo esc_attr( $args['id'] ); ?>">
+				<?php
+				echo __( // phpcs:ignore
+					'The following settings influence how meta data is exported inside html meta tags.',
 					'vb-metadata-export'
 				);
 				?>
@@ -556,15 +578,25 @@ if ( ! class_exists( 'VB_Metadata_Export_Admin' ) ) {
 			// check with doi.
 			$require_doi = $this->common->get_settings_field_value( 'require_doi' );
 			if ( $require_doi ) {
-				$doi_meta_key             = $this->common->get_settings_field_value( 'doi_meta_key' );
+				$doi_meta_keys = explode(",", $this->common->get_settings_field_value( 'doi_meta_key' ), 2);
+				$doi_meta_keys = array_filter(array_map('trim', $doi_meta_keys));
 				$query_args['meta_query'] = array( // phpcs:ignore
-					'relation' => 'AND',
+					'relation' => 'OR',
 					array(
-						'key'     => $doi_meta_key,
+						'key'     => $doi_meta_keys[0],
 						'value'   => '',
 						'compare' => '!=',
 					),
 				);
+				if ( count($doi_meta_keys) == 2 ) {
+					array_push($query_args['meta_query'],
+						array(
+							'key'     => $doi_meta_keys[1],
+							'value'   => '',
+							'compare' => '!=',
+						),
+					);
+				}
 			}
 
 			// query for posts.
@@ -579,6 +611,27 @@ if ( ! class_exists( 'VB_Metadata_Export_Admin' ) ) {
 				return $posts[0];
 			}
 			return false;
+		}
+
+		/**
+		 * Render function for general tab.
+		 */
+		public function render_metatags_tab() {
+			$post = $this->find_example_post();
+			if ( ! empty( $post ) ) {
+				$renderer      = new VB_Metadata_Export_Metatags( $this->common->plugin_name );
+				$metatags_html = $renderer->render( $post );
+				$example_url   = get_the_permalink( $post );
+			}
+			?>
+			<h2>
+				<a href="<?php echo esc_attr( $example_url ); ?>">
+					<?php echo esc_html( __( 'Example', 'vb-metadata-export' ) ); ?>
+				</a>
+			</h2>
+			<p>The following meta tags would be added to the HTML header of a post:</p>
+			<pre><?php echo htmlspecialchars( $metatags_html ); // phpcs:ignore ?></pre>
+			<?php
 		}
 
 		/**

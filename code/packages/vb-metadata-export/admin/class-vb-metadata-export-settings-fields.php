@@ -217,6 +217,8 @@ if ( ! class_exists( 'VB_Metadata_Export_Settings_Fields' ) ) {
 					'placeholder' => 'meta key for the DOI',
 					'description' => 'The meta key for the custom field that contains the DOI for a post (used in
                         <a href="https://www.loc.gov/marc/bibliographic/bd024.html" target="_blank">Marc21 024a</a>).
+						Two meta keys may be provided by separating them with a comma. The first available doi is
+						used in all exports.
                         <br>The DOI should be provided as code (not as URI), e.g. <code>10.1214/aos/1176345451</code>.',
 				),
 				array(
@@ -282,6 +284,36 @@ if ( ! class_exists( 'VB_Metadata_Export_Settings_Fields' ) ) {
 					'description' => 'The meta key for the custom field that contains the GND-ID of the post author
                         (used in
                         <a href="https://www.loc.gov/marc/bibliographic/bd100.html" target="_blank">Marc21 100 0</a>).',
+				),
+
+				// ----------------- html meta tags settings ----------------
+
+				array(
+					'name'        => 'metatags_enabled',
+					'type'        => 'boolean',
+					'section'     => 'metatags',
+					'label'       => __( 'HTML Meta Tags Enabled', 'vb-metadata-export' ),
+					'description' => 'Whether any HTML meta tags will be added or not.',
+				),
+
+				array(
+					'name'        => 'metatags_dc_enabled',
+					'type'        => 'boolean',
+					'section'     => 'metatags',
+					'label'       => __( 'Add Dublin Core Meta Tags', 'vb-metadata-export' ),
+					'description' => 'If enabled, adds Dublin Core meta tags according to the
+						<a href="https://www.dublincore.org/specifications/dublin-core/dcq-html/" target="_blank">
+						documentation</a>.',
+				),
+
+				array(
+					'name'        => 'metatags_hw_enabled',
+					'type'        => 'boolean',
+					'section'     => 'metatags',
+					'label'       => __( 'Add Highwire Meta Tags', 'vb-metadata-export' ),
+					'description' => 'If enabled, adds Highwire meta tags according to the
+						<a href="https://www.zotero.org/support/dev/exposing_metadata" target="_blank">Zotero
+						documentation</a>.',
 				),
 
 				// ------------------ marc21 xml settings -------------------

@@ -146,7 +146,7 @@ if ( ! class_exists( 'VB_Metadata_Export_Marc21Xml' ) ) {
 			// control number definition see: https://www.loc.gov/marc/bibliographic/bd001.html .
 			$use_doi = $this->common->get_settings_field_value( 'marc21_doi_as_control_number' );
 			if ( $use_doi ) {
-				$doi            = $this->common->get_post_meta_field_value( 'doi_meta_key', $post );
+				$doi            = $this->common->get_post_doi( $post );
 				$control_number = $doi;
 			} else {
 				$control_number = $post->ID;
@@ -201,7 +201,7 @@ if ( ! class_exists( 'VB_Metadata_Export_Marc21Xml' ) ) {
 		 * @return string the Marc21 XML field 024 containing the DOI as string
 		 */
 		public function render_datafield_024( $post ) {
-			$doi = $this->common->get_post_meta_field_value( 'doi_meta_key', $post );
+			$doi = $this->common->get_post_doi( $post );
 			if ( ! empty( $doi ) ) {
 				return '<marc21:datafield tag="024" ind1="7" ind2=" ">' .
 					'<marc21:subfield code="a">' . $this->escape( $doi ) . '</marc21:subfield>' .
