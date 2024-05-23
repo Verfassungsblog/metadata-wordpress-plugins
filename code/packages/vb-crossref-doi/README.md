@@ -50,6 +50,10 @@ The plugin does not support any theme integration.
 
 ## Changelog
 
+### v0.3.0
+
+- No changes
+
 ### v0.2.2
 
 - Add link to GitHub as plugin website

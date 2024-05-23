@@ -8,7 +8,7 @@
  * Plugin Name: Verfassungsblog DOAJ Submit
  * Plugin URI: https://github.com/Verfassungsblog/metadata-wordpress-plugins
  * Description: Automates the submission of posts to the DOAJ
- * Version: 0.2.2
+ * Version: 0.3.0
  * Requires at least: 5.9.3
  * Requires PHP: 7.4.29
  * License: GPL v3

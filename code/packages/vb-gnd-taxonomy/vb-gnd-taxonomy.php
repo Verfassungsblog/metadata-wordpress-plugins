@@ -8,7 +8,7 @@
  * Plugin Name: Verfassungsblog GND Taxonomy
  * Plugin URI: https://github.com/Verfassungsblog/metadata-wordpress-plugins
  * Description: GND taxonomy for posts including autocomplete suggestions based on lobid.org
- * Version: 0.2.2
+ * Version: 0.3.0
  * Requires at least: 5.9.3
  * Requires PHP: 7.4.29
  * License: GPL v2 or later
