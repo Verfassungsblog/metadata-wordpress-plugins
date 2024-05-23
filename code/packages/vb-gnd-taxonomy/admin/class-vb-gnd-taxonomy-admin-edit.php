@@ -154,9 +154,9 @@ if ( ! class_exists( 'VB_GND_Taxonomy_Admin_Edit' ) ) {
 			}
 			wp_enqueue_script(
 				$this->common->plugin_name . '-admin-script',
-				plugins_url( 'js/index.js', __FILE__ ),
+				plugins_url( 'js/classic_autosuggest.js', __FILE__ ),
 				array( 'jquery', 'jquery-ui-autocomplete' ),
-				filemtime( realpath( plugin_dir_path( __FILE__ ) . 'js/index.js' ) ),
+				filemtime( realpath( plugin_dir_path( __FILE__ ) . 'js/classic_autosuggest.js' ) ),
 				false
 			);
 			wp_localize_script(

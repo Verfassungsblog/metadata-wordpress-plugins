@@ -224,7 +224,7 @@ if ( ! class_exists( 'VB_Metadata_Export_Metatags' ) ) {
 					"\n",
 					array_filter(
 						array(
-							'<!-- dublin core meta tags -->',
+							'<!-- vb-metadata-export: dublin core meta tags -->',
 							'<link rel="schema.DC" href="http://purl.org/dc/elements/1.1/" />',
 							$this->render_metatag( 'DC.type', 'electronic resource' ),
 							$this->render_metatag( 'DC.format', 'text/html' ),
@@ -250,7 +250,7 @@ if ( ! class_exists( 'VB_Metadata_Export_Metatags' ) ) {
 					"\n",
 					array_filter(
 						array(
-							'<!-- highwire meta tags -->',
+							'<!-- vb-metadata-export: highwire meta tags -->',
 							$this->render_metatag( 'citation_title', $post_title ),
 							$this->render_authors( $post, 'citation_author' ),
 							$this->render_metatag( 'citation_abstract', $post_excerpt ),
@@ -275,7 +275,7 @@ if ( ! class_exists( 'VB_Metadata_Export_Metatags' ) ) {
 		public function wp_head() {
 			global $post;
 			if ( is_single( $post ) && $this->common->get_settings_field_value( 'metatags_enabled' ) ) {
-				echo $this->render( $post ); // phpcs:ignore
+				echo "\n" . $this->render( $post ) . "\n\n"; // phpcs:ignore
 			}
 		}
 
