@@ -62,12 +62,12 @@ if ( ! class_exists( 'VB_DOAJ_Submit_Render' ) ) {
 		 * @return string the escaped string
 		 */
 		protected function escape( $str ) {
-			return html_entity_decode( $str );
+			return html_entity_decode( wp_strip_all_tags( $str ) );
 		}
 
 		/**
-		 * Return the name of the post author in the format of first name last name. 
-		 * In case only a first name or last name is available, return that. 
+		 * Return the name of the post author in the format of first name last name.
+		 * In case only a first name or last name is available, return that.
 		 *
 		 * @param int $author user id of the post author.
 		 * @return string the name of the post author

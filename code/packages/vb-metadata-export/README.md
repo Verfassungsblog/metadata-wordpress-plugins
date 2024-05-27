@@ -145,6 +145,7 @@ The OAI-PMH 2.0 base URL is `https://example.com/oai/repository/`. There is no o
 
 - Allow to export meta data es HTML meta tags in Dublin Core and Highwire format
 - Allow to specify as second custom meta field that contains the DOI of a post
+- Strip HTML tags from all meta data information
 
 ### v0.2.2
 

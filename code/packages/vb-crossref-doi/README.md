@@ -54,6 +54,7 @@ The plugin does not support any theme integration.
 
 - Allow to conveniently dismiss last error message via cross (x) in admin notice
 - Add setting that allows to disable showing the last error as admin notice
+- Strip HTML tags from all meta data information
 
 ### v0.2.2
 

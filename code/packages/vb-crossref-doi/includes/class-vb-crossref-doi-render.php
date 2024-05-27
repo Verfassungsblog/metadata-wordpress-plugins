@@ -48,7 +48,7 @@ if ( ! class_exists( 'VB_CrossRef_DOI_Render' ) ) {
 		 * @return string the escaped string
 		 */
 		protected function escape( $str ) {
-			return htmlspecialchars( html_entity_decode( $str ), ENT_XML1, 'UTF-8' );
+			return htmlspecialchars( html_entity_decode( wp_strip_all_tags( $str ) ), ENT_XML1, 'UTF-8' );
 		}
 
 		/**
