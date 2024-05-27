@@ -52,7 +52,7 @@ The plugin does not support any theme integration.
 
 ### v0.3.0
 
-- No changes
+- Allow to conveniently dismiss last error message
 
 ### v0.2.2
 

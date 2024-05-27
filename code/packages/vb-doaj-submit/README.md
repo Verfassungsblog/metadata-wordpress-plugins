@@ -76,6 +76,7 @@ The plugin does not support any theme integration.
 
 - Allow to reset error status for all posts
 - Accept 404 as valid response when deleting a post from the DOAJ
+- Allow to conveniently dismiss last error message
 
 ### v0.2.2
 

@@ -289,11 +289,31 @@ if ( ! class_exists( 'VB_CrossRef_DOI_Admin' ) ) {
 		public function admin_notices() {
 			$error = $this->status->get_last_error();
 			if ( ! empty( $error ) ) {
+				$admin_notice_field_name = $this->common->plugin_name . '_dismiss_admin_notice';
+
+				if ( ! empty( $_POST[ $admin_notice_field_name ] ) && check_admin_referer( $admin_notice_field_name ) ) {
+					$this->status->clear_last_error();
+					return;
+				}
+
 				?>
-				<div class="error notice">
+				<div class="notice notice-error is-dismissible">
 					<p>
 						<?php echo 'Error in ' . esc_html( $this->common->plugin_name ) . ': ' . esc_html( $error ); ?>
 					</p>
+					<form method="post" onsubmit="return;">
+						<?php
+						wp_nonce_field( $admin_notice_field_name );
+						?>
+						<button
+							type="submit"
+							name="<?php echo esc_attr( $admin_notice_field_name ); ?>"
+							value="true"
+							class="notice-dismiss"
+						>
+							<span class="screen-reader-text">dismiss</span>
+						</button>
+					</form>
 				</div>
 				<?php
 			}
