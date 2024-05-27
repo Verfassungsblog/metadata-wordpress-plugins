@@ -693,7 +693,7 @@ if ( ! class_exists( 'VB_CrossRef_DOI_Admin' ) ) {
 				<h2>
 					Example:
 					<a href="<?php echo esc_attr( get_edit_post_link( $post ) ); ?>">
-							<?php echo esc_html( get_the_title( $post ) ); ?>
+							<?php echo esc_html( wp_strip_all_tags( get_the_title( $post ) ) ); ?>
 					</a>
 				</h2>
 				<form method="post" onsubmit="return;">

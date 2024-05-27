@@ -656,7 +656,7 @@ if ( ! class_exists( 'VB_DOAJ_Submit_Admin' ) ) {
 				?>
 				<h2>
 					Example: <a href="<?php echo esc_attr( get_edit_post_link( $post ) ); ?>">
-					<?php echo esc_html( get_the_title( $post ) ); ?>
+					<?php echo esc_html( wp_strip_all_tags( get_the_title( $post ) ) ); ?>
 				</a>
 				<?php
 				if ( ! empty( $doaj_article_id ) ) {
