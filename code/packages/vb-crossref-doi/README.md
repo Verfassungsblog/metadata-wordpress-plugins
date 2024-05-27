@@ -52,7 +52,8 @@ The plugin does not support any theme integration.
 
 ### v0.3.0
 
-- Allow to conveniently dismiss last error message
+- Allow to conveniently dismiss last error message via cross (x) in admin notice
+- Add setting that allows to disable showing the last error as admin notice
 
 ### v0.2.2
 

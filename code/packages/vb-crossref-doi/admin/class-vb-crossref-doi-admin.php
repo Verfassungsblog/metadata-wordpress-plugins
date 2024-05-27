@@ -287,8 +287,9 @@ if ( ! class_exists( 'VB_CrossRef_DOI_Admin' ) ) {
 		 * Render function for displaying error message in the admin interface.
 		 */
 		public function admin_notices() {
-			$error = $this->status->get_last_error();
-			if ( ! empty( $error ) ) {
+			$error             = $this->status->get_last_error();
+			$show_admin_notice = $this->common->get_settings_field_value( 'show_admin_notice' );
+			if ( ! empty( $error ) && $show_admin_notice ) {
 				$admin_notice_field_name = $this->common->plugin_name . '_dismiss_admin_notice';
 
 				if ( ! empty( $_POST[ $admin_notice_field_name ] ) && check_admin_referer( $admin_notice_field_name ) ) {

@@ -46,6 +46,8 @@ if ( ! class_exists( 'VB_CrossRef_DOI_Common' ) ) {
 					'registrant'              => $blog_title,
 					'doi_prefix'              => 'example-prefix',
 					'doi_suffix_length'       => 16,
+					'show_admin_notice'       => true,
+					// meta data.
 					'issn'                    => '2366-7044',
 					'copyright_name_general'  => 'CC BY-SA 4.0',
 					'include_excerpt'         => true,
@@ -78,6 +80,8 @@ if ( ! class_exists( 'VB_CrossRef_DOI_Common' ) ) {
 					'api_url_submission'    => 'https://doi.crossref.org/servlet/submissionDownload',
 					'depositor_name'        => 'Wordpress Plugin ' . $this->plugin_name,
 					'doi_suffix_length'     => 16,
+					'show_admin_notice'     => true,
+					// meta data.
 					'include_excerpt'       => true,
 					// institution.
 					'institution_name'      => $blog_title,

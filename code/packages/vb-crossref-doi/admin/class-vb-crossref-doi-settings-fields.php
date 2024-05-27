@@ -129,6 +129,14 @@ if ( ! class_exists( 'VB_CrossRef_DOI_Settings_Fields' ) ) {
 					'description' => 'The length of the randomly generated suffix (min 12, max 64).',
 					'sanitize'    => 'doi_suffix_length',
 				),
+				array(
+					'name'        => 'show_admin_notice',
+					'type'        => 'boolean',
+					'section'     => 'general',
+					'label'       => 'Show Errors as Admin Notice',
+					'placeholder' => 'Show Errors as Admin Notice',
+					'description' => 'Whether to show an admin notice in case of errors.',
+				),
 
 				// -------------- meta data settings -----------------------
 

@@ -153,6 +153,14 @@ if ( ! class_exists( 'VB_DOAJ_Submit_Settings_Fields' ) ) {
 						allow to modify	the permalink or DOI of a registered DOAJ article.',
 				),
 				array(
+					'name'        => 'show_admin_notice',
+					'type'        => 'boolean',
+					'section'     => 'general',
+					'label'       => 'Show Errors as Admin Notice',
+					'placeholder' => 'Show Errors as Admin Notice',
+					'description' => 'Whether to show an admin notice in case of errors.',
+				),
+				array(
 					'name'        => 'test_without_api_key',
 					'type'        => 'boolean',
 					'section'     => 'general',

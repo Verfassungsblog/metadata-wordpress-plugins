@@ -49,6 +49,7 @@ if ( ! class_exists( 'VB_DOAJ_Submit_Common' ) ) {
 					'include_subheadline'         => false,
 					'identify_by_permalink'       => true,
 					'delete_if_permalink_changed' => false,
+					'show_admin_notice'           => true,
 					'test_without_apikey'         => false,
 					// post selection.
 					'submit_all_posts'            => true,
@@ -76,6 +77,7 @@ if ( ! class_exists( 'VB_DOAJ_Submit_Common' ) ) {
 					'include_tags'                => true,
 					'identify_by_permalink'       => true,
 					'delete_if_permalink_changed' => false,
+					'show_admin_notice'           => true,
 					'test_without_apikey'         => false,
 					// post selection.
 					'submit_all_posts'            => false,
