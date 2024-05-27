@@ -159,8 +159,14 @@ if ( ! class_exists( 'VB_DOAJ_Submit_Admin' ) ) {
 			}
 
 			if ( ! empty( $_POST['reset_last_error'] ) &&
-					check_admin_referer( $this->common->plugin_name . '_reset_last_error' ) ) {
+					check_admin_referer( $this->common->plugin_name . '_reset_error' ) ) {
 				$this->status->clear_last_error();
+			}
+
+			if ( ! empty( $_POST['reset_all_errors'] ) &&
+					check_admin_referer( $this->common->plugin_name . '_reset_error' ) ) {
+				$this->status->clear_last_error();
+				$this->update->reset_all_errors();
 			}
 
 			if ( ! empty( $_POST['manual_update'] ) &&
@@ -695,11 +701,14 @@ if ( ! class_exists( 'VB_DOAJ_Submit_Admin' ) ) {
 			</ul>
 			<form method="post" onsubmit="return;">
 				<?php
-				wp_nonce_field( $this->common->plugin_name . '_reset_last_error' );
+				wp_nonce_field( $this->common->plugin_name . '_reset_error' );
 				?>
 				<p>
 					<?php
 					submit_button( __( 'Reset Last Error', 'vb-doaj-submit' ), 'secondary', 'reset_last_error', false );
+					?>
+					<?php
+					submit_button( __( 'Reset All Errors', 'vb-doaj-submit' ), 'secondary', 'reset_all_errors', false );
 					?>
 				</p>
 			</form>

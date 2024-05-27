@@ -182,6 +182,20 @@ if ( ! class_exists( 'VB_DOAJ_Submit_Update' ) ) {
 		}
 
 		/**
+		 * Resets error status of all posts that are currently in error status.
+		 */
+		public function reset_all_errors() {
+			$query = $this->queries->query_posts_with_submit_error( false );
+			if ( $query->post_count > 0 ) {
+				foreach ( $query->posts as $post_id ) {
+					$post     = new stdClass();
+					$post->ID = $post_id;
+					$this->status->reset_post_error_status( $post );
+				}
+			}
+		}
+
+		/**
 		 * Update function that is called by the cron scheduler or manually upon user input.
 		 */
 		public function do_update() {

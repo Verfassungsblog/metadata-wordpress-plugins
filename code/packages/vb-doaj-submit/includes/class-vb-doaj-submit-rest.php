@@ -88,33 +88,38 @@ if ( ! class_exists( 'VB_DOAJ_Submit_REST' ) ) {
 		 *
 		 * @param WP_Post        $post the post which was submitted to the DOAJ.
 		 * @param WP_Error|array $response the HTTP response object.
-		 * @param int            $expected_status_code the status code that indicates success.
+		 * @param array          $expected_status_codes the status code that indicates success.
 		 * @return bool false if there was an error, else true
 		 */
-		protected function parse_repones_for_error( $post, $response, $expected_status_code ) {
+		protected function parse_response_for_error( $post, $response, $expected_status_codes ) {
 			// validate response.
 			if ( is_wp_error( $response ) ) {
-				$error = '[Request Error] ' . $response->get_error_message();
+				$error = '[ Post id=' . $post->ID . '] request error ' . $response->get_error_message();
 				$this->status->set_last_error( $error );
+				$this->status->set_post_submit_status( $post, VB_DOAJ_Submit_Status::SUBMIT_ERROR );
+				$this->status->set_post_submit_error( $post, $error );
 				return false;
 			}
 			$status_code = wp_remote_retrieve_response_code( $response );
 			if ( 400 === $status_code || 401 === $status_code || 403 === $status_code ) {
 				// parse error response.
 				$json_data = json_decode( wp_remote_retrieve_body( $response ) );
+				$error     = '[ Post id=' . $post->ID . '] ';
 				if ( json_last_error() !== JSON_ERROR_NONE ) {
-					$error = 'DOAJ responded with unknown error (status code "' . $status_code . '")';
+					$error .= 'DOAJ responded with unknown error (status code "' . $status_code . '")';
 				} else {
-					$msg   = $json_data->error;
-					$error = 'DOAJ responded with error "' . $msg . '" (status code "' . $status_code . '")';
+					$msg    = $json_data->error;
+					$error .= 'DOAJ responded with error "' . $msg . '" (status code "' . $status_code . '")';
 				}
 				$this->status->set_post_submit_status( $post, VB_DOAJ_Submit_Status::SUBMIT_ERROR );
 				$this->status->set_post_submit_error( $post, $error );
 				$this->status->set_last_error( $error );
 				return false;
-			} elseif ( $status_code !== $expected_status_code ) {
-				$this->status->set_last_error( 'DOAJ responsed with invalid status code "' . $status_code . '"' );
+			} elseif ( ! in_array( $status_code, $expected_status_codes, false ) ) {
+				$error = '[ Post id=' . $post->ID . '] DOAJ responded with invalid status code "' . $status_code . '"';
+				$this->status->set_last_error( $error );
 				$this->status->set_post_submit_status( $post, VB_DOAJ_Submit_Status::SUBMIT_ERROR );
+				$this->status->set_post_submit_error( $post, $error );
 				return false;
 			}
 
@@ -287,6 +292,7 @@ if ( ! class_exists( 'VB_DOAJ_Submit_REST' ) ) {
 					// simulate error.
 					$this->status->set_post_submit_status( $post, VB_DOAJ_Submit_Status::SUBMIT_ERROR );
 					$this->status->set_post_submit_error( $post, 'simulated error message' );
+					$this->status->set_last_error( 'simulated error message' );
 					return false;
 				}
 			}
@@ -338,18 +344,20 @@ if ( ! class_exists( 'VB_DOAJ_Submit_REST' ) ) {
 				return $this->submit_trashed_post( $post );
 			}
 
-			if ( ! $this->parse_repones_for_error( $post, $response, empty( $article_id ) ? 201 : 204 ) ) {
+			if ( ! $this->parse_response_for_error( $post, $response, array( 201, 204 ) ) ) {
 				return false;
 			}
 
 			// parse success response.
 			if ( empty( $article_id ) ) {
 				// only parse response as json if new article is submitted
-				// otherwise, updates to articles will have empty body as response
+				// otherwise, updates to articles will have empty body as response.
 				$json_data = json_decode( wp_remote_retrieve_body( $response ) );
 				if ( json_last_error() !== JSON_ERROR_NONE ) {
-					$this->status->set_last_error( '[ Post id=' . $post->ID . '] response is invalid json' );
+					$error = '[ Post id=' . $post->ID . '] response is invalid json';
+					$this->status->set_last_error( $error );
 					$this->status->set_post_submit_status( $post, VB_DOAJ_Submit_Status::SUBMIT_ERROR );
+					$this->status->set_post_submit_error( $post, $error );
 					return false;
 				}
 				$article_id = $json_data->id;
@@ -419,7 +427,7 @@ if ( ! class_exists( 'VB_DOAJ_Submit_REST' ) ) {
 				),
 			);
 
-			if ( ! $this->parse_repones_for_error( $post, $response, 204 ) ) {
+			if ( ! $this->parse_response_for_error( $post, $response, array( 204, 404 ) ) ) {
 				return false;
 			}
 

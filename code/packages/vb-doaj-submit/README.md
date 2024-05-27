@@ -74,7 +74,8 @@ The plugin does not support any theme integration.
 
 ### v0.3.0
 
-- No changes
+- Allow to reset error status for all posts
+- Accept 404 as valid response when deleting a post from the DOAJ
 
 ### v0.2.2
 

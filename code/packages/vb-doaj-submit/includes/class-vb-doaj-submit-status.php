@@ -352,6 +352,16 @@ if ( ! class_exists( 'VB_DOAJ_Submit_Status' ) ) {
 		}
 
 		/**
+		 * Resets error status of a post.
+		 *
+		 * @param WP_Post $post the post.
+		 */
+		public function reset_post_error_status( $post ) {
+			$this->clear_post_submit_error( $post );
+			$this->clear_post_submit_status( $post );
+		}
+
+		/**
 		 * Resets all status information of this plugin (except for known DOAJ article ids).
 		 */
 		public function reset_status() {
