@@ -202,17 +202,40 @@ if ( ! class_exists( 'VB_Metadata_Export_Metatags' ) ) {
 		}
 
 		/**
+		 * Render doi as meta tag
+		 *
+		 * @param WP_Post $post the post.
+		 * @param string  $meta_name the name of the meta tag.
+		 * @return string the doi as meta tag
+		 */
+		public function render_doi( $post, $meta_name ) {
+			$doi = $this->common->get_post_doi( $post );
+
+			if ( empty( $doi ) ) {
+				return false;
+			}
+
+			return $this->render_metatag( $meta_name, 'http://dx.doi.org/' . $doi );
+		}
+
+		/**
 		 * Return fully rendered Dublin Core XML document for a post.
 		 *
 		 * @param WP_Post $post the post.
 		 * @return string the rendered Dublin Core XML document as string
 		 */
 		public function render( $post ) {
+			$post_doi    = $this->common->get_post_doi( $post );
+			$require_doi = $this->common->get_settings_field_value( 'require_doi' );
+
+			if ( empty( $post_doi ) && $require_doi ) {
+				return false;
+			}
+
 			$dc_str         = '';
 			$highwire_str   = '';
 			$post_title     = get_the_title( $post );
 			$post_date      = get_the_date( 'Y-m-d', $post );
-			$post_doi       = $this->common->get_post_doi( $post );
 			$post_excerpt   = wp_strip_all_tags( get_the_excerpt( $post ) );
 			$post_publisher = $this->common->get_settings_field_value( 'publisher' );
 			$post_permalink = get_the_permalink( $post );
@@ -234,7 +257,7 @@ if ( ! class_exists( 'VB_Metadata_Export_Metatags' ) ) {
 							$this->render_metatag( 'DC.language', $post_language ),
 							$this->render_metatag( 'DC.date', $post_date ),
 							$this->render_metatag( 'DC.publisher', $post_publisher ),
-							$this->render_metatag( 'DC.identifier', 'http://dx.doi.org/' . $post_doi ),
+							$this->render_doi( $post, 'DC.identifier' ),
 							$this->render_metatag( 'DC.identifier', $post_permalink ),
 							$this->render_copyright( $post, 'DC.rights' ),
 							$this->render_dc_subjects( $post ),
@@ -257,7 +280,7 @@ if ( ! class_exists( 'VB_Metadata_Export_Metatags' ) ) {
 							$this->render_metatag( 'citation_date', $post_date ),
 							$this->render_metatag( 'citation_journal_title', $post_blog_title ),
 							$this->render_metatag( 'citation_publisher', $post_publisher ),
-							$this->render_metatag( 'citation_doi', 'http://dx.doi.org/' . $post_doi ),
+							$this->render_doi( $post, 'citation_doi' ),
 							$this->render_metatag( 'citation_fulltext_html_url', $post_permalink ),
 							$this->render_metatag( 'citation_issn', $post_issn ),
 							$this->render_highwire_keywords( $post ),
